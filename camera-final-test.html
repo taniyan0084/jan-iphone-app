@@ -1,0 +1,292 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>にゃんSearch</title><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="./jan-cat-180.png"><link rel="icon" type="image/png" sizes="192x192" href="./jan-cat-192.png"><meta name="theme-color" content="#173b66"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="にゃんSearch"><style>
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f2f5f9;color:#162235}header{background:#173b66;color:#fff;padding:15px;font-size:20px;font-weight:700}.wrap{max-width:640px;margin:auto;padding:14px}.box{background:white;padding:15px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 5px #dce2ea}label{display:block;font-weight:700;margin-bottom:8px}input[type=text]{font-size:30px;letter-spacing:3px;width:100%;padding:12px;border:2px solid #9fb1c4;border-radius:9px}button{font-size:16px;padding:10px 14px;border:0;border-radius:8px;background:#e5eef7;color:#173b66;margin:3px}button.primary{background:#1768b0;color:white}button:disabled{opacity:.45}.hint{font-size:13px;color:#59697b;margin-top:8px;line-height:1.6}.candidate{display:block;width:100%;text-align:left;background:white;border-bottom:1px solid #e1e6ed;padding:13px 4px;border-radius:0}.candidate strong{display:block;font-size:16px}.candidate small{display:block;color:#576679;margin-top:4px}.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e6ebef}.row span:last-child{text-align:right;font-weight:700}.red-price{color:#c51d29!important}.muted{color:#64748b}.hidden{display:none!important}.status{font-size:15px;font-weight:700;margin:12px 0}.warn{color:#b45309}.head{font-size:20px;font-weight:750;line-height:1.45}.spec{color:#526276;margin-top:7px}.tag{display:inline-block;background:#e6f1fa;border-radius:5px;padding:3px 6px;margin:5px 5px 0 0;font-size:13px}#reader{width:100%;min-height:240px;background:#17212b;border-radius:10px;overflow:hidden}#reader video{width:100%!important;height:auto!important;object-fit:contain!important}#reader{min-height:300px}#reader__scan_region{width:100%!important}#reader__scan_region video{width:100%!important}#cameraBox{margin-top:10px}.ok{color:#08764b}#loadStatus{word-break:break-word}#nameQuery{font-size:20px;letter-spacing:normal}#nameSearch{margin-top:10px}input[type=file]{width:100%;max-width:100%;font-size:14px}#imageSearch:disabled{opacity:.45}#imagePanel{margin-top:14px;border-top:2px solid #e6ebef;padding-top:12px}#imagePanel iframe{width:100%;height:460px;border:1px solid #dce2ea;border-radius:8px;background:white}#imagePanel .hint{margin-bottom:8px}summary{cursor:pointer;font-weight:700}details{margin-top:8px}
+</style></head><body><header>にゃんSearch <span style="font-size:12px;font-weight:400">カメラ最終テスト</span></header><main class="wrap"><section class="box"><label for="q">JANコード（下4桁〜13桁）</label><input id="q" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" autocomplete="off" placeholder="下4桁〜JAN13桁を入力"><div class="hint">4桁から自動検索。4〜12桁は末尾一致、13桁は完全一致で検索します。</div><div style="margin-top:10px"><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div></section><section class="box"><label for="nameQuery">メーカー名・商品名あいまい検索</label><input id="nameQuery" type="text" autocomplete="off" placeholder="例：しまの えぎ"><div class="hint">メーカー名と商品名を検索。ひらがな・カタカナ、全角・半角の違いにも対応。スペース区切りでAND検索します。</div><button class="primary" id="nameSearch" type="button">🔍 商品名検索</button></section><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（V5対応）</summary><div class="hint">初回または更新時に、スマホ内の「商品マスター.json」を選択してください。ファイルは外部へ送信しません。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">V2形式のJSONも読み込めます（釣展価格は「—」、棚番は「未登録」）。V3形式は配列の13列目に釣展価格、14列目に棚番を追加します。V4形式は15列目に定番マークを追加します（空欄可）。JSONファイル名の日付から30日間有効です。期限切れのマスターは端末内から削除されます。端末内に保存できた場合は次回から自動復元します。保存容量不足の場合は次回も読み込みが必要です。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
+<script>
+'use strict';let DATA=[],currentProduct=null,scanner=null,usingDetector=false,stream=null,scanTimer=0,scanning=false,cameraSession=0,cameraBusy=false;const q=document.getElementById('q'),res=document.getElementById('result'),detail=document.getElementById('detail'),camBtn=document.getElementById('camera'),camBox=document.getElementById('cameraBox'),camStatus=document.getElementById('camStatus'),loadStatus=document.getElementById('loadStatus');function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function lower(k){let l=0,h=DATA.length;while(l<h){let m=(l+h)>>1;if(DATA[m][0]<k)l=m+1;else h=m}return l}function money(v){if(v===null||v===undefined||v==='')return '—';let n=Number(v);return Number.isFinite(n)?'¥'+n.toLocaleString('ja-JP',{maximumFractionDigits:2}):esc(v)}function line(k,v){return '<div class="row"><span>'+k+'</span><span>'+v+'</span></div>'}function show(p){if(!masterValid())return;currentProduct=p;document.getElementById('imageSearch').disabled=false;res.classList.add('hidden');detail.classList.remove('hidden');detail.innerHTML='<button id="back">← 候補に戻る</button><div class="head">'+esc(p[3])+'</div><div class="spec">'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</div><div class="tag">'+esc(p[2])+'</div><div class="tag">JAN '+esc(p[1])+'</div><div style="margin-top:12px">'+line('定価',money(p[6]))+line('通常卸',money(p[7]))+line('売出卸','<span class="red-price">'+money(p[8])+'</span>')+line('釣展価格','<span class="red-price">'+money(p.length>12?p[12]:null)+'</span>')+line('倉庫在庫実数',p[9]===null||p[9]===undefined?'データなし':esc(p[9]))+line('メーカー在庫',p[11]===null||p[11]===undefined||String(p[11]).trim()===''?'要確認':esc(p[11]))+line('定番',p.length>14&&p[14]!==null&&p[14]!==undefined?esc(p[14]):'')+line('棚番',p.length>13&&p[13]!==null&&p[13]!==undefined&&String(p[13]).trim()!==''?esc(p[13]):'未登録')+'</div>';document.getElementById('back').onclick=()=>{currentProduct=null;document.getElementById('imageSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden')}}function search(){if(!masterValid())return;currentProduct=null;document.getElementById('imageSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden');let v=q.value.replace(/\D/g,'').slice(0,13);if(q.value!==v)q.value=v;if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}if(v.length<4){res.innerHTML='<div class="muted">JANの下4桁〜JAN13桁を入力してください。</div>';return}let matches=[];if(v.length===13){for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0')===v)matches.push(i)}else if(v.length===6){let start=lower(v),end=start;while(end<DATA.length&&DATA[end][0]===v)end++;for(let i=start;i<end;i++)matches.push(i)}else{for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0').endsWith(v))matches.push(i)}let n=matches.length;if(!n){res.innerHTML='<div class="status warn">該当商品なし</div>';return}if(n===1){show(DATA[matches[0]]);return}res.innerHTML='<div class="status">末尾'+v.length+'桁が一致：'+n.toLocaleString()+'件</div><div id="candidates"></div>';let c=document.getElementById('candidates');let limit=Math.min(n,150);for(let j=0;j<limit;j++){let p=DATA[matches[j]],b=document.createElement('button');b.className='candidate';b.innerHTML='<strong>'+esc(p[3])+'</strong><small>'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</small><small>'+esc(p[2])+' ／ JAN '+esc(p[1])+'</small>';b.onclick=()=>show(p);c.appendChild(b)}if(n>limit)c.insertAdjacentHTML('beforeend','<div class="hint">先頭150件を表示。桁数を増やすと絞れます。</div>')}
+
+// メーカー名＋商品名のAND検索。NFKCで全半角を統一し、ひらがなをカタカナへ寄せる。
+// 入力とマスターの両方に同じ変換を行う（オフラインで動作）。
+function normalizeName(s){
+ return String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP')
+  .replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));
+}
+function searchByName(){
+ if(!masterValid())return;
+ currentProduct=null;document.getElementById('imageSearch').disabled=true;
+ detail.classList.add('hidden');res.classList.remove('hidden');
+ const words=normalizeName(document.getElementById('nameQuery').value).trim().split(/\s+/u).filter(Boolean);
+ if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
+ if(!words.length){res.innerHTML='<div class="status warn">メーカー名・商品名のキーワードを入力してください。</div>';return}
+ const hits=[];
+ for(let i=0;i<DATA.length;i++){
+  const name=normalizeName(String(DATA[i][2]??'')+' '+String(DATA[i][3]??''));
+  if(words.every(w=>name.includes(w))){hits.push(i);if(hits.length>=50)break}
+ }
+ if(hits.length>=50){res.innerHTML='<div class="status warn">候補が50件以上あります。キーワードを追加して絞り込んでください。</div>';return}
+ if(hits.length===0){res.innerHTML='<div class="status warn">該当商品がありません。</div>';return}
+ if(hits.length===1){show(DATA[hits[0]]);return}
+ res.innerHTML='<div class="status">メーカー名・商品名検索：'+hits.length+'件</div><div id="candidates"></div>';
+ const c=document.getElementById('candidates');
+ for(const i of hits){const p=DATA[i],b=document.createElement('button');b.className='candidate';
+ b.innerHTML='<strong>'+esc(p[3])+'</strong><small>'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</small><small>'+esc(p[2])+' ／ JAN '+esc(p[1])+'</small>';
+ b.onclick=()=>show(p);c.appendChild(b)}
+}
+document.getElementById('nameSearch').onclick=searchByName;
+document.getElementById('nameQuery').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchByName()}});
+function googleImagesUrl(p){const jan=String(p[1]??'').replace(/\D/g,'');return 'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(jan)}
+function openGoogleImages(){if(!masterValid()||!currentProduct)return;const jan=String(currentProduct[1]??'').replace(/\D/g,'');if(jan.length!==13){alert('画像検索にはJAN13桁が必要です。');return}const url=googleImagesUrl(currentProduct);if(window.AndroidApp&&window.AndroidApp.openExternalUrl)window.AndroidApp.openExternalUrl(url);else window.open(url,'_blank')}
+document.getElementById('imageSearch').onclick=openGoogleImages;
+// JSON_YYYYMMDD.json / YYYYMMDD_JSON.json の日付を基準に30日間有効。
+// 有効期限は作成日+30日の午前0時（端末のローカル日付）。
+const MASTER_DAYS=30;
+let masterExpiry=null, expiring=false;
+function parseMasterDate(filename){
+ const m=/^(?:JSON_(\d{8})|(\d{8})_JSON)\.json$/i.exec(filename);
+ if(!m)throw Error('ファイル名は JSON_YYYYMMDD.json または YYYYMMDD_JSON.json にしてください');
+ const d=m[1]||m[2],y=Number(d.slice(0,4)),mo=Number(d.slice(4,6)),day=Number(d.slice(6,8));
+ const date=new Date(y,mo-1,day);
+ if(date.getFullYear()!==y||date.getMonth()!==mo-1||date.getDate()!==day)throw Error('ファイル名の日付が正しくありません');
+ const today=new Date();today.setHours(0,0,0,0);
+ if(date>today)throw Error('ファイル名の作成日が未来になっています');
+ const expiry=new Date(y,mo-1,day+MASTER_DAYS);
+ if(today>=expiry)throw Error('このJSONは作成日から30日が経過しているため読み込めません');
+ return expiry.getTime();
+}
+function expiryLabel(ms){return new Date(ms).toLocaleDateString('ja-JP')+' 0:00';}
+function resetMaster(message){
+ DATA=[];masterExpiry=null;currentProduct=null;camBtn.disabled=true;
+ document.getElementById('imageSearch').disabled=true;
+ document.getElementById('nameQuery').value='';q.value='';
+ detail.classList.add('hidden');res.classList.remove('hidden');
+ res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';
+ loadStatus.textContent=message;
+}
+function masterValid(){
+ if(!DATA.length)return true;
+ if(!Number.isFinite(masterExpiry)||Date.now()>=masterExpiry){void expireMaster();return false;}
+ return true;
+}
+async function expireMaster(){
+ if(expiring)return;expiring=true;
+ resetMaster('30日間の有効期限が終了しました。新しいJSONを読み込んでください。');
+ try{await stopCamera();await dbDelete();}catch(e){loadStatus.textContent='期限切れデータの削除に失敗しました。アプリを再起動してください：'+(e.message||e);}
+ finally{expiring=false;}
+}
+function dbOpen(){return new Promise((resolve,reject)=>{let r=indexedDB.open('jan-local-master-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('files');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function dbGet(){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readonly'),r=tx.objectStore('files').get('master');r.onsuccess=()=>{db.close();resolve(r.result)};r.onerror=()=>{db.close();reject(r.error)}})}
+async function dbPut(record){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').put(record,'master');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error)}})}
+async function dbDelete(){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').delete('master');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+function applyData(record,source){
+ if(!record||typeof record!=='object'||typeof record.raw!=='string'||typeof record.filename!=='string')throw Error('旧形式の保存データです。JSONを選び直してください');
+ const expiry=parseMasterDate(record.filename);
+ const d=JSON.parse(record.raw);
+ if(!Array.isArray(d)||!d.length||!Array.isArray(d[0])||d[0].length<12)throw Error('商品マスターの形式が違います');
+ masterExpiry=expiry;DATA=d;camBtn.disabled=false;
+ loadStatus.innerHTML='<span class="ok">✓ '+source+'：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
+ document.getElementById('settings').open=false;search();
+}
+document.getElementById('masterFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ loadStatus.textContent='読み込み中…';
+ try{
+  const expiry=parseMasterDate(f.name);
+  const raw=await f.text();
+  const parsed=JSON.parse(raw);
+  if(!Array.isArray(parsed)||!parsed.length||!Array.isArray(parsed[0])||parsed[0].length<12)throw Error('商品マスターの形式が違います');
+  loadStatus.textContent='端末内に保存中…';
+  await dbPut({raw,filename:f.name});
+  masterExpiry=expiry;DATA=parsed;camBtn.disabled=false;
+  loadStatus.innerHTML='<span class="ok">✓ 読み込み完了：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
+  document.getElementById('settings').open=false;
+  search();
+  alert('商品マスターの読み込みが完了しました。\n\nファイル名：'+f.name+'\n商品件数：'+DATA.length.toLocaleString()+'件\n\n端末内に保存しました。');
+ }catch(err){
+  loadStatus.textContent='読み込みまたは保存に失敗しました：'+(err.message||err);
+  alert('商品マスターの読み込み・保存に失敗しました。\n'+(err.message||err));
+ }finally{e.target.value=''}
+});
+document.getElementById('forget').onclick=async()=>{
+ if(!confirm('端末内に保存したマスターを削除しますか？'))return;
+ try{
+  await stopCamera();await dbDelete();resetMaster('保存済みマスターを削除しました');
+  alert('保存済みの商品マスターを削除しました。');
+ }catch(e){loadStatus.textContent='削除失敗：'+(e.message||e);alert('削除失敗：'+(e.message||e))}
+};
+q.addEventListener('input',search);document.getElementById('clear').onclick=()=>{q.value='';document.getElementById('nameQuery').value='';search();q.focus()};
+function scanned(code){
+ if(!masterValid())return;
+ let digits=String(code).replace(/\D/g,'');
+ if(digits.length!==13&&digits.length!==8)return;
+ // カメラはJAN全桁一致で検索。手入力は4〜12桁末尾一致／13桁完全一致。
+ q.value='';
+ currentProduct=null;detail.classList.add('hidden');res.classList.remove('hidden');
+ camStatus.textContent='読み取り完了：'+digits;
+ if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
+ let found=[];
+ for(let i=0;i<DATA.length;i++)if(String(DATA[i][1])===digits)found.push(DATA[i]);
+ if(found.length===0){res.innerHTML='<div class="status warn">JAN '+esc(digits)+'：該当商品なし</div>';return}
+ if(found.length===1){show(found[0]);return}
+ // 同一JANが複数行ある場合のみ、誤った商品を選ばないよう候補を表示。
+ res.innerHTML='<div class="status">JAN '+esc(digits)+'：同一JANの商品が'+found.length+'件あります</div><div id="candidates"></div>';
+ let c=document.getElementById('candidates');
+ for(let p of found.slice(0,150)){
+  let b=document.createElement('button');b.className='candidate';
+  b.innerHTML='<strong>'+esc(p[3])+'</strong><small>'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</small><small>'+esc(p[2])+' ／ JAN '+esc(p[1])+'</small>';
+  b.onclick=()=>show(p);c.appendChild(b);
+ }
+ if(found.length>150)c.insertAdjacentHTML('beforeend','<div class="hint">先頭150件を表示</div>');
+}
+// iPhoneカメラ改善版：画面全体を読み取り対象とし、検出できないときは別方式に切り替える。
+function validCameraJAN(value){const digits=String(value??'').replace(/\D/g,'');return digits.length===13||digits.length===8?digits:null}
+async function releaseCameraHardware(){
+ clearTimeout(scanTimer);scanTimer=0;
+ const oldScanner=scanner;scanner=null;
+ if(oldScanner){try{await oldScanner.stop()}catch(e){}try{oldScanner.clear()}catch(e){}}
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ document.getElementById('reader').replaceChildren();
+}
+// iPhone / iPad だけ読み取り方式を端末内に記憶する。Androidの方式は従来のまま。
+const appleCamera=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const SCANNER_PREF='nyan-camera-preference-v1';
+const switchBtn=document.getElementById('switchScanner');
+const retryBtn=document.getElementById('retryScanner');
+let currentEngine='',nativeAvailable=false,autoSwitched=false,engineTimer=0,engineBusy=false;
+function preferredEngine(){try{return localStorage.getItem(SCANNER_PREF)==='native'?'native':'wide'}catch(e){return 'wide'}}
+function rememberEngine(mode){if(!appleCamera)return;try{localStorage.setItem(SCANNER_PREF,mode)}catch(e){}}
+function clearEngineTimer(){clearTimeout(engineTimer);engineTimer=0}
+function setCameraStatus(message){camStatus.textContent=message}
+function updateSwitchButton(){
+ // iPhoneでは非対応端末でもボタンを表示し、理由を説明できるようにする。
+ switchBtn.classList.add('hidden');
+ switchBtn.disabled=engineBusy||!scanning||!currentEngine;
+ switchBtn.textContent=nativeAvailable?'🔄 読み取り方式を手動で切り替える':'ℹ️ 読み取り方式について';
+}
+function scheduleAppleFallback(session,mode){
+ clearEngineTimer();
+ if(!appleCamera||autoSwitched||!nativeAvailable)return;
+ // 起動・カメラ合わせの時間を考慮し、方式が起動してから8秒後に一度だけ変更。
+ engineTimer=setTimeout(()=>{
+  if(session!==cameraSession||!scanning||engineBusy||currentEngine!==mode)return;
+  autoSwitched=true;
+  void switchEngine(session,mode==='wide'?'native':'wide',true);
+ },8000);
+}
+async function stopCamera(){
+ cameraSession++;scanning=false;cameraBusy=false;engineBusy=false;
+ clearEngineTimer();switchBtn.classList.add('hidden');retryBtn.classList.add('hidden');currentEngine='';
+ await releaseCameraHardware();camBox.classList.add('hidden');
+}
+async function finishCameraRead(digits,session,mode){
+ if(session!==cameraSession||!scanning)return;
+ rememberEngine(mode);
+ await stopCamera();scanned(digits);
+}
+async function supportsNative(){
+ if(!('BarcodeDetector' in window))return false;
+ try{const f=await BarcodeDetector.getSupportedFormats();return f.includes('ean_13')||f.includes('ean_8')}catch(e){return false}
+}
+async function startNativeScanner(session){
+ if(session!==cameraSession||!scanning)return;
+ await releaseCameraHardware();
+ if(session!==cameraSession||!scanning)return;
+ const formats=(await BarcodeDetector.getSupportedFormats()).filter(f=>f==='ean_13'||f==='ean_8');
+ if(!formats.length)throw Error('この端末はJANのネイティブ認識に非対応です');
+ const detector=new BarcodeDetector({formats});
+ stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+ if(session!==cameraSession||!scanning){await releaseCameraHardware();return}
+ const v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.autoplay=true;v.srcObject=stream;
+ document.getElementById('reader').appendChild(v);await v.play();
+ if(session!==cameraSession||!scanning)return;
+ currentEngine='native';engineBusy=false;cameraBusy=false;
+ setCameraStatus('JANを画面内に映してください（読み取り方式：標準）');
+ updateSwitchButton();
+ scheduleAppleFallback(session,'native');
+ async function loop(){
+  if(session!==cameraSession||!scanning||currentEngine!=='native')return;
+  try{
+   const codes=await detector.detect(v);
+   if(session!==cameraSession||!scanning||currentEngine!=='native')return;
+   for(const code of codes){const digits=validCameraJAN(code.rawValue);if(digits){clearEngineTimer();void finishCameraRead(digits,session,'native');return}}
+  }catch(e){}
+  if(session!==cameraSession||!scanning||currentEngine!=='native')return;
+  scanTimer=setTimeout(loop,160);
+ }
+ void loop();
+}
+async function startWideScanner(session){
+ if(session!==cameraSession||!scanning)return;
+ await releaseCameraHardware();
+ if(session!==cameraSession||!scanning)return;
+ await loadZXing();
+ if(session!==cameraSession||!scanning)return;
+ const qr=new Html5Qrcode('reader',{verbose:false,formatsToSupport:[Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8]});
+ scanner=qr;
+ // 読み取り枠を指定しないことで、カメラ映像全体を対象にする。
+ await qr.start({facingMode:'environment'},{fps:appleCamera?10:12},text=>{
+  if(session!==cameraSession||!scanning||currentEngine!=='wide')return;
+  const digits=validCameraJAN(text);
+  if(digits){clearEngineTimer();void finishCameraRead(digits,session,'wide')}
+ },()=>{});
+ if(session!==cameraSession||!scanning){await releaseCameraHardware();return}
+ currentEngine='wide';engineBusy=false;cameraBusy=false;
+ setCameraStatus('JAN全体を映して静止してください。反応しないときは「カメラを再起動」を押してください。');
+ updateSwitchButton();
+ // iPhone: 自動切替は行わず、カメラ再起動で復旧する。
+}
+async function switchEngine(session,mode,automatic=false){
+ if(session!==cameraSession||!scanning||engineBusy)return;
+ engineBusy=true;clearEngineTimer();
+ setCameraStatus((automatic?'自動で':'手動で')+'読み取り方式を切り替えています…');
+ try{
+  if(mode==='native')await startNativeScanner(session);else await startWideScanner(session);
+  updateSwitchButton();
+ }catch(e){
+  if(session!==cameraSession||!scanning)return;
+  // 切替先が失敗したら元の方式へ復帰する。
+  const other=mode==='native'?'wide':'native';
+  setCameraStatus('別方式を起動できませんでした。元の方式に戻しています…');
+  try{if(other==='native')await startNativeScanner(session);else await startWideScanner(session)}
+  catch(err){if(session!==cameraSession)return;await stopCamera();alert('カメラ読み取りを開始できません：'+(err.message||err))}
+ }finally{if(session===cameraSession){engineBusy=false;updateSwitchButton()}}
+}
+async function startCamera(){
+ if(cameraBusy||scanning)return;
+ if(!masterValid())return;
+ if(!DATA.length){alert('先に商品マスターを読み込んでください');return}
+ if(!window.isSecureContext){alert('カメラを使うにはHTTPSでページを開いてください');return}
+ const session=++cameraSession;cameraBusy=true;scanning=true;autoSwitched=false;currentEngine='';
+ camBox.classList.remove('hidden');switchBtn.classList.add('hidden');retryBtn.classList.remove('hidden');switchBtn.disabled=true;setCameraStatus('カメラを起動中…');
+ try{
+  nativeAvailable=await supportsNative();
+  if(session!==cameraSession||!scanning)return;
+  updateSwitchButton();
+  if(appleCamera){
+   // 初回は広範囲方式、2回目以降はその端末で最後に成功した方式から開始。
+   await switchEngine(session,'wide');
+  }else{
+   // Android: 以前の高速なBarcodeDetector優先処理を維持。
+   if(nativeAvailable){
+    await switchEngine(session,'native');
+    // Androidは従来どおり、5秒で広範囲方式にフォールバック。
+    if(session===cameraSession&&scanning&&currentEngine==='native'){
+     engineTimer=setTimeout(()=>{if(session===cameraSession&&scanning&&currentEngine==='native')void switchEngine(session,'wide',true)},5000);
+    }
+   }else await switchEngine(session,'wide');
+  }
+ }catch(e){
+  if(session!==cameraSession)return;
+  await stopCamera();alert('カメラ起動失敗：'+(e.message||e));
+ }finally{if(session===cameraSession)cameraBusy=false}
+}
+retryBtn.onclick=async()=>{if(cameraBusy)return;await stopCamera();await startCamera()};
+switchBtn.onclick=()=>{
+ if(!appleCamera||!scanning||engineBusy)return;
+ if(!nativeAvailable){setCameraStatus('このiPhoneでは標準のJAN読み取り方式が利用できないため、広範囲方式のみ使用できます。');return;}
+ // 手動切り替えをした場合、次の自動切り替えは行わない。
+ autoSwitched=true;
+ void switchEngine(cameraSession,currentEngine==='wide'?'native':'wide');
+};
+function loadZXing(){return new Promise((resolve,reject)=>{if(window.Html5Qrcode){resolve();return}let s=document.createElement('script');s.src='https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';s.onload=resolve;s.onerror=()=>reject(Error('カメラ用ライブラリの読み込みに失敗'));document.head.appendChild(s)})}camBtn.onclick=()=>{if(window.AndroidApp){window.AndroidApp.openScanner()}else{startCamera()}};document.getElementById('stop').onclick=stopCamera;window.addEventListener('pagehide',stopCamera);(async()=>{try{let record=await dbGet();if(record){try{applyData(record,'端末保存から復元')}catch(e){resetMaster('保存データが期限切れ、または旧形式です。新しいJSONを選択してください。');await dbDelete()}}else loadStatus.textContent='マスター未読み込み：下のファイル選択から読み込んでください'}catch(e){loadStatus.textContent='保存済みマスターの確認に失敗しました：'+(e.message||e)}})();
+window.addEventListener('focus',masterValid);document.addEventListener('visibilitychange',()=>{if(!document.hidden)masterValid()});
+setInterval(()=>{if(DATA.length)masterValid()},60000);
+if('serviceWorker' in navigator && window.isSecureContext){navigator.serviceWorker.register('./sw.js').catch(()=>{});}</script></body></html>
