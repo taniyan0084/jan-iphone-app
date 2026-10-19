@@ -1,5 +1,5 @@
 // JAN照会アプリ: アプリ本体のみをキャッシュ。商品マスター(IndexedDB)には触れません。
-const CACHE = 'jan-iphone-shell-v2';
+const CACHE = 'nyan-search-shell-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -21,7 +21,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(key => key.startsWith('jan-iphone-shell-') && key !== CACHE)
+        keys.filter(key => (key.startsWith('jan-iphone-shell-') || key.startsWith('nyan-search-shell-')) && key !== CACHE)
             .map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())

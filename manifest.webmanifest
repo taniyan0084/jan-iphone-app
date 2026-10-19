@@ -1,6 +1,8 @@
 {
-  "name": "JAN 商品・在庫照会",
-  "short_name": "JAN照会",
+  "id": "./index.html",
+  "name": "にゃんSearch",
+  "short_name": "にゃんSearch",
+  "description": "JAN商品・在庫照会",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -12,13 +14,13 @@
       "src": "./jan-cat-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./jan-cat-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
