@@ -109,7 +109,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   el.textContent=cartRestoreError?'⚠ 保存されたカートの読み込みに失敗しました。元の保存データは保護されています。初期化する場合はカートを開いて確認してください。':(!cartStorageOK?'⚠ カートを端末に保存できません。タブを閉じると商品や入力情報が失われる可能性があります。':'');
  }
  function restoreCart(){
-  cartRestoreError=false;let hasSavedData=false;
+  cartRestoreError=false;orderSendPending=null;let hasSavedData=false;
   try{
    const raw=localStorage.getItem(CART_STORAGE_KEY);
    hasSavedData=!!raw;
@@ -118,17 +118,18 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
    if(!saved||!Array.isArray(saved.rows))throw new Error('保存されたデータの形式が不正です');
    for(const item of saved.rows){
     if(!item||!/^\d{8,13}$/.test(String(item.jan))||!validCartQty(item.qty))continue;
-    const clean={jan:String(item.jan),maker:String(item.maker??''),name:String(item.name??''),spec1:String(item.spec1??''),spec2:String(item.spec2??''),unitPrice:cartNumber(item.unitPrice),listPrice:cartNumber(item.listPrice),qty:Number(item.qty),note:String(item.note??'').slice(0,1000)};
+    const clean={jan:String(item.jan),maker:String(item.maker??''),name:String(item.name??''),spec1:String(item.spec1??''),spec2:String(item.spec2??''),unitPrice:cartNumber(item.unitPrice),listPrice:cartNumber(item.listPrice),qty:Number(item.qty),note:String(item.note??'').slice(0,1000),orderLineId:String(item.orderLineId||orderSendId())};
     cart.set(clean.jan,clean);
    }
    if(saved.meta&&typeof saved.meta==='object')for(const key of Object.keys(cartMeta))cartMeta[key]=String(saved.meta[key]??'').slice(0,1000);
+   orderSendPending=orderSendNormalize(saved.pendingOrder);
    cartStorageOK=true;
   }catch(e){cartStorageOK=false;cartRestoreError=hasSavedData;cart.clear();}
   updateCartStorageWarning();
  }
  function saveCart(){
   if(cartRestoreError){updateCartStorageWarning();return false}
-  try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify({rows:[...cart.values()],meta:cartMeta}));cartStorageOK=true;updateCartStorageWarning();return true}
+  try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify({rows:[...cart.values()],meta:cartMeta,pendingOrder:orderSendPending}));cartStorageOK=true;updateCartStorageWarning();return true}
   catch(e){cartStorageOK=false;updateCartStorageWarning();return false}
  }
  function cartSorted(){return [...cart.values()].sort((a,b)=>a.maker.localeCompare(b.maker,'ja')||a.jan.localeCompare(b.jan))}
@@ -162,7 +163,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   if(!/^\d{8,13}$/.test(jan)){alert('JANコードが不正なためカートに追加できません。');return false}
   const old=cart.get(jan),sum=Number(n)+(old?old.qty:0);
   if(sum>CART_MAX_QTY){alert('同一JANの数量は合計9,999個までです。');return false}
-  cart.set(jan,{jan,maker:String(p[2]??''),name:String(p[3]??''),spec1:String(p[4]??''),spec2:String(p[5]??''),unitPrice:cartNumber(p[7]),listPrice:cartNumber(p[6]),qty:sum,note:old?old.note:''});
+  cart.set(jan,{jan,maker:String(p[2]??''),name:String(p[3]??''),spec1:String(p[4]??''),spec2:String(p[5]??''),unitPrice:cartNumber(p[7]),listPrice:cartNumber(p[6]),qty:sum,note:old?old.note:'',orderLineId:old?.orderLineId||orderSendId()});
   saveCart();
   updateCartHeader('✓ '+String(p[3]??'商品')+'：'+n+'個を追加しました（カート内 '+sum+'個）');
   return true;
@@ -271,7 +272,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
  const XLSX_MIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
  let lastOrderFileName='';
  let lastOrderSignature='';
- function orderSignature(){return JSON.stringify({rows:[...cart.values()],meta:cartMeta})}
+ function orderSignature(){return JSON.stringify({rows:[...cart.values()].map(({orderLineId,...row})=>row),meta:cartMeta})}
  function xmlEscape(s){
   return String(s??'').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g,'')
    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
@@ -421,6 +422,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   catch(error){mailStatus('共有・自動保存ができませんでした。「'+format+'を保存」から保存し、メールに手動添付してください。')}
  }
  async function sharePreparedOrder(format,builder,includeMailText){
+  if(!orderSendCanStart())return;
   if(orderShareBusy){mailStatus('共有処理中です。共有画面を閉じてから再度お試しください。');return}
   if(!validateOrderMail())return;
   let file;
@@ -433,7 +435,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   // Keep the native share call inside the original click task, without an earlier await.
   orderShareBusy=true;
   try{
-   await navigator.share(payload);
+   await shareWithOrderConfirmation(payload);
    mailStatus(format+'を共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・添付を確認してから送信してください。共有だけでは送信完了ではありません。');
   }catch(error){
    if(error?.name==='AbortError')mailStatus('共有が中断されました。注文カートは残っています。必要な場合は「'+format+'を保存」を押してください。');
@@ -487,6 +489,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   catch(e){mailStatus('Excelの保存に失敗しました：'+(e.message||e))}
  }
  function prepareCartMail(){
+  if(!orderSendCanStart())return;
   if(!validateOrderMail())return;
   if(!lastOrderFileName||lastOrderSignature!==orderSignature()){mailStatus('現在の注文内容に対応したTXTまたはExcelを先に保存してください。注文変更後は再生成が必要です。');return}
   const cc=ccAddresses();
@@ -494,13 +497,141 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
    (cc.length?'&cc='+encodeURIComponent(cc.join(',')):'')+'&body='+encodeURIComponent(orderMailContent(lastOrderFileName));
   if(uri.length>6000){mailStatus('メール本文が長すぎます。備考を短くして再度お試しください。');return}
   mailStatus('メールアプリで保存済み注文ファイル「'+lastOrderFileName+'」を手動添付し、宛先・CCを確認して送信してください。ファイルは自動添付されません。');
+  const confirmation=orderSendBegin('メール','ready');if(confirmation.blocked)return;
   window.location.href=uri;
+ }
+
+ // Pending order and cart are committed together in the existing cart storage record.
+ let orderSendPending=null,orderSendRestored=false,orderSendWarning='',orderSendDialogId=null,orderSendPrepared=null;
+ function orderSendId(){return globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}
+ function orderSendFingerprint(row){return JSON.stringify([row.maker,row.name,row.spec1,row.spec2,row.unitPrice,row.listPrice,row.note])}
+ function orderSendNormalize(value){
+  if(value==null)return null;
+  if(!value||value.version!==1||typeof value.id!=='string'||!['opening','ready'].includes(value.phase)||!Array.isArray(value.lines)||!value.lines.length){orderSendWarning='前回の送信確認情報を読み取れません。カートは自動削除しません。';return null}
+  const seen=new Set();
+  for(const line of value.lines){if(!line||!/^\d{8,13}$/.test(line.jan)||typeof line.lineId!=='string'||!validCartQty(line.qty)||typeof line.fingerprint!=='string'||seen.has(line.jan)){orderSendWarning='前回の送信確認情報を読み取れません。カートは自動削除しません。';return null}seen.add(line.jan)}
+  return {version:1,id:value.id,phase:value.phase,hasLeft:!!value.hasLeft,createdAt:Number(value.createdAt)||Date.now(),kind:String(value.kind||'注文'),lines:value.lines.map(line=>({...line,qty:Number(line.qty)}))};
+ }
+ function orderSendReadLatest(){
+  const before=[...cart.values()].map(row=>({...row})),meta={...cartMeta},pending=orderSendPending;
+  try{
+   if(localStorage.getItem(CART_STORAGE_KEY)===null)return true;
+   cart.clear();restoreCart();
+   if(cartRestoreError)throw Error('Saved cart unreadable');
+   return true;
+  }catch(error){cart.clear();for(const row of before)cart.set(row.jan,row);Object.assign(cartMeta,meta);orderSendPending=pending;orderSendWarning='保存されたカートを確認できないため、送信後の削除を停止しています。';return false}
+ }
+ function orderSendRefresh(){
+  const banner=document.getElementById('orderSendBanner');if(!banner)return;
+  const text=document.getElementById('orderSendBannerText'),review=document.getElementById('orderSendReview');
+  banner.hidden=!orderSendPending&&!orderSendWarning;
+  text.textContent=orderSendWarning||(orderSendPending?'注文メールの送信状況が未確認です。カートの商品はまだ残っています。':'');
+  review.hidden=!orderSendPending;review.disabled=!!orderSendPending&&orderSendPending.phase==='opening'&&!orderSendRestored;
+ }
+ function orderSendCanStart(){
+  if(!orderSendReadLatest()){orderSendRefresh();return false}
+  if(!orderSendPending){
+   for(const row of cart.values())if(!row.orderLineId)row.orderLineId=orderSendId();
+   orderSendPrepared={lines:[...cart.values()].map(row=>({jan:row.jan,lineId:row.orderLineId,qty:row.qty,fingerprint:orderSendFingerprint(row)})),saved:saveCart()};
+   return true;
+  }
+  orderSendMaybeAsk(true);mailStatus('前回の注文メールの送信状況を確認してください。未送信なら「まだ送信していない」を選ぶと再作成できます。');return false;
+ }
+ function orderSendBegin(kind,phase='opening'){
+  const prepared=orderSendPrepared;orderSendPrepared=null;
+  if(!orderSendReadLatest())return {id:null};
+  if(orderSendPending){orderSendMaybeAsk(true);return {blocked:true}}
+  if(cartRestoreError||prepared?.saved===false){orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。';orderSendRefresh();return {id:null}}
+  for(const row of cart.values())if(!row.orderLineId)row.orderLineId=orderSendId();
+  const record={version:1,id:orderSendId(),phase,hasLeft:false,createdAt:Date.now(),kind,
+   lines:prepared?.lines||[...cart.values()].map(row=>({jan:row.jan,lineId:row.orderLineId,qty:row.qty,fingerprint:orderSendFingerprint(row)}))};
+  if(!record.lines.length)return {id:null};
+  orderSendPending=record;orderSendRestored=false;
+  if(!saveCart()){orderSendPending=null;orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。必要な場合は手動で整理してください。';orderSendRefresh();return {id:null}}
+  orderSendWarning='';orderSendRefresh();return {id:record.id};
+ }
+ function orderSendFinish(ticket,success){
+  if(!ticket?.id||!orderSendReadLatest()||orderSendPending?.id!==ticket.id)return;
+  const before=orderSendPending;
+  if(success)orderSendPending={...before,phase:'ready'};else orderSendPending=null;
+  if(!saveCart()){orderSendPending=before;orderSendWarning='送信確認の保存に失敗しました。カートは残しています。';}
+  if(!success)orderSendCloseDialog();
+  orderSendRefresh();if(success)setTimeout(()=>orderSendMaybeAsk(),0);
+ }
+ async function shareWithOrderConfirmation(payload){
+  const ticket=orderSendBegin(payload.files?.[0]?.name?.endsWith('.xlsx')?'Excel':'TXT');
+  if(ticket.blocked){const error=new Error('Previous order needs confirmation');error.name='AbortError';throw error}
+  try{const result=await navigator.share(payload);orderSendFinish(ticket,true);return result}
+  catch(error){orderSendFinish(ticket,false);throw error}
+ }
+ function orderSendMarkLeft(){
+  if(!orderSendPending||!orderSendReadLatest()||!orderSendPending||orderSendPending.hasLeft)return;
+  orderSendPending.hasLeft=true;
+  if(!saveCart())orderSendWarning='送信確認の保存に失敗しました。カートは残しています。';
+  orderSendRefresh();
+ }
+ function orderSendCloseDialog(){const dialog=document.getElementById('orderSentDialog');if(dialog?.open)dialog.close();orderSendDialogId=null}
+ function orderSendMaybeAsk(force=false){
+  if(!orderSendPending||document.visibilityState!=='visible'||(typeof document.hasFocus==='function'&&!document.hasFocus()))return;
+  if(orderSendPending.phase==='opening'&&!orderSendRestored)return;
+  if(!force&&!orderSendRestored&&!orderSendPending.hasLeft)return;
+  const dialog=document.getElementById('orderSentDialog');if(!dialog||dialog.open)return;
+  orderSendDialogId=orderSendPending.id;
+  document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'実際に送信した場合だけ「送信した」を選んでください。送信済みの注文分だけを削除し、後から追加・変更した商品と登録情報は残します。';
+  try{dialog.showModal();document.getElementById('orderSentNo').focus()}catch(error){orderSendWarning='送信状況の確認画面を開けませんでした。下の「送信状況を確認」から再度お試しください。';orderSendRefresh()}
+ }
+ function orderSendApplyDecision(sent,id){
+  if(!orderSendReadLatest()){orderSendRefresh();return}
+  if(!orderSendPending||orderSendPending.id!==id){orderSendCloseDialog();orderSendRefresh();updateCartHeader();return}
+  const before=[...cart.values()].map(row=>({...row})),pending=orderSendPending;
+  if(sent){
+   for(const line of pending.lines){
+    const row=cart.get(line.jan);
+    if(!row||row.orderLineId!==line.lineId||orderSendFingerprint(row)!==line.fingerprint||row.qty<line.qty)continue;
+    if(row.qty===line.qty)cart.delete(line.jan);else row.qty-=line.qty;
+   }
+  }
+  orderSendPending=null;
+  if(!saveCart()){
+   cart.clear();for(const row of before)cart.set(row.jan,row);orderSendPending=pending;
+   orderSendWarning='保存できなかったためカートの変更を取り消しました。送信確認は未確定です。';orderSendRefresh();updateCartHeader();return;
+  }
+  orderSendRestored=false;orderSendWarning='';orderSendCloseDialog();orderSendRefresh();
+  updateCartHeader(sent?(cart.size?'送信済みの注文分を削除しました。追加・変更された商品はカートに残しています。':'カートを空にしました'):'カートを保持しました。注文メールを再度作成できます。');
+ }
+ async function orderSendDecide(sent){
+  const id=orderSendDialogId;if(!id)return;
+  const yes=document.getElementById('orderSentYes'),no=document.getElementById('orderSentNo');yes.disabled=true;no.disabled=true;
+  try{
+   if(navigator.locks?.request)await navigator.locks.request(CART_STORAGE_KEY+'-send-confirm',()=>orderSendApplyDecision(sent,id));
+   else orderSendApplyDecision(sent,id);
+  }catch(error){orderSendWarning='送信確認を保存できませんでした。カートは自動削除しません。';orderSendRefresh()}
+  finally{yes.disabled=false;no.disabled=false}
+ }
+ function orderSendSetup(){
+  const banner=document.createElement('section');banner.id='orderSendBanner';banner.className='box';banner.hidden=true;
+  const text=document.createElement('p');text.id='orderSendBannerText';text.setAttribute('role','status');
+  const review=document.createElement('button');review.id='orderSendReview';review.type='button';review.textContent='送信状況を確認';review.onclick=()=>orderSendMaybeAsk(true);banner.append(text,review);
+  document.getElementById('cartNotice').after(banner);
+  const dialog=document.createElement('dialog');dialog.id='orderSentDialog';dialog.setAttribute('aria-labelledby','orderSentQuestion');dialog.style.cssText='max-width:520px;width:calc(100% - 32px);border:1px solid #9fb1c4;border-radius:12px;padding:22px;color:#162235';
+  const title=document.createElement('h2');title.id='orderSentQuestion';title.textContent='注文メールは送信しましたか？';title.style.fontSize='20px';
+  const explanation=document.createElement('p');explanation.id='orderSentExplanation';
+  const yes=document.createElement('button');yes.id='orderSentYes';yes.type='button';yes.className='primary';yes.textContent='送信した';yes.onclick=()=>void orderSendDecide(true);
+  const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='まだ送信していない';no.onclick=()=>void orderSendDecide(false);
+  dialog.append(title,explanation,yes,no);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
+  orderSendRestored=!!orderSendPending;orderSendRefresh();
+  window.addEventListener('blur',orderSendMarkLeft);window.addEventListener('pagehide',orderSendMarkLeft);
+  window.addEventListener('focus',()=>setTimeout(()=>orderSendMaybeAsk(),0));window.addEventListener('pageshow',()=>setTimeout(()=>orderSendMaybeAsk(),0));
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')orderSendMarkLeft();else setTimeout(()=>orderSendMaybeAsk(),0)});
+  window.addEventListener('storage',event=>{if(event.key===CART_STORAGE_KEY){orderSendRefresh();if(!orderSendPending)orderSendCloseDialog();else setTimeout(()=>orderSendMaybeAsk(),0)}});
+  setTimeout(()=>orderSendMaybeAsk(),0);
  }
 
  restoreCart();
  document.getElementById('openCart').onclick=()=>{const panel=document.getElementById('cartPanel');if(panel.classList.contains('hidden'))showCart();else hideCart()};
  updateCartHeader();
  window.addEventListener('storage',e=>{if(e.key!==CART_STORAGE_KEY)return;cart.clear();for(const k of Object.keys(cartMeta))cartMeta[k]='';restoreCart();updateCartHeader('別タブで更新されたカートを再読み込みしました。')});
+ orderSendSetup();
 
  function showPagedCandidates(hits,title,page=0){
   const pages=Math.ceil(hits.length/PAGE_SIZE),current=Math.min(Math.max(0,page),Math.max(0,pages-1));
