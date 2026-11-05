@@ -580,7 +580,8 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'実際に送信した場合だけ「送信した」を選んでください。送信済みの注文分だけを削除し、後から追加・変更した商品と登録情報は残します。';
   try{dialog.showModal();document.getElementById('orderSentNo').focus()}catch(error){orderSendWarning='送信状況の確認画面を開けませんでした。下の「送信状況を確認」から再度お試しください。';orderSendRefresh()}
  }
- function orderSendApplyDecision(sent,id){
+ function orderSendApplyDecision(action,id){
+  const sent=action===true,addBeforeSend=action==='add';
   if(!orderSendReadLatest()){orderSendRefresh();return}
   if(!orderSendPending||orderSendPending.id!==id){orderSendCloseDialog();orderSendRefresh();updateCartHeader();return}
   const before=[...cart.values()].map(row=>({...row})),pending=orderSendPending;
@@ -596,17 +597,17 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
    cart.clear();for(const row of before)cart.set(row.jan,row);orderSendPending=pending;
    orderSendWarning='保存できなかったためカートの変更を取り消しました。送信確認は未確定です。';orderSendRefresh();updateCartHeader();return;
   }
-  orderSendRestored=false;orderSendWarning='';orderSendCloseDialog();orderSendRefresh();
-  updateCartHeader(sent?(cart.size?'送信済みの注文分を削除しました。追加・変更された商品はカートに残しています。':'カートを空にしました'):'カートを保持しました。注文メールを再度作成できます。');
+  orderSendRestored=false;orderSendPrepared=null;orderSendWarning='';orderSendCloseDialog();orderSendRefresh();
+  updateCartHeader(addBeforeSend?'カートを保持し、前の注文の送信確認を解除しました。未送信の場合のみ、商品を追加・変更して「注文メールを作成」を押してください。以前の下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。':sent?(cart.size?'送信済みの注文分を削除しました。追加・変更された商品はカートに残しています。':'カートを空にしました'):'カートを保持しました。注文メールを再度作成できます。');
  }
  async function orderSendDecide(sent){
   const id=orderSendDialogId;if(!id)return;
-  const yes=document.getElementById('orderSentYes'),no=document.getElementById('orderSentNo');yes.disabled=true;no.disabled=true;
+  const yes=document.getElementById('orderSentYes'),no=document.getElementById('orderSentNo'),add=document.getElementById('orderSentAdd');yes.disabled=true;no.disabled=true;add.disabled=true;
   try{
    if(navigator.locks?.request)await navigator.locks.request(CART_STORAGE_KEY+'-send-confirm',()=>orderSendApplyDecision(sent,id));
    else orderSendApplyDecision(sent,id);
   }catch(error){orderSendWarning='送信確認を保存できませんでした。カートは自動削除しません。';orderSendRefresh()}
-  finally{yes.disabled=false;no.disabled=false}
+  finally{yes.disabled=false;no.disabled=false;add.disabled=false}
  }
  function orderSendSetup(){
   const banner=document.createElement('section');banner.id='orderSendBanner';banner.className='box';banner.hidden=true;
@@ -618,7 +619,9 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const explanation=document.createElement('p');explanation.id='orderSentExplanation';
   const yes=document.createElement('button');yes.id='orderSentYes';yes.type='button';yes.className='primary';yes.textContent='送信した';yes.onclick=()=>void orderSendDecide(true);
   const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='まだ送信していない';no.onclick=()=>void orderSendDecide(false);
-  dialog.append(title,explanation,yes,no);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
+  const add=document.createElement('button');add.id='orderSentAdd';add.type='button';add.textContent='送信前に追加注文';add.setAttribute('aria-describedby','orderSentAddHint');add.onclick=()=>void orderSendDecide('add');
+  const addHint=document.createElement('p');addHint.id='orderSentAddHint';addHint.className='hint';addHint.textContent='メールが未送信の場合のみ「送信前に追加注文」を選んでください。商品を追加・変更して注文メールを作り直せます。以前開いたGmailなどの下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。';
+  dialog.append(title,explanation,yes,no,add,addHint);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
   orderSendRestored=!!orderSendPending;orderSendRefresh();
   window.addEventListener('blur',orderSendMarkLeft);window.addEventListener('pagehide',orderSendMarkLeft);
   window.addEventListener('focus',()=>setTimeout(()=>orderSendMaybeAsk(),0));window.addEventListener('pageshow',()=>setTimeout(()=>orderSendMaybeAsk(),0));
