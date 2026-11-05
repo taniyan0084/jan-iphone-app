@@ -245,13 +245,15 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const emailPc=createCartField('orderEmailPc','PC用の注文控えメールアドレス（任意）',cartMeta.emailPc,v=>cartMeta.emailPc=v);
   emailMain.querySelector('input').type='email';emailPc.querySelector('input').type='email';
   form.append(emailMain,emailPc);
-  const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent='📤 注文Excelをメールで共有する';mailBtn.onclick=shareOrderFile;
-  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文数に関係なくExcel（.xlsx）を生成します。メールアプリを選び、宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・Excel添付を確認して「送信」を押してください。共有機能が使えない場合はExcelを保存します。';
+  const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent='注文メールを作成';mailBtn.onclick=shareTextOrderFile;
+  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文TXTを作成して共有画面を開きます。メールアプリを選び、宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・TXT添付を確認してください。共有できない場合はTXTを保存できます。Excel（.xlsx）の保存・共有も利用できます。';
   const status=document.createElement('div');status.id='cartMailStatus';status.className='cart-status';status.setAttribute('role','status');
   const fallbacks=document.createElement('div');fallbacks.className='cart-action-row';
   const download=document.createElement('button');download.type='button';download.textContent='📥 Excelを保存';download.onclick=saveExcelOrder;
-  const fallbackMail=document.createElement('button');fallbackMail.type='button';fallbackMail.textContent='✉ メールを開く（Excelは手動添付）';fallbackMail.onclick=prepareCartMail;
-  fallbacks.append(download,fallbackMail);
+  const fallbackMail=document.createElement('button');fallbackMail.type='button';fallbackMail.textContent='✉ メールを開く（ファイルは手動添付）';fallbackMail.onclick=prepareCartMail;
+  const textDownload=document.createElement('button');textDownload.type='button';textDownload.textContent='📥 TXTを保存';textDownload.onclick=saveTextOrder;
+  const excelShare=document.createElement('button');excelShare.type='button';excelShare.textContent='📤 Excelを共有';excelShare.onclick=shareOrderFile;
+  fallbacks.append(textDownload,download,excelShare,fallbackMail);
   const action=document.createElement('div');action.className='cart-action-row';
   const clear=document.createElement('button');clear.type='button';clear.className='cart-danger';clear.textContent='カートを空にする';clear.onclick=()=>{if(confirm('カートの商品をすべて削除しますか？')){cart.clear();saveCart();updateCartHeader('カートを空にしました。')}};
   const close=document.createElement('button');close.type='button';close.textContent='カートを閉じる';close.onclick=hideCart;
@@ -377,9 +379,9 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
    '商品種類：'+cart.size+'種類',
    '注文数量：'+t.quantity+'個',
    '参考合計（税抜）：'+money(t.total)+(t.missing?'（未登録単価 '+t.missing+'種類を除く）':''),
-   '','注文明細は添付Excelファイル「'+filename+'」をご確認ください。',
+   '','注文明細は添付注文ファイル「'+filename+'」をご確認ください。',
    '','注文全体の備考：'+(cartMeta.orderNote.trim()||'なし'),
-   '','※送信前にExcelの添付・宛先・CCをご確認ください。',
+   '','※送信前に注文ファイルの添付・宛先・CCをご確認ください。',
    '※参考価格は実際の取引価格・請求額と異なる場合があります。',
    '※在庫・出荷時期は確約されません。'].join('\n');
  }
@@ -413,6 +415,63 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
    mailStatus('この端末ではファイル共有を利用できないためExcelを保存しました。「メールを開く」でメールを作成し、Excelを添付してください。');
   }
  }
+
+ // UTF-8 (BOM) / CRLF order text. JAN stays a string, including leading zeroes.
+ function orderText(){
+  const t=cartTotals();
+  const lines=['にゃんSearch 注文依頼','作成日時（日本時間）：'+new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}),
+   '宛先：'+ORDER_MAIL_ADDRESS,'CC：'+(ccAddresses().join(', ')||'なし'),
+   '店舗名・注文者名：'+cartMeta.store.trim(),'得意先コード：'+(cartMeta.customerCode.trim()||'記載なし'),
+   '連絡先：'+(cartMeta.contact.trim()||'記載なし'),'商品種類：'+cart.size+'種類','注文数量：'+t.quantity+'個',''];
+  let number=0;
+  for(const item of cart.values()){
+   lines.push('【商品 '+(++number)+'】','JAN：'+String(item.jan),'メーカー：'+item.maker,'商品名：'+item.name,
+    '規格1：'+(item.spec1||''),'規格2：'+(item.spec2||''),'数量：'+item.qty,
+    '参考卸単価（税抜）：'+money(item.unitPrice),'参考小計（税抜）：'+(item.unitPrice===null?'単価要確認':money(item.unitPrice*item.qty)),
+    '商品備考：'+(item.note||'なし'),'');
+  }
+  const groups=new Map();
+  for(const item of cart.values()){
+   const key=item.maker||'メーカー未登録';
+   if(!groups.has(key))groups.set(key,{amount:0,missing:0});
+   const group=groups.get(key);
+   if(item.unitPrice===null)group.missing++;
+   else group.amount=Math.round((group.amount+item.unitPrice*item.qty+Number.EPSILON)*100)/100;
+  }
+  for(const [maker,group] of groups)lines.push(maker+' 小計（税抜）：'+money(group.amount)+(group.missing?'（単価未登録 '+group.missing+'種類を除く）':''));
+  lines.push('参考合計（税抜）：'+money(t.total)+(t.missing?'（単価未登録 '+t.missing+'種類を除く）':''),
+   '','注文全体の備考：'+(cartMeta.orderNote.trim()||'なし'),
+   '','※参考価格は実際の取引価格・請求額と異なる場合があります。','※在庫・出荷時期は確約されません。');
+  return lines.join('\n').replace(/\r\n|\r|\n/g,'\r\n')+'\r\n';
+ }
+ function buildTextOrderFile(){
+  return new File(['\uFEFF',orderText()],orderFileName().replace(/\.xlsx$/,'.txt'),{type:'text/plain;charset=utf-8'});
+ }
+ function saveTextOrder(){
+  if(!validateOrderMail())return;
+  try{const file=buildTextOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('TXTを保存しました：'+file.name+'。メールに手動添付して宛先・CCを確認してください。')}
+  catch(e){mailStatus('TXTの保存に失敗しました。「TXTを保存」から再度お試しください：'+(e.message||e))}
+ }
+ async function shareTextOrderFile(){
+  if(!validateOrderMail())return;
+  let file;
+  try{file=buildTextOrderFile()}catch(e){mailStatus('TXT生成に失敗しました：'+(e.message||e));return}
+  lastOrderFileName=file.name;lastOrderSignature=orderSignature();
+  // No awaited work before navigator.share: retain the button's user activation.
+  try{
+   if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
+    downloadOrderFile(file);
+    mailStatus('このブラウザではTXTファイル共有を利用できないためTXTを保存しました。保存されない場合は「TXTを保存」を押してください。メールに手動添付し、宛先 '+ORDER_MAIL_ADDRESS+' とCCを確認してください。');return;
+   }
+   await navigator.share({files:[file],title:orderSubject(),text:'宛先：'+ORDER_MAIL_ADDRESS+'\nCC：'+(ccAddresses().join(', ')||'なし')+'\n注文内容は添付TXTをご確認ください。'});
+   mailStatus('TXTを共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'・CC・TXT添付を確認してください。共有だけでは注文送信は完了しません。');
+  }catch(e){
+   if(e&&e.name==='AbortError'){mailStatus('共有を中止しました。必要な場合は「TXTを保存」から保存できます。カートは残っています。');return}
+   try{downloadOrderFile(file);mailStatus('共有に失敗したためTXTを保存しました。保存されない場合は「TXTを保存」を押してください。メールに手動添付し、宛先・CCを確認してください。')}
+   catch(downloadError){mailStatus('共有・自動保存ができませんでした。「TXTを保存」を押して保存してください。')}
+  }
+ }
+
  function saveExcelOrder(){
   if(!validateOrderMail())return;
   try{const file=buildOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('Excelを保存しました：'+file.name+'。メール送信時はこのファイルを添付してください。')}
@@ -420,12 +479,12 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
  }
  function prepareCartMail(){
   if(!validateOrderMail())return;
-  if(!lastOrderFileName||lastOrderSignature!==orderSignature()){mailStatus('現在の注文内容に対応したExcelを先に保存してください。注文変更後はExcelの再生成が必要です。');return}
+  if(!lastOrderFileName||lastOrderSignature!==orderSignature()){mailStatus('現在の注文内容に対応したTXTまたはExcelを先に保存してください。注文変更後は再生成が必要です。');return}
   const cc=ccAddresses();
   const uri='mailto:'+ORDER_MAIL_ADDRESS+'?subject='+encodeURIComponent(orderSubject())+
    (cc.length?'&cc='+encodeURIComponent(cc.join(',')):'')+'&body='+encodeURIComponent(orderMailContent(lastOrderFileName));
   if(uri.length>6000){mailStatus('メール本文が長すぎます。備考を短くして再度お試しください。');return}
-  mailStatus('メールアプリで保存済みExcel「'+lastOrderFileName+'」を手動添付し、宛先・CCを確認して送信してください。ファイルは自動添付されません。');
+  mailStatus('メールアプリで保存済み注文ファイル「'+lastOrderFileName+'」を手動添付し、宛先・CCを確認して送信してください。ファイルは自動添付されません。');
   window.location.href=uri;
  }
 
