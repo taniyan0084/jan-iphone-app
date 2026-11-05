@@ -259,7 +259,10 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const close=document.createElement('button');close.type='button';close.textContent='カートを閉じる';close.onclick=hideCart;
   action.append(clear,close);
   const storageNote=document.createElement('div');storageNote.className='hint';storageNote.textContent='カート・連絡先はこのブラウザの端末内保存です。別のPC・スマホとは共有しません。';
+  const metadataTest=document.createElement('button');metadataTest.type='button';metadataTest.textContent='件名・本文付き共有テスト';metadataTest.onclick=shareTextWithMetadataTest;
+  const metadataHint=document.createElement('div');metadataHint.className='hint';metadataHint.textContent='一時テスト：TXT添付と件名・本文を同時に共有します。Gmailでの反映は実機で確認してください。宛先・控え用アドレスは設定しません。';
   form.append(mailBtn,mailHint,status,fallbacks,action,storageNote);
+  form.append(metadataTest,metadataHint);
   appendShareDiagnostics(form);
  }
 
@@ -479,6 +482,43 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   }finally{orderShareBusy=false;attempt.completedAt=new Date().toISOString();refreshShareDiagnostics()}
  }
  function shareOrderFile(event){return shareOrderWithDiagnostics('Excel',buildOrderFile,event)}
+ // Temporary experiment only. The production file-only share handlers stay unchanged.
+ const GMAIL_SHARE_TEST_TITLE='【にゃんSearch 注文依頼】';
+ const GMAIL_SHARE_TEST_TEXT='注文ファイルを添付しました。大橋漁具宛ての注文です。';
+ async function shareTextWithMetadataTest(event){
+  if(orderShareBusy){mailStatus('共有処理中です。共有画面を閉じてから再度お試しください。');return}
+  const started=performance.now();
+  const attempt={format:'TXT',mode:'files-title-text-test',time:new Date().toISOString(),eventTrusted:event?.isTrusted??null,
+   environment:shareEnvironment(),activationAtClick:shareActivation(),shareCalled:false,download:'none',outcome:'validating',
+   payload:{keys:['files','title','text'],title:GMAIL_SHARE_TEST_TITLE,text:GMAIL_SHARE_TEST_TEXT}};
+  shareDiagnostics.attempts.push(attempt);if(shareDiagnostics.attempts.length>8)shareDiagnostics.attempts.shift();
+  if(!validateOrderMail()){attempt.outcome='validation-failed';refreshShareDiagnostics();return}
+  let file;
+  try{file=buildTextOrderFile()}catch(error){attempt.outcome='generation-failed';attempt.generationError=shareErrorInfo(error);refreshShareDiagnostics();mailStatus('テスト用TXT生成に失敗しました。診断結果をご確認ください。');return}
+  const payload={files:[file],title:GMAIL_SHARE_TEST_TITLE,text:GMAIL_SHARE_TEST_TEXT};
+  attempt.file={extension:file.name.split('.').pop(),type:file.type,size:file.size};
+  attempt.generationMs=Math.round((performance.now()-started)*100)/100;
+  attempt.canShareFiles=canShareProbe({files:[file]});
+  attempt.canShareWithMetadata=canShareProbe(payload);
+  attempt.activationBeforeShare=shareActivation();
+  attempt.elapsedBeforeShareMs=Math.round((performance.now()-started)*100)/100;
+  let reason=null;
+  if(!window.isSecureContext)reason='insecure-context';
+  else if(typeof navigator.share!=='function')reason='navigator.share-unavailable';
+  else if(attempt.canShareWithMetadata.error)reason='navigator.canShare-metadata-threw';
+  else if(attempt.canShareWithMetadata.result===false)reason='navigator.canShare-files-title-text-false';
+  if(reason){attempt.outcome='test-preflight-failed';attempt.preflightError={name:'ShareTestUnavailable',message:reason};refreshShareDiagnostics();mailStatus('件名・本文付き共有テストを開始できません（'+reason+'）。診断欄をご確認ください。通常の「注文メールを作成」はそのまま利用できます。');return}
+  orderShareBusy=true;attempt.outcome='calling-share';attempt.shareCalled=true;refreshShareDiagnostics();
+  // Call inside this click task; never await file generation or a preflight operation.
+  try{
+   await navigator.share(payload);
+   attempt.outcome='share-resolved';mailStatus('件名・本文付き共有テスト：共有APIが正常終了しました。GmailのTXT添付・件名・本文を確認してください。反映は未確認で、メールは自動送信しません。');
+  }catch(error){
+   attempt.shareError=shareErrorInfo(error);attempt.outcome=error?.name==='AbortError'?'share-aborted':'test-share-failed';
+   mailStatus('件名・本文付き共有テスト：'+attempt.shareError.name+' / '+attempt.shareError.message+'。診断欄をご確認ください。通常の「注文メールを作成」はそのまま利用できます。');
+  }finally{orderShareBusy=false;attempt.completedAt=new Date().toISOString();refreshShareDiagnostics()}
+ }
+
 
 
  // UTF-8 (BOM) / CRLF order text. JAN stays a string, including leading zeroes.
