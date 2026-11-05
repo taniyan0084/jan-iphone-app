@@ -101,7 +101,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const n=Number(String(v).replace(/,/g,''));
   return Number.isFinite(n)&&n>=0?n:null;
  }
- function validCartQty(v){const n=Number(v);return Number.isInteger(n)&&n>=1&&n<=CART_MAX_QTY}
+ function validCartQty(v){const n=Number(v);return /^\d+$/.test(String(v))&&Number.isInteger(n)&&n>=1&&n<=CART_MAX_QTY}
 
  let cartRestoreError=false;
  function updateCartStorageWarning(){
@@ -172,7 +172,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const wrap=document.createElement('div');wrap.className='cart-add-controls';
   const label=document.createElement('label');label.textContent='数量';
   const input=document.createElement('input');input.type='number';input.min='1';input.max='9999';input.step='1';input.value='1';input.setAttribute('aria-label',String(p[3]??'商品')+' の追加数量');
-  label.appendChild(input);
+  setupQuantityInput(input);label.appendChild(input);
   const btn=document.createElement('button');btn.type='button';btn.textContent='🛒 カートへ追加';
   const add=()=>{if(addToCart(p,input.value))input.value='1'};
   btn.onclick=add;
@@ -227,7 +227,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
     if(!validCartQty(input.value)){alert('数量は1～9,999の整数で入力してください。');input.value=String(item.qty);return}
     item.qty=Number(input.value);saveCart();updateCartHeader('カートの数量を変更しました。');
    });
-   lbl.appendChild(input);
+   setupQuantityInput(input);lbl.appendChild(input);
    const remove=document.createElement('button');remove.type='button';remove.className='cart-danger';remove.textContent='削除';remove.onclick=()=>{if(confirm(item.name+' をカートから削除しますか？')){cart.delete(item.jan);saveCart();updateCartHeader('商品をカートから削除しました。')}};
    tools.append(lbl,remove);
    const noteBox=createCartField('cartNote-'+item.jan,'商品別備考（任意）',item.note,value=>{item.note=value},true);noteBox.classList.add('cart-order-note');
@@ -446,33 +446,50 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
  function shareOrderFile(){return sharePreparedOrder('Excel',buildOrderFile,false)}
 
  // UTF-8 (BOM) / CRLF order text. JAN stays a string, including leading zeroes.
- function orderText(){
-  const t=cartTotals();
-  const lines=['にゃんSearch 注文依頼','作成日時（日本時間）：'+new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}),
-   '宛先：'+ORDER_MAIL_ADDRESS,'CC：'+(ccAddresses().join(', ')||'なし'),
-   '店舗名・注文者名：'+cartMeta.store.trim(),'得意先コード：'+(cartMeta.customerCode.trim()||'記載なし'),
-   '連絡先：'+(cartMeta.contact.trim()||'記載なし'),'商品種類：'+cart.size+'種類','注文数量：'+t.quantity+'個',''];
-  let number=0;
-  for(const item of cart.values()){
-   lines.push('【商品 '+(++number)+'】','JAN：'+String(item.jan),'メーカー：'+item.maker,'商品名：'+item.name,
-    '規格1：'+(item.spec1||''),'規格2：'+(item.spec2||''),'数量：'+item.qty,
-    '参考卸単価（税抜）：'+money(item.unitPrice),'参考小計（税抜）：'+(item.unitPrice===null?'単価要確認':money(item.unitPrice*item.qty)),
-    '商品備考：'+(item.note||'なし'),'');
-  }
-  const groups=new Map();
-  for(const item of cart.values()){
-   const key=item.maker||'メーカー未登録';
-   if(!groups.has(key))groups.set(key,{amount:0,missing:0});
-   const group=groups.get(key);
-   if(item.unitPrice===null)group.missing++;
-   else group.amount=Math.round((group.amount+item.unitPrice*item.qty+Number.EPSILON)*100)/100;
-  }
-  for(const [maker,group] of groups)lines.push(maker+' 小計（税抜）：'+money(group.amount)+(group.missing?'（単価未登録 '+group.missing+'種類を除く）':''));
-  lines.push('参考合計（税抜）：'+money(t.total)+(t.missing?'（単価未登録 '+t.missing+'種類を除く）':''),
-   '','注文全体の備考：'+(cartMeta.orderNote.trim()||'なし'),
-   '','※参考価格は実際の取引価格・請求額と異なる場合があります。','※在庫・出荷時期は確約されません。');
-  return lines.join('\n').replace(/\r\n|\r|\n/g,'\r\n')+'\r\n';
+ function setupQuantityInput(input){
+  input.type='text';input.inputMode='numeric';input.pattern='[0-9]*';input.maxLength=4;input.autocomplete='off';input.classList.add('cart-qty');
+  let entering=false;
+  input.addEventListener('focus',()=>{entering=true;input.select();setTimeout(()=>{if(document.activeElement===input&&entering)input.select()},0)});
+  input.addEventListener('pointerup',event=>{if(entering){event.preventDefault();input.select();entering=false}});
+  input.addEventListener('click',()=>{if(entering){input.select();entering=false}});
+  input.addEventListener('input',()=>{entering=false});input.addEventListener('blur',()=>{entering=false});
  }
+ function orderTableCell(value){
+  let text=String(value??'').replace(/\\/g,'\\\\').replace(/\r\n|\r|\n/g,'\\n').replace(/\t/g,'\\t').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
+  if(/^\s*[=+@-]/.test(text))text="'"+text;
+  return text.includes('"')?'"'+text.replace(/"/g,'""')+'"':text;
+ }
+ function orderTableDate(time){
+  const p=new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(time));
+  const part=k=>p.find(x=>x.type===k).value;return part('year')+'/'+part('month')+'/'+part('day')+' '+part('hour')+':'+part('minute');
+ }
+ function orderText(){
+  const totals=cartTotals(),created=orderTableDate(Date.now()),groups=new Map();
+  for(const row of cart.values()){const maker=row.maker||'メーカー未登録';groups.set(maker,Math.round(((groups.get(maker)||0)+(row.unitPrice===null?0:row.unitPrice*row.qty)+Number.EPSILON)*100)/100)}
+  const headers=['JAN','メーカー','商品名','規格1','規格2','数量','定価','参考卸単価（税抜）','参考金額（税抜）','商品備考','店舗名・注文者名','得意先コード','連絡先','注文全体の備考','控え用メール','PC控え用メール','注文作成日時（日本時間）','宛先','CC','商品種類数','注文数量合計','参考合計（税抜）','メーカー小計（税抜）','単価未登録商品種類数','単価状態','価格・在庫の注意'];
+  const lines=[headers];
+  for(const row of cart.values())lines.push([String(row.jan),row.maker,row.name,row.spec1,row.spec2,row.qty,row.listPrice,row.unitPrice,row.unitPrice===null?'':Number((row.unitPrice*row.qty).toFixed(2)),row.note,cartMeta.store.trim(),cartMeta.customerCode,cartMeta.contact,cartMeta.orderNote,cartMeta.emailMain,cartMeta.emailPc,created,ORDER_MAIL_ADDRESS,ccAddresses().join(', '),cart.size,totals.quantity,totals.total,groups.get(row.maker||'メーカー未登録'),totals.missing,row.unitPrice===null?'単価未登録':'登録済み','参考価格は実際の取引価格・請求額と異なる場合があります。在庫・出荷時期は確約されません。']);
+  return lines.map(row=>row.map(orderTableCell).join('\t')).join('\r\n')+'\r\n';
+ }
+ async function copyConfirmationRecipient(){
+  const manual=document.getElementById('orderSentRecipientManual'),status=document.getElementById('orderSentCopyStatus');
+  try{if(!navigator.clipboard?.writeText)throw Error('Clipboard unavailable');await navigator.clipboard.writeText(ORDER_MAIL_ADDRESS);manual.hidden=true;status.textContent='宛先をコピーしました'}
+  catch(error){manual.hidden=false;manual.focus();manual.select();manual.setSelectionRange(0,manual.value.length);status.textContent='自動コピーできませんでした。下の宛先を選択して手動でコピーしてください。'}
+ }
+ const MASTER_LAST_READ_KEY=CART_STORAGE_KEY+'-master-last-read';
+ let masterLastReadAt=null;
+ function renderMasterLastRead(){const el=document.getElementById('masterLastRead');if(el)el.textContent='商品マスター最終読み込み：'+(masterLastReadAt?orderTableDate(masterLastReadAt):'未読み込み')}
+ function rememberMasterLastRead(time){
+  if(!Number.isFinite(time)||time<=0)return;
+  masterLastReadAt=Math.max(masterLastReadAt||0,time);
+  try{localStorage.setItem(MASTER_LAST_READ_KEY,String(masterLastReadAt))}catch(error){}
+  renderMasterLastRead();
+ }
+ function setupMasterLastRead(){
+  try{const time=Number(localStorage.getItem(MASTER_LAST_READ_KEY));if(Number.isFinite(time)&&time>0)masterLastReadAt=time}catch(error){}
+  const box=document.createElement('section');box.className='box';const text=document.createElement('div');text.id='masterLastRead';text.setAttribute('role','status');const hint=document.createElement('div');hint.className='hint';hint.textContent='この端末でJSONを最後に正常取得・保存した日時（日本時間）です。JSONファイル自体の更新日時ではありません。保存済みデータの復元では日時を更新しません。';box.append(text,hint);document.getElementById('settings').closest('section').before(box);renderMasterLastRead();
+ }
+
  function buildTextOrderFile(){
   return new File(['\uFEFF',orderText()],orderFileName().replace(/\.xlsx$/,'.txt'),{type:'text/plain'});
  }
@@ -577,6 +594,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   if(!force&&!orderSendRestored&&!orderSendPending.hasLeft)return;
   const dialog=document.getElementById('orderSentDialog');if(!dialog||dialog.open)return;
   orderSendDialogId=orderSendPending.id;
+  document.getElementById('orderSentCopyStatus').textContent='';document.getElementById('orderSentRecipientManual').hidden=true;
   document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'実際に送信した場合だけ「送信した」を選んでください。送信済みの注文分だけを削除し、後から追加・変更した商品と登録情報は残します。';
   try{dialog.showModal();document.getElementById('orderSentNo').focus()}catch(error){orderSendWarning='送信状況の確認画面を開けませんでした。下の「送信状況を確認」から再度お試しください。';orderSendRefresh()}
  }
@@ -621,7 +639,10 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='まだ送信していない';no.onclick=()=>void orderSendDecide(false);
   const add=document.createElement('button');add.id='orderSentAdd';add.type='button';add.textContent='送信前に追加注文';add.setAttribute('aria-describedby','orderSentAddHint');add.onclick=()=>void orderSendDecide('add');
   const addHint=document.createElement('p');addHint.id='orderSentAddHint';addHint.className='hint';addHint.textContent='メールが未送信の場合のみ「送信前に追加注文」を選んでください。商品を追加・変更して注文メールを作り直せます。以前開いたGmailなどの下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。';
-  dialog.append(title,explanation,yes,no,add,addHint);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
+  const copy=document.createElement('button');copy.type='button';copy.id='orderSentCopy';copy.textContent='宛先をコピー';copy.onclick=()=>void copyConfirmationRecipient();
+  const copyStatus=document.createElement('p');copyStatus.id='orderSentCopyStatus';copyStatus.setAttribute('role','status');
+  const manual=document.createElement('input');manual.id='orderSentRecipientManual';manual.type='text';manual.readOnly=true;manual.value=ORDER_MAIL_ADDRESS;manual.hidden=true;manual.setAttribute('aria-label','送信確認の宛先（手動コピー用）');manual.style.cssText='font-size:16px;letter-spacing:normal;width:100%';
+  dialog.append(title,explanation,yes,no,add,addHint,copy,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
   orderSendRestored=!!orderSendPending;orderSendRefresh();
   window.addEventListener('blur',orderSendMarkLeft);window.addEventListener('pagehide',orderSendMarkLeft);
   window.addEventListener('focus',()=>setTimeout(()=>orderSendMaybeAsk(),0));window.addEventListener('pageshow',()=>setTimeout(()=>orderSendMaybeAsk(),0));
@@ -631,6 +652,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
  }
 
  restoreCart();
+ setupMasterLastRead();
  document.getElementById('openCart').onclick=()=>{const panel=document.getElementById('cartPanel');if(panel.classList.contains('hidden'))showCart();else hideCart()};
  updateCartHeader();
  window.addEventListener('storage',e=>{if(e.key!==CART_STORAGE_KEY)return;cart.clear();for(const k of Object.keys(cartMeta))cartMeta[k]='';restoreCart();updateCartHeader('別タブで更新されたカートを再読み込みしました。')});
@@ -880,6 +902,7 @@ async function updateFrom配信元(force=false){
   const now=Date.now();
   const record={raw,filename:DATA_FILENAME,remote:true,remoteSource:DROPBOX_MASTER_URL,downloadedAt:now,checkedAt:now,remoteTag,remoteModified,remoteLength};
   await dbPut(record);
+  rememberMasterLastRead(now);
   masterExpiry=now+REMOTE_VALID_MS;DATA=parsed;camBtn.disabled=false;
   loadStatus.innerHTML='<span class="ok">✓ 配信元自動更新：'+DATA.length.toLocaleString()+'件（最終取得：'+new Date(now).toLocaleString('ja-JP')+'）</span>';
   progress.textContent='✓ 更新完了：'+DATA.length.toLocaleString()+'件';
@@ -923,6 +946,7 @@ function applyData(record,source){
  const d=JSON.parse(record.raw.replace(/^\uFEFF/,''));
  validateData(d);
  masterExpiry=expiry;DATA=d;camBtn.disabled=false;
+ rememberMasterLastRead(record.downloadedAt);
  loadStatus.innerHTML='<span class="ok">✓ '+source+'：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
  document.getElementById('settings').open=false;search();
 }
@@ -935,7 +959,8 @@ document.getElementById('masterFile').addEventListener('change',async e=>{
   const parsed=JSON.parse(raw);
   validateData(parsed);
   loadStatus.textContent='端末内に保存中…';
-  await dbPut({raw,filename:f.name,downloadedAt:Date.now()});
+  const loadedAt=Date.now();await dbPut({raw,filename:f.name,downloadedAt:loadedAt});
+  rememberMasterLastRead(loadedAt);
   masterExpiry=expiry;DATA=parsed;camBtn.disabled=false;
   loadStatus.innerHTML='<span class="ok">✓ 読み込み完了：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
   document.getElementById('settings').open=false;
