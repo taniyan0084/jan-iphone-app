@@ -34,7 +34,7 @@ body.iphone-center-test #reader{width:58%;min-height:0;margin:0 auto}body.iphone
 #cartPanel .cart-mail-note{font-size:13px;line-height:1.6;color:#59697b;margin:10px 0}
 .cart-maker-subtotal{background:#edf6f1;border-left:4px solid #08764b;padding:10px 12px;margin:6px 0 14px;font-size:14px;font-weight:700;color:#07593a}#cartStorageAlert{font-size:13px;font-weight:700;color:#a52323;white-space:pre-wrap;margin-top:6px}#cartPanel .cart-status{font-size:13px;font-weight:700;color:#08764b;white-space:pre-wrap;margin-top:6px}
 @media(max-width:420px){.cart-add-controls{gap:6px}.cart-add-controls input{width:72px}.cart-add-controls button{padding:8px 10px}}
-</style></head><body><header>にゃんSearch Ver.5 お客様用</header><div class="hint" style="text-align:center">共有診断版：2026-11-05-share-diag-1</div><main class="wrap"><section class="box"><label for="q">JANコード（下4桁〜13桁）</label><input id="q" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" autocomplete="off" placeholder="下4桁〜JAN13桁を入力"><div class="hint">4桁から自動検索。4〜12桁は末尾一致、13桁は完全一致で検索します。</div><div style="margin-top:10px"><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div></section><section class="box"><label for="nameQuery">メーカー名・商品名・規格あいまい検索</label><input id="nameQuery" type="text" autocomplete="off" placeholder="例：しまの えぎ"><div class="hint">メーカー名・商品名・規格1・規格2を検索。ひらがな・カタカナ、全角・半角の違いにも対応。スペース区切りでAND検索します。</div><button class="primary" id="nameSearch" type="button">🔍 商品・規格検索</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="variationSearch" class="variation-action" type="button" disabled>🔎 規格違いと思われる商品を探す</button><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（Ver.5対応）</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">customer.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
+</style></head><body><header>にゃんSearch Ver.5 お客様用</header><main class="wrap"><section class="box"><label for="q">JANコード（下4桁〜13桁）</label><input id="q" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" autocomplete="off" placeholder="下4桁〜JAN13桁を入力"><div class="hint">4桁から自動検索。4〜12桁は末尾一致、13桁は完全一致で検索します。</div><div style="margin-top:10px"><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div></section><section class="box"><label for="nameQuery">メーカー名・商品名・規格あいまい検索</label><input id="nameQuery" type="text" autocomplete="off" placeholder="例：しまの えぎ"><div class="hint">メーカー名・商品名・規格1・規格2を検索。ひらがな・カタカナ、全角・半角の違いにも対応。スペース区切りでAND検索します。</div><button class="primary" id="nameSearch" type="button">🔍 商品・規格検索</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="variationSearch" class="variation-action" type="button" disabled>🔎 規格違いと思われる商品を探す</button><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（Ver.5対応）</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">customer.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
 <script>
 'use strict';
 function validateData(d){
@@ -208,7 +208,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
     reset.onclick=()=>{if(!confirm('保存されているカートデータを初期化します。よろしいですか？'))return;try{localStorage.removeItem(CART_STORAGE_KEY);cartRestoreError=false;cartStorageOK=true;cart.clear();saveCart();updateCartHeader('保存データを初期化しました。')}catch(e){mailStatus('保存データの初期化に失敗しました。')}};
     form.appendChild(reset);
    }
-   const close=document.createElement('button');close.type='button';close.textContent='検索に戻る';close.onclick=hideCart;form.appendChild(close);appendShareDiagnostics(form);return;
+   const close=document.createElement('button');close.type='button';close.textContent='検索に戻る';close.onclick=hideCart;form.appendChild(close);return;
   }
   let groupName=null,groupAmount=0,groupMissing=0;
   function appendGroup(){if(groupName===null)return;const el=document.createElement('div');el.className='cart-maker-subtotal';el.textContent=(groupName||'メーカー未登録')+' 小計（税抜）：'+money(groupAmount)+(groupMissing?' ※単価未登録 '+groupMissing+'種類を除く':'');contents.appendChild(el)}
@@ -246,7 +246,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   emailMain.querySelector('input').type='email';emailPc.querySelector('input').type='email';
   form.append(emailMain,emailPc);
   const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent='注文メールを作成';mailBtn.onclick=shareTextOrderFile;
-  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文TXTを作成して共有画面を開きます。メールアプリを選び、宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・TXT添付を確認してください。共有できない場合はTXTを保存できます。Excel（.xlsx）の保存・共有も利用できます。';
+  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文TXTを添付し、件名・本文を付けて共有します。メールアプリを選び、宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・TXT添付を確認してください。宛先は「宛先をコピー」から貼り付けられます。共有できない場合はTXTを保存できます。Excel（.xlsx）の保存・共有も利用できます。';
   const status=document.createElement('div');status.id='cartMailStatus';status.className='cart-status';status.setAttribute('role','status');
   const fallbacks=document.createElement('div');fallbacks.className='cart-action-row';
   const download=document.createElement('button');download.type='button';download.textContent='📥 Excelを保存';download.onclick=saveExcelOrder;
@@ -259,11 +259,12 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const close=document.createElement('button');close.type='button';close.textContent='カートを閉じる';close.onclick=hideCart;
   action.append(clear,close);
   const storageNote=document.createElement('div');storageNote.className='hint';storageNote.textContent='カート・連絡先はこのブラウザの端末内保存です。別のPC・スマホとは共有しません。';
-  const metadataTest=document.createElement('button');metadataTest.type='button';metadataTest.textContent='件名・本文付き共有テスト';metadataTest.onclick=shareTextWithMetadataTest;
-  const metadataHint=document.createElement('div');metadataHint.className='hint';metadataHint.textContent='一時テスト：TXT添付と件名・本文を同時に共有します。Gmailでの反映は実機で確認してください。宛先・控え用アドレスは設定しません。';
-  form.append(mailBtn,mailHint,status,fallbacks,action,storageNote);
-  form.append(metadataTest,metadataHint);
-  appendShareDiagnostics(form);
+  const recipient=document.createElement('div');recipient.className='cart-action-row';
+  const address=document.createElement('span');address.textContent='宛先：'+ORDER_MAIL_ADDRESS;
+  const copyRecipient=document.createElement('button');copyRecipient.type='button';copyRecipient.textContent='宛先をコピー';copyRecipient.onclick=copyOrderRecipient;
+  const manualRecipient=document.createElement('input');manualRecipient.type='text';manualRecipient.id='orderRecipientManual';manualRecipient.value=ORDER_MAIL_ADDRESS;manualRecipient.readOnly=true;manualRecipient.className='hidden';manualRecipient.setAttribute('aria-label','注文メールの宛先（手動コピー用）');
+  recipient.append(address,copyRecipient,manualRecipient);
+  form.append(mailBtn,recipient,mailHint,status,fallbacks,action,storageNote);
  }
 
  // Excel (.xlsx) is generated entirely on the device. No external CDN/server required.
@@ -399,127 +400,48 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   return true;
  }
  function mailStatus(s){const el=document.getElementById('cartMailStatus');if(el)el.textContent=s}
- // Temporary on-device diagnostics. No order contents or customer metadata are logged.
- const SHARE_DIAG_VERSION='2026-11-05-share-diag-1';
- const shareDiagnostics={attempts:[]};
+ async function copyOrderRecipient(){
+  const manual=document.getElementById('orderRecipientManual');
+  try{
+   if(!navigator.clipboard||typeof navigator.clipboard.writeText!=='function')throw Error('Clipboard unavailable');
+   await navigator.clipboard.writeText(ORDER_MAIL_ADDRESS);
+   if(manual)manual.classList.add('hidden');
+   mailStatus('宛先をコピーしました：'+ORDER_MAIL_ADDRESS+'。メールアプリの宛先欄に貼り付けてください。');
+  }catch(error){
+   if(manual){manual.classList.remove('hidden');manual.focus();manual.select();manual.setSelectionRange(0,manual.value.length)}
+   mailStatus('宛先を自動コピーできませんでした。表示されたアドレスを長押ししてコピーし、メールアプリの宛先欄に貼り付けてください。');
+  }
+ }
+
+ const ORDER_SHARE_TITLE='【にゃんSearch 注文依頼】';
+ const ORDER_SHARE_TEXT='注文ファイルを添付しました。大橋漁具宛ての注文です。';
  let orderShareBusy=false;
- let preparedOrderShare=null;
- function shareErrorInfo(error){return {name:String(error?.name||'Error'),message:String(error?.message||error||''),code:error?.code??null}}
- function shareActivation(){return navigator.userActivation?{isActive:navigator.userActivation.isActive,hasBeenActive:navigator.userActivation.hasBeenActive}:null}
- function shareEnvironment(){
-  let policy='unknown';
-  try{const p=document.permissionsPolicy||document.featurePolicy;if(p&&typeof p.allowsFeature==='function')policy=p.allowsFeature('web-share')}catch(e){policy=shareErrorInfo(e)}
-  return {revision:SHARE_DIAG_VERSION,time:new Date().toISOString(),page:location.origin+location.pathname,
-   secureContext:window.isSecureContext,protocol:location.protocol,userAgent:navigator.userAgent,
-   embedded:window.self!==window.top,androidWebView:/;\s*wv\)|\bwv\b/i.test(navigator.userAgent),
-   standalone:!!navigator.standalone||!!window.matchMedia?.('(display-mode: standalone)').matches,
-   visibility:document.visibilityState,webSharePolicy:policy,
-   navigatorShare:typeof navigator.share==='function',navigatorCanShare:typeof navigator.canShare==='function',activation:shareActivation()};
+ function saveUnsharedOrder(file,format){
+  try{downloadOrderFile(file);mailStatus('メールアプリへ共有できなかったため'+format+'を保存しました。保存されない場合は「'+format+'を保存」を押し、メールに手動添付してください。')}
+  catch(error){mailStatus('共有・自動保存ができませんでした。「'+format+'を保存」から保存し、メールに手動添付してください。')}
  }
- function canShareProbe(data){
-  if(typeof navigator.canShare!=='function')return {available:false,result:null};
-  try{return {available:true,result:navigator.canShare(data)}}catch(error){return {available:true,result:null,error:shareErrorInfo(error)}}
- }
- function shareDiagnosticsText(){return JSON.stringify({environment:shareEnvironment(),attempts:shareDiagnostics.attempts},null,2)}
- function refreshShareDiagnostics(){const el=document.getElementById('shareDiagnosticText');if(el)el.value=shareDiagnosticsText();const retry=document.getElementById('retryPreparedOrderShare');if(retry)retry.disabled=orderShareBusy||!preparedOrderShare||preparedOrderShare.signature!==orderSignature()}
- function retryPreparedOrderShare(event){
-  if(!preparedOrderShare||preparedOrderShare.signature!==orderSignature()){mailStatus('注文内容が変わりました。「注文メールを作成」または「Excelを共有」でファイルを作り直してください。');return}
-  return shareOrderWithDiagnostics(preparedOrderShare.format,()=>preparedOrderShare.file,event,true);
- }
- function appendShareDiagnostics(parent){
-  const box=document.createElement('details');box.open=true;box.id='shareDiagnosticPanel';
-  const summary=document.createElement('summary');summary.textContent='一時診断：Androidファイル共有（'+SHARE_DIAG_VERSION+'）';
-  const hint=document.createElement('p');hint.className='hint';hint.textContent='TXTは「注文メールを作成」、Excelは「Excelを共有」を押すと、利用可否・保存へ切り替えた理由・エラーが下に表示されます。診断はこの画面内だけで保持し、再読み込みで消えます。注文内容は診断に含めません。';
-  const text=document.createElement('textarea');text.id='shareDiagnosticText';text.readOnly=true;text.rows=14;text.setAttribute('aria-label','ファイル共有の診断結果');text.style.fontSize='12px';text.value=shareDiagnosticsText();
-  const copy=document.createElement('button');copy.type='button';copy.textContent='診断結果をコピー';
-  copy.onclick=async()=>{refreshShareDiagnostics();try{if(!navigator.clipboard?.writeText)throw Error('clipboard unavailable');await navigator.clipboard.writeText(text.value);copy.textContent='診断結果をコピーしました'}catch(e){text.focus();text.select();copy.textContent='診断欄を長押ししてコピーしてください'}};
-  const retry=document.createElement('button');retry.id='retryPreparedOrderShare';retry.type='button';retry.textContent='同じファイルで共有を再試行';retry.onclick=retryPreparedOrderShare;retry.disabled=orderShareBusy||!preparedOrderShare||preparedOrderShare.signature!==orderSignature();
-  const retryHint=document.createElement('p');retryHint.className='hint';retryHint.textContent='生成に時間がかかった場合は、この再試行ボタンで生成済みファイルを直接共有できます。注文内容を変更した場合は作り直してください。';
-  box.append(summary,hint,text,copy,retry,retryHint);parent.appendChild(box);
- }
- function diagnosticDownload(file,attempt,reason){
-  attempt.downloadReason=reason;attempt.download='requested';refreshShareDiagnostics();
-  try{downloadOrderFile(file);attempt.download='triggered';mailStatus(attempt.format+'を保存しました（理由：'+reason+'）。詳しくは下の一時診断をご確認ください。保存されない場合は「'+attempt.format+'を保存」を押してください。')}
-  catch(error){attempt.download='failed';attempt.downloadError=shareErrorInfo(error);mailStatus('自動保存に失敗しました。「'+attempt.format+'を保存」から再試行してください。')}
-  refreshShareDiagnostics();
- }
- async function shareOrderWithDiagnostics(format,builder,event,reusedPreparedFile=false){
+ async function sharePreparedOrder(format,builder,includeMailText){
   if(orderShareBusy){mailStatus('共有処理中です。共有画面を閉じてから再度お試しください。');return}
-  const started=performance.now();
-  const attempt={format,reusedPreparedFile,time:new Date().toISOString(),eventTrusted:event?.isTrusted??null,environment:shareEnvironment(),activationAtClick:shareActivation(),shareCalled:false,download:'none',outcome:'validating'};
-  shareDiagnostics.attempts.push(attempt);if(shareDiagnostics.attempts.length>8)shareDiagnostics.attempts.shift();
-  if(!validateOrderMail()){attempt.outcome='validation-failed';refreshShareDiagnostics();return}
+  if(!validateOrderMail())return;
   let file;
-  try{file=builder()}catch(error){attempt.outcome='generation-failed';attempt.generationError=shareErrorInfo(error);refreshShareDiagnostics();mailStatus(format+'生成に失敗しました。診断結果をご確認ください。');return}
+  try{file=builder()}catch(error){mailStatus(format+'の生成に失敗しました。カートを確認して再度お試しください。');return}
   lastOrderFileName=file.name;lastOrderSignature=orderSignature();
-  preparedOrderShare={format,file,signature:lastOrderSignature};
-  attempt.file={extension:file.name.split('.').pop(),type:file.type,size:file.size};
-  attempt.generationMs=Math.round((performance.now()-started)*100)/100;
-  const payload={files:[file]};
-  attempt.canShareFiles=canShareProbe(payload);
-  attempt.canShareWithMetadata=canShareProbe({files:[file],title:orderSubject(),text:'注文ファイル'});
-  // A harmless tiny file separates general file-share support from the actual order file.
-  attempt.canShareTinyTxt=canShareProbe({files:[new File(['test'],'share-check.txt',{type:'text/plain'})]});
-  if(format==='TXT')attempt.canShareLegacyMime=canShareProbe({files:[new File([file],file.name,{type:'text/plain;charset=utf-8'})]});
-  attempt.activationBeforeShare=shareActivation();
-  attempt.elapsedBeforeShareMs=Math.round((performance.now()-started)*100)/100;
-  let reason=null;
-  if(!window.isSecureContext)reason='insecure-context';
-  else if(typeof navigator.share!=='function')reason='navigator.share-unavailable';
-  else if(attempt.canShareFiles.error)reason='navigator.canShare-threw';
-  else if(attempt.canShareFiles.result===false)reason=attempt.environment.webSharePolicy===false?'navigator.canShare-files-false:policy-denied':'navigator.canShare-files-false';
-  if(reason){attempt.outcome='fallback-before-share';diagnosticDownload(file,attempt,reason);return}
-  // File-only sharing, in the original click task. Do not await, fetch, or defer before this call.
-  orderShareBusy=true;attempt.outcome='calling-share';attempt.shareCalled=true;refreshShareDiagnostics();
+  const payload=includeMailText?{files:[file],title:ORDER_SHARE_TITLE,text:ORDER_SHARE_TEXT}:{files:[file]};
+  try{
+   if(typeof navigator.share!=='function'||(typeof navigator.canShare==='function'&&!navigator.canShare(payload))){saveUnsharedOrder(file,format);return}
+  }catch(error){saveUnsharedOrder(file,format);return}
+  // Keep the native share call inside the original click task, without an earlier await.
+  orderShareBusy=true;
   try{
    await navigator.share(payload);
-   attempt.outcome='share-resolved';mailStatus(format+'を共有先へ渡しました。宛先 '+ORDER_MAIL_ADDRESS+'・CC・添付をメールアプリで確認してください。共有だけでは送信完了ではありません。');
+   mailStatus(format+'を共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・添付を確認してから送信してください。共有だけでは送信完了ではありません。');
   }catch(error){
-   attempt.shareError=shareErrorInfo(error);
-   if(error?.name==='AbortError'){
-    attempt.outcome='share-aborted';mailStatus('共有が中断されました。キャンセルまたは共有先なしの可能性があります。必要なら「'+format+'を保存」を押してください。');
-   }else{attempt.outcome='fallback-after-share-error';diagnosticDownload(file,attempt,'navigator.share-rejected:'+String(error?.name||'Error'))}
-  }finally{orderShareBusy=false;attempt.completedAt=new Date().toISOString();refreshShareDiagnostics()}
+   if(error?.name==='AbortError')mailStatus('共有が中断されました。注文カートは残っています。必要な場合は「'+format+'を保存」を押してください。');
+   else saveUnsharedOrder(file,format);
+  }finally{orderShareBusy=false}
  }
- function shareOrderFile(event){return shareOrderWithDiagnostics('Excel',buildOrderFile,event)}
- // Temporary experiment only. The production file-only share handlers stay unchanged.
- const GMAIL_SHARE_TEST_TITLE='【にゃんSearch 注文依頼】';
- const GMAIL_SHARE_TEST_TEXT='注文ファイルを添付しました。大橋漁具宛ての注文です。';
- async function shareTextWithMetadataTest(event){
-  if(orderShareBusy){mailStatus('共有処理中です。共有画面を閉じてから再度お試しください。');return}
-  const started=performance.now();
-  const attempt={format:'TXT',mode:'files-title-text-test',time:new Date().toISOString(),eventTrusted:event?.isTrusted??null,
-   environment:shareEnvironment(),activationAtClick:shareActivation(),shareCalled:false,download:'none',outcome:'validating',
-   payload:{keys:['files','title','text'],title:GMAIL_SHARE_TEST_TITLE,text:GMAIL_SHARE_TEST_TEXT}};
-  shareDiagnostics.attempts.push(attempt);if(shareDiagnostics.attempts.length>8)shareDiagnostics.attempts.shift();
-  if(!validateOrderMail()){attempt.outcome='validation-failed';refreshShareDiagnostics();return}
-  let file;
-  try{file=buildTextOrderFile()}catch(error){attempt.outcome='generation-failed';attempt.generationError=shareErrorInfo(error);refreshShareDiagnostics();mailStatus('テスト用TXT生成に失敗しました。診断結果をご確認ください。');return}
-  const payload={files:[file],title:GMAIL_SHARE_TEST_TITLE,text:GMAIL_SHARE_TEST_TEXT};
-  attempt.file={extension:file.name.split('.').pop(),type:file.type,size:file.size};
-  attempt.generationMs=Math.round((performance.now()-started)*100)/100;
-  attempt.canShareFiles=canShareProbe({files:[file]});
-  attempt.canShareWithMetadata=canShareProbe(payload);
-  attempt.activationBeforeShare=shareActivation();
-  attempt.elapsedBeforeShareMs=Math.round((performance.now()-started)*100)/100;
-  let reason=null;
-  if(!window.isSecureContext)reason='insecure-context';
-  else if(typeof navigator.share!=='function')reason='navigator.share-unavailable';
-  else if(attempt.canShareWithMetadata.error)reason='navigator.canShare-metadata-threw';
-  else if(attempt.canShareWithMetadata.result===false)reason='navigator.canShare-files-title-text-false';
-  if(reason){attempt.outcome='test-preflight-failed';attempt.preflightError={name:'ShareTestUnavailable',message:reason};refreshShareDiagnostics();mailStatus('件名・本文付き共有テストを開始できません（'+reason+'）。診断欄をご確認ください。通常の「注文メールを作成」はそのまま利用できます。');return}
-  orderShareBusy=true;attempt.outcome='calling-share';attempt.shareCalled=true;refreshShareDiagnostics();
-  // Call inside this click task; never await file generation or a preflight operation.
-  try{
-   await navigator.share(payload);
-   attempt.outcome='share-resolved';mailStatus('件名・本文付き共有テスト：共有APIが正常終了しました。GmailのTXT添付・件名・本文を確認してください。反映は未確認で、メールは自動送信しません。');
-  }catch(error){
-   attempt.shareError=shareErrorInfo(error);attempt.outcome=error?.name==='AbortError'?'share-aborted':'test-share-failed';
-   mailStatus('件名・本文付き共有テスト：'+attempt.shareError.name+' / '+attempt.shareError.message+'。診断欄をご確認ください。通常の「注文メールを作成」はそのまま利用できます。');
-  }finally{orderShareBusy=false;attempt.completedAt=new Date().toISOString();refreshShareDiagnostics()}
- }
-
-
+ function shareTextOrderFile(){return sharePreparedOrder('TXT',buildTextOrderFile,true)}
+ function shareOrderFile(){return sharePreparedOrder('Excel',buildOrderFile,false)}
 
  // UTF-8 (BOM) / CRLF order text. JAN stays a string, including leading zeroes.
  function orderText(){
@@ -557,7 +479,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   try{const file=buildTextOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('TXTを保存しました：'+file.name+'。メールに手動添付して宛先・CCを確認してください。')}
   catch(e){mailStatus('TXTの保存に失敗しました。「TXTを保存」から再度お試しください：'+(e.message||e))}
  }
- function shareTextOrderFile(event){return shareOrderWithDiagnostics('TXT',buildTextOrderFile,event)}
+
 
  function saveExcelOrder(){
   if(!validateOrderMail())return;
