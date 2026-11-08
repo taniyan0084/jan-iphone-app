@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>にゃんSearch Ver.5 スタッフ用（検証版）</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#173b66"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="にゃんSearch スタッフ用（検証版）"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>にゃんSearch Ver.5 スタッフ用（検証版）</title><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="../jan-cat-180.png"><meta name="theme-color" content="#173b66"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="にゃんSearch スタッフ用（検証版）"><style>
 *{box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f2f5f9;color:#162235}header{background:#173b66;color:#fff;padding:15px;font-size:20px;font-weight:700}.wrap{max-width:640px;margin:auto;padding:14px}.box{background:white;padding:15px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 5px #dce2ea}label{display:block;font-weight:700;margin-bottom:8px}input[type=text]{font-size:30px;letter-spacing:3px;width:100%;padding:12px;border:2px solid #9fb1c4;border-radius:9px}button{font-size:16px;padding:10px 14px;border:0;border-radius:8px;background:#e5eef7;color:#173b66;margin:3px}button.primary{background:#1768b0;color:white}button:disabled{opacity:.45}.pager{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:12px}.pager button{font-size:14px}.variation-action{margin-top:12px;width:100%;background:#1768b0;color:white}.hint{font-size:13px;color:#59697b;margin-top:8px;line-height:1.6}.candidate{display:block;width:100%;text-align:left;background:white;border-bottom:1px solid #e1e6ed;padding:13px 4px;border-radius:0}.candidate strong{display:block;font-size:16px}.candidate small{display:block;color:#576679;margin-top:4px}.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e6ebef}.row span:last-child{text-align:right;font-weight:700}.red-price{color:#c51d29!important}.muted{color:#64748b}.hidden{display:none!important}.status{font-size:15px;font-weight:700;margin:12px 0}.warn{color:#b45309}.head{font-size:20px;font-weight:750;line-height:1.45}.spec{color:#526276;margin-top:7px}.tag{display:inline-block;background:#e6f1fa;border-radius:5px;padding:3px 6px;margin:5px 5px 0 0;font-size:13px}#reader{width:100%;min-height:240px;background:#17212b;border-radius:10px;overflow:hidden}#reader video{width:100%!important;height:auto!important;object-fit:contain!important}#reader{min-height:300px}#reader__scan_region{width:100%!important}#reader__scan_region video{width:100%!important}#cameraBox{margin-top:10px}.ok{color:#08764b}#loadStatus{word-break:break-word}#nameQuery{font-size:20px;letter-spacing:normal}#nameSearch{margin-top:10px}#voiceSearch{margin-top:10px}#voiceStatus{font-size:13px;margin-top:5px}input[type=file]{width:100%;max-width:100%;font-size:14px}#imageSearch:disabled{opacity:.45}#priceRows .row span:last-child{display:flex;align-items:center;justify-content:flex-end;gap:8px}#priceRows .row button{font-size:14px;padding:7px 10px;margin:0;white-space:nowrap}#imagePanel{margin-top:14px;border-top:2px solid #e6ebef;padding-top:12px}#imagePanel iframe{width:100%;height:460px;border:1px solid #dce2ea;border-radius:8px;background:white}#imagePanel .hint{margin-bottom:8px}summary{cursor:pointer;font-weight:700}details{margin-top:8px}
 body.iphone-center-test #reader{width:58%;min-height:0;margin:0 auto}body.iphone-center-test #reader video{display:block;width:100%!important;height:auto!important}#toggleCost{min-height:44px;width:auto;font-weight:700;margin-top:10px}.search-actions{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.search-actions button{flex:0 0 auto;white-space:nowrap;margin:3px 0}@media(min-width:370px) and (max-width:480px){.search-actions{gap:4px}.search-actions button{font-size:12px;padding:10px 6px;letter-spacing:-.3px}}@media(max-width:369px){.search-actions button{font-size:13px;padding:9px 7px}}#toggleCost[aria-pressed="true"]{background:#1768b0;color:white}
 /* カート・注文依頼 Ver.5（検索エンジンはVer.4維持） */
@@ -251,7 +251,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   emailMain.querySelector('input').type='email';emailPc.querySelector('input').type='email';
   form.append(emailMain,emailPc);
   const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent='注文メールを作成';mailBtn.onclick=shareTextOrderFile;
-  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文TXTを作成して共有画面を開きます。メールアプリを選び、宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・TXT添付を確認してください。共有できない場合はTXTを保存できます。Excel（.xlsx）の保存・共有も利用できます。';
+  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文TXTを添付し、件名・本文を付けて共有します。メールアプリを選び、宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・TXT添付を確認してください。宛先は「宛先をコピー」から貼り付けられます。共有できない場合はTXTを保存できます。Excel（.xlsx）の保存・共有も利用できます。';
   const status=document.createElement('div');status.id='cartMailStatus';status.className='cart-status';status.setAttribute('role','status');
   const fallbacks=document.createElement('div');fallbacks.className='cart-action-row';
   const download=document.createElement('button');download.type='button';download.textContent='📥 Excelを保存';download.onclick=saveExcelOrder;
@@ -264,7 +264,12 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   const close=document.createElement('button');close.type='button';close.textContent='カートを閉じる';close.onclick=hideCart;
   action.append(clear,close);
   const storageNote=document.createElement('div');storageNote.className='hint';storageNote.textContent='カート・連絡先はこのブラウザの端末内保存です。別のPC・スマホとは共有しません。';
-  form.append(mailBtn,mailHint,status,fallbacks,action,storageNote);
+  const recipient=document.createElement('div');recipient.className='cart-action-row';
+  const address=document.createElement('span');address.textContent='宛先：'+ORDER_MAIL_ADDRESS;
+  const copyRecipient=document.createElement('button');copyRecipient.type='button';copyRecipient.textContent='宛先をコピー';copyRecipient.onclick=copyOrderRecipient;
+  const manualRecipient=document.createElement('input');manualRecipient.type='text';manualRecipient.id='orderRecipientManual';manualRecipient.value=ORDER_MAIL_ADDRESS;manualRecipient.readOnly=true;manualRecipient.className='hidden';manualRecipient.setAttribute('aria-label','注文メールの宛先（手動コピー用）');
+  recipient.append(address,copyRecipient,manualRecipient);
+  form.append(mailBtn,recipient,mailHint,status,fallbacks,action,storageNote);
  }
 
  // Excel (.xlsx) is generated entirely on the device. No external CDN/server required.
@@ -400,27 +405,49 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   return true;
  }
  function mailStatus(s){const el=document.getElementById('cartMailStatus');if(el)el.textContent=s}
- async function shareOrderFile(){
-  if(!orderSendCanStart())return;
-  if(!validateOrderMail())return;
-  let file;try{file=buildOrderFile()}catch(e){mailStatus('Excel生成に失敗しました：'+(e.message||e));return}
-  lastOrderFileName=file.name;lastOrderSignature=orderSignature();
-  const cc=ccAddresses();
-  const text=orderMailContent(file.name)+'\n\n【メール送信時の確認】\n宛先：'+ORDER_MAIL_ADDRESS+'\nCC：'+(cc.join(', ')||'なし');
-  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-   try{
-    await shareWithOrderConfirmation({files:[file],title:orderSubject(),text});
-    mailStatus('Excelファイルを共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'、CC、Excel添付を確認してから送信してください。共有しただけでは送信完了ではありません。');
-   }catch(e){
-    if(e&&e.name==='AbortError'){mailStatus('共有を中止しました。注文カートはそのまま残っています。');return}
-    downloadOrderFile(file);
-    mailStatus('共有に失敗したためExcelを保存しました。下の「メールを開く」を押し、保存したExcelファイルを手動添付してください。');
-   }
-  }else{
-   downloadOrderFile(file);
-   mailStatus('この端末ではファイル共有を利用できないためExcelを保存しました。「メールを開く」でメールを作成し、Excelを添付してください。');
+ async function copyOrderRecipient(){
+  const manual=document.getElementById('orderRecipientManual');
+  try{
+   if(!navigator.clipboard||typeof navigator.clipboard.writeText!=='function')throw Error('Clipboard unavailable');
+   await navigator.clipboard.writeText(ORDER_MAIL_ADDRESS);
+   if(manual)manual.classList.add('hidden');
+   mailStatus('宛先をコピーしました：'+ORDER_MAIL_ADDRESS+'。メールアプリの宛先欄に貼り付けてください。');
+  }catch(error){
+   if(manual){manual.classList.remove('hidden');manual.focus();manual.select();manual.setSelectionRange(0,manual.value.length)}
+   mailStatus('宛先を自動コピーできませんでした。表示されたアドレスを長押ししてコピーし、メールアプリの宛先欄に貼り付けてください。');
   }
  }
+
+ const ORDER_SHARE_TITLE='【にゃんSearch 注文依頼】';
+ const ORDER_SHARE_TEXT='注文ファイルを添付しました。大橋漁具宛ての注文です。';
+ let orderShareBusy=false;
+ function saveUnsharedOrder(file,format){
+  try{downloadOrderFile(file);mailStatus('メールアプリへ共有できなかったため'+format+'を保存しました。保存されない場合は「'+format+'を保存」を押し、メールに手動添付してください。')}
+  catch(error){mailStatus('共有・自動保存ができませんでした。「'+format+'を保存」から保存し、メールに手動添付してください。')}
+ }
+ async function sharePreparedOrder(format,builder,includeMailText){
+  if(!orderSendCanStart())return;
+  if(orderShareBusy){mailStatus('共有処理中です。共有画面を閉じてから再度お試しください。');return}
+  if(!validateOrderMail())return;
+  let file;
+  try{file=builder()}catch(error){mailStatus(format+'の生成に失敗しました。カートを確認して再度お試しください。');return}
+  lastOrderFileName=file.name;lastOrderSignature=orderSignature();
+  const payload=includeMailText?{files:[file],title:ORDER_SHARE_TITLE,text:ORDER_SHARE_TEXT}:{files:[file]};
+  try{
+   if(typeof navigator.share!=='function'||(typeof navigator.canShare==='function'&&!navigator.canShare(payload))){saveUnsharedOrder(file,format);return}
+  }catch(error){saveUnsharedOrder(file,format);return}
+  // Keep the native share call inside the original click task, without an earlier await.
+  orderShareBusy=true;
+  try{
+   await shareWithOrderConfirmation(payload);
+   mailStatus(format+'を共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・添付を確認してから送信してください。共有だけでは送信完了ではありません。');
+  }catch(error){
+   if(error?.name==='AbortError')mailStatus('共有が中断されました。注文カートは残っています。必要な場合は「'+format+'を保存」を押してください。');
+   else saveUnsharedOrder(file,format);
+  }finally{orderShareBusy=false}
+ }
+ function shareTextOrderFile(){return sharePreparedOrder('TXT',buildTextOrderFile,true)}
+ function shareOrderFile(){return sharePreparedOrder('Excel',buildOrderFile,false)}
 
  // UTF-8 (BOM) / CRLF order text. JAN stays a string, including leading zeroes.
  function setupQuantityInput(input){
@@ -468,34 +495,13 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
  }
 
  function buildTextOrderFile(){
-  return new File(['\uFEFF',orderText()],orderFileName().replace(/\.xlsx$/,'.txt'),{type:'text/plain;charset=utf-8'});
+  return new File(['\uFEFF',orderText()],orderFileName().replace(/\.xlsx$/,'.txt'),{type:'text/plain'});
  }
  function saveTextOrder(){
   if(!validateOrderMail())return;
   try{const file=buildTextOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('TXTを保存しました：'+file.name+'。メールに手動添付して宛先・CCを確認してください。')}
   catch(e){mailStatus('TXTの保存に失敗しました。「TXTを保存」から再度お試しください：'+(e.message||e))}
  }
- async function shareTextOrderFile(){
-  if(!orderSendCanStart())return;
-  if(!validateOrderMail())return;
-  let file;
-  try{file=buildTextOrderFile()}catch(e){mailStatus('TXT生成に失敗しました：'+(e.message||e));return}
-  lastOrderFileName=file.name;lastOrderSignature=orderSignature();
-  // No awaited work before navigator.share: retain the button's user activation.
-  try{
-   if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
-    downloadOrderFile(file);
-    mailStatus('このブラウザではTXTファイル共有を利用できないためTXTを保存しました。保存されない場合は「TXTを保存」を押してください。メールに手動添付し、宛先 '+ORDER_MAIL_ADDRESS+' とCCを確認してください。');return;
-   }
-   await shareWithOrderConfirmation({files:[file],title:orderSubject(),text:'宛先：'+ORDER_MAIL_ADDRESS+'\nCC：'+(ccAddresses().join(', ')||'なし')+'\n注文内容は添付TXTをご確認ください。'});
-   mailStatus('TXTを共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'・CC・TXT添付を確認してください。共有だけでは注文送信は完了しません。');
-  }catch(e){
-   if(e&&e.name==='AbortError'){mailStatus('共有を中止しました。必要な場合は「TXTを保存」から保存できます。カートは残っています。');return}
-   try{downloadOrderFile(file);mailStatus('共有に失敗したためTXTを保存しました。保存されない場合は「TXTを保存」を押してください。メールに手動添付し、宛先・CCを確認してください。')}
-   catch(downloadError){mailStatus('共有・自動保存ができませんでした。「TXTを保存」を押して保存してください。')}
-  }
- }
-
  function saveExcelOrder(){
   if(!validateOrderMail())return;
   try{const file=buildOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('Excelを保存しました：'+file.name+'。メール送信時はこのファイルを添付してください。')}
