@@ -4,6 +4,8 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './index_v5_test.html',
+  './manifest_v5.webmanifest',
   './jan-cat-180.png',
   './jan-cat-192.png',
   './jan-cat-512.png'
@@ -33,8 +35,12 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
+  // Ver.5は専用の起動先・manifestとして扱い、Ver.4への代替表示を防ぐ。
+  const isV5Document = url.pathname === new URL('./index_v5_test.html', self.location.href).pathname;
+  const isV5Manifest = url.pathname === new URL('./manifest_v5.webmanifest', self.location.href).pathname;
+
   // HTML・マニフェストはオンラインなら最新版を優先し、オフラインでは保存版を使用。
-  const isAppDocument = request.mode === 'navigate' ||
+  const isAppDocument = request.mode === 'navigate' || isV5Document || isV5Manifest ||
     url.pathname.endsWith('/index.html') ||
     url.pathname.endsWith('/manifest.webmanifest');
 
@@ -50,7 +56,7 @@ self.addEventListener('fetch', event => {
         const cached = await caches.match(request);
         if (cached) return cached;
         if (request.mode === 'navigate') {
-          const fallback = await caches.match('./index.html');
+          const fallback = await caches.match(isV5Document ? './index_v5_test.html' : './index.html');
           if (fallback) return fallback;
         }
         return Response.error();
