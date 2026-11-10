@@ -34,7 +34,64 @@ body.iphone-center-test #reader{width:58%;min-height:0;margin:0 auto}body.iphone
 #cartPanel .cart-mail-note{font-size:13px;line-height:1.6;color:#59697b;margin:10px 0}
 .cart-maker-subtotal{background:#edf6f1;border-left:4px solid #08764b;padding:10px 12px;margin:6px 0 14px;font-size:14px;font-weight:700;color:#07593a}#cartStorageAlert{font-size:13px;font-weight:700;color:#a52323;white-space:pre-wrap;margin-top:6px}#cartPanel .cart-status{font-size:13px;font-weight:700;color:#08764b;white-space:pre-wrap;margin-top:6px}
 @media(max-width:420px){.cart-add-controls{gap:6px}.cart-add-controls input{width:72px}.cart-add-controls button{padding:8px 10px}}
-</style></head><body><header>にゃんSearch Ver.5 スタッフ用（検証版）</header><main class="wrap"><section class="box"><label for="q">JANコード（下4桁〜13桁）</label><input id="q" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" autocomplete="off" placeholder="下4桁〜JAN13桁を入力"><div class="hint">4桁から自動検索。4〜12桁は末尾一致、13桁は完全一致で検索します。</div><div style="margin-top:10px"><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div></section><section class="box"><label for="nameQuery">メーカー名・商品名・規格あいまい検索</label><input id="nameQuery" type="text" autocomplete="off" placeholder="例：しまの えぎ"><div class="hint">メーカー名・商品名・規格1・規格2を検索。ひらがな・カタカナ、全角・半角の違いにも対応。スペース区切りでAND検索します。</div><div class="search-actions"><button class="primary" id="nameSearch" type="button">🔍 商品・規格検索</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="toggleCost" type="button" aria-pressed="false">原価表示：OFF</button></div><button id="variationSearch" class="variation-action" type="button" disabled>🔎 規格違いと思われる商品を探す</button><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div><div class="hint">検証版・社内用。原価表示の切替は認証機能ではありません。</div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（Ver.5対応）</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">master.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
+</style><script>
+/* Index values and row order intentionally match the supplied B engine. */
+(function(host){
+const norm=s=>String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+96));
+const strip=s=>s.replace(/[\s\-‐‑‒–—―ーｰ_・･./／\\]+/gu,'');
+function builder(data){const index=new Array(data.length),makers=new Map(),memo=new Map();let pos=0;return {index,makers,step(limit=Infinity){const start=performance.now();while(pos<data.length){const p=data[pos],raw=String(p[2]??'');let maker=memo.get(raw);if(maker===undefined){maker=norm(raw);memo.set(raw,maker)}const product=norm(p[3]),specs=norm([p[4],p[5]].join(' ')),code=/^[0-9]*$/.test(String(p[1]??''))?String(p[1]??''):norm(p[1]);const all=[maker,product,specs,code].join(' ');index[pos]={maker,product,specs,all,compact:strip(all),productCompact:strip(product)};if(!makers.has(maker))makers.set(maker,[]);makers.get(maker).push(pos++);if(pos%256===0&&performance.now()-start>=limit)break;}return pos===data.length;}}}
+async function build(data,mode='chunk',current=()=>true){const b=builder(data),start=performance.now();if(mode==='sync')b.step();else while(!b.step(8)){if(!current())throw Error('旧マスターの索引作成を中止');await new Promise(r=>setTimeout(r,0));}return {index:b.index,makers:b.makers,build_ms:performance.now()-start};}
+host.FastCore={builder,build,norm,strip};if(typeof module!=='undefined')module.exports=host.FastCore;
+})(typeof self!=='undefined'?self:globalThis);
+(function(){
+FastCore.packChecksum=function(pack){let h=2166136261;const feed=n=>{h=Math.imul(h^n,16777619)>>>0};for(const pool of pack.pools){feed(pool.length);for(const value of pool){feed(value.length);for(let j=0;j<value.length;j++)feed(value.charCodeAt(j))}}for(const id of pack.rows)feed(id);return h;};
+FastCore.pack=function(index){const pools=[[],[],[]],maps=[new Map(),new Map(),new Map()],rows=new Uint32Array(index.length*3);for(let i=0;i<index.length;i++){const p=index[i];[p.maker,p.product,p.specs].forEach((v,k)=>{let n=maps[k].get(v);if(n===undefined){n=pools[k].length;pools[k].push(v);maps[k].set(v,n)}rows[i*3+k]=n})}const pack={pools,rows,count:index.length};pack.checksum=FastCore.packChecksum(pack);return pack;};
+FastCore.unpack=async function(data,pack,current=()=>true){if(pack?.count!==data.length||!(pack.rows instanceof Uint32Array)||pack.rows.length!==data.length*3||!Array.isArray(pack.pools)||pack.pools.length!==3||pack.pools.some(p=>!Array.isArray(p)||p.some(s=>typeof s!=='string')))throw Error('cache shape');if(pack.checksum!==FastCore.packChecksum(pack))throw Error('cache checksum');const index=new Array(data.length),makers=new Map();let start=performance.now();for(let i=0;i<data.length;i++){const vals=[0,1,2].map(k=>pack.pools[k][pack.rows[i*3+k]]);if(vals.some(v=>v===undefined))throw Error('cache row');const [maker,product,specs]=vals,p=data[i],code=/^[0-9]*$/.test(String(p[1]??''))?String(p[1]??''):FastCore.norm(p[1]),all=[maker,product,specs,code].join(' ');index[i]={maker,product,specs,all,compact:FastCore.strip(all),productCompact:FastCore.strip(product)};if(!makers.has(maker))makers.set(maker,[]);makers.get(maker).push(i);if(i%512===0&&performance.now()-start>=8){if(!current())throw Error('旧マスターの復元を中止');await new Promise(r=>setTimeout(r,0));start=performance.now()}}return {index,makers};};
+})();
+
+/* Optional index cache; master JSON remains authoritative. No cart writes. */
+(function(host){
+const VERSION='fast-index-v1';
+function db(name){return new Promise((ok,no)=>{const r=indexedDB.open(name,1);r.onupgradeneeded=()=>r.result.createObjectStore('index');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function cache(name,value,write=false){const d=await db(name);return new Promise((ok,no)=>{let result;const tx=d.transaction('index',write?'readwrite':'readonly'),s=tx.objectStore('index'),r=write?s.put(value,'current'):s.get('current');r.onsuccess=()=>result=r.result;tx.oncomplete=()=>{d.close();ok(result)};tx.onerror=tx.onabort=()=>{d.close();no(tx.error)}})}
+// Non-cryptographic fingerprint is NOT used as cache authority: raw equality is checked.
+async function prepare(data,raw,name,mode,metrics){
+const start=performance.now();let out;
+if(mode==='cache'){const t=performance.now();try{const v=await cache(name);if(v?.version===VERSION&&v.raw===raw&&v.index?.length===data.length&&v.makers instanceof Map){out=v;metrics.cacheHit=true}}catch(e){metrics.cacheReadError=String(e)}metrics.cacheRead_ms=performance.now()-t;}
+if(!out){if(mode==='worker'&&typeof Worker!=='undefined'){const t=performance.now();try{out=await new Promise((ok,no)=>{const worker=new Worker('../fast-worker.js');const timer=setTimeout(()=>{worker.terminate();no(Error('Worker timeout'))},120000);worker.onerror=e=>{clearTimeout(timer);worker.terminate();no(Error(e.message))};worker.onmessage=e=>{clearTimeout(timer);worker.terminate();e.data.error?no(Error(e.data.error)):ok(e.data)};worker.postMessage(data.map(p=>p.slice(0,6)))});metrics.workerWall_ms=performance.now()-t;}catch(e){metrics.workerError=String(e)}}
+if(!out)out=await FastCore.build(data,mode==='sync'?'sync':'chunk');metrics.build_ms=out.build_ms;
+if(mode==='cache'){const t=performance.now();try{await cache(name,{version:VERSION,raw,index:out.index,makers:out.makers},true);metrics.cacheWrite_ms=performance.now()-t}catch(e){metrics.cacheWriteError=String(e)}}}
+metrics.indexTotal_ms=performance.now()-start;return out;}
+host.FastRuntime={prepare,cache};
+})(window);
+(function(){
+FastRuntime.ready=async function(data,generation,name,metrics,current=()=>true){const start=performance.now();const version='packed-normalization-v1';let out;
+if(generation){const t=performance.now();try{const cached=await FastRuntime.cache(name);if(cached?.version===version&&cached.generation===generation){out=await FastCore.unpack(data,cached.pack,current);metrics.cacheHit=true}}catch(e){metrics.cacheError=String(e)}metrics.cacheRestore_ms=performance.now()-t;}
+if(!out){if(!current())throw Error('旧マスターの索引作成を中止');out=await FastCore.build(data,'chunk',current);if(!current())throw Error('旧マスターの索引作成を中止');metrics.build_ms=out.build_ms;if(generation){const t=performance.now();const pack=FastCore.pack(out.index);metrics.pack_ms=performance.now()-t;metrics.packStringChars=pack.pools.reduce((s,p)=>s+p.reduce((s,v)=>s+v.length,0),0);metrics.packTypedBytes=pack.rows.byteLength;
+// A cache write is optional; its failure does not affect master or cart.
+FastRuntime.pendingSave=new Promise(resolve=>FastRuntime.cache(name,{version,generation,pack},true).then(()=>{metrics.cacheWrite_ms=performance.now()-t;resolve(true)},e=>{metrics.cacheWriteError=String(e);resolve(false)}));}}
+metrics.total_ms=performance.now()-start;return out;};
+})();
+
+/* B方式関数は前回比較ZIPのworker.jsから無改変で再利用。createは商品群の再照合用ラッパー。 */
+(function(host){'use strict';const definitions=[{"canonical": "鱒レンジャー", "alias": "マスレンジャー", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "ますレンジャー", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "マス レンジャー", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "鱒レン", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "マスレン", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}];
+function create(DATA,idx){
+ const groups=new Map();const aliases=definitions.map(d=>{const key=JSON.stringify(d.rule);if(!groups.has(key)){const ids=[],maker=norm(d.rule.makerEquals),product=norm(d.rule.productIncludes);for(let i=0;i<DATA.length;i++)if(String(DATA[i][2]??'')===d.rule.makerEquals&&String(DATA[i][3]??'').includes(d.rule.productIncludes))ids.push(i);groups.set(key,{ids,idset:new Set(ids)})}return {...d,...groups.get(key)}});
+function norm(s){return String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+96))}
+function compact(s){return norm(s).replace(/[\s\-‐‑‒–—―ーｰ_・･./／\\]+/gu,'')}
+function plan(q){const words=norm(q).trim().split(/\s+/u).filter(Boolean); const key=compact(q);const a=aliases.find(a=>compact(a.alias)===key);return {words,cwords:words.map(compact),a};}
+function rank(q, ids){const n=norm(q).trim(),c=compact(q),{a,words}=plan(q);return ids.map(i=>{let x=idx[i],score=0;
+ if(x.product===n)score+=1000;if(x.product.startsWith(n))score+=500;if(x.productCompact===c)score+=800;
+ for(const w of words){if(x.product===w)score+=150;else if(x.product.startsWith(w))score+=100;else if(x.product.includes(w))score+=60;if(x.maker===w)score+=50;else if(x.maker.startsWith(w))score+=25;if(x.specs.includes(w))score+=20;}
+ let tier=String(DATA[i][1]).padStart(13,'0')===n?7:x.product===n?6:x.productCompact===c?6:a&&a.idset.has(i)?5.5:x.product.startsWith(n)?5:2;
+ return {i,score:tier*1000000+score}}).sort((a,b)=>b.score-a.score||a.i-b.i).map(x=>x.i)}
+function searchB(q){const timingStart=performance.now();let {words,cwords,a}=plan(q);if(!words.length)return [];let ids=[];for(let i=0;i<idx.length;i++){let x=idx[i];if(words.every((w,j)=>x.all.includes(w)||cwords[j]&&x.compact.includes(cwords[j]))||a&&a.idset.has(i))ids.push(i)}const rankingStart=performance.now();const ranked=rank(q,ids);window.NyanLastBTiming={filter_ms:rankingStart-timingStart,rank_ms:performance.now()-rankingStart};return ranked}
+ return {search:searchB,groupCount:aliases[0]?.ids.length||0};
+}
+host.NyanB={create,definitions};if(typeof module!=='undefined')module.exports=host.NyanB;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script></head><body><header>にゃんSearch Ver.5 スタッフ用（検証版）</header><main class="wrap"><section class="box"><label for="q">JANコード（下4桁〜13桁）</label><input id="q" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" autocomplete="off" placeholder="下4桁〜JAN13桁を入力"><div class="hint">4桁から自動検索。4〜12桁は末尾一致、13桁は完全一致で検索します。</div><div style="margin-top:10px"><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div></section><section class="box"><label for="nameQuery">メーカー名・商品名・規格あいまい検索</label><input id="nameQuery" type="text" autocomplete="off" placeholder="例：しまの えぎ"><div class="hint">メーカー名・商品名・規格1・規格2を検索。ひらがな・カタカナ、全角・半角の違いにも対応。スペース区切りでAND検索します。</div><div class="search-actions"><button class="primary" id="nameSearch" type="button">🔍 商品・規格検索</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="toggleCost" type="button" aria-pressed="false">原価表示：OFF</button></div><button id="variationSearch" class="variation-action" type="button" disabled>🔎 規格違いと思われる商品を探す</button><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div><div class="hint">検証版・社内用。原価表示の切替は認証機能ではありません。</div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（Ver.5対応）</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">master.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
 <script>
 'use strict';
 function validateData(d){
@@ -58,32 +115,44 @@ let costVisible=false;let DATA=[],currentProduct=null,scanner=null,usingDetector
  detail.appendChild(createAddControls(p));
  
 }
-document.getElementById('variationSearch').onclick=()=>{const p=currentProduct;if(!p)return;const btn=document.getElementById('variationSearch');btn.disabled=true;btn.textContent='⏳ 規格違いを検索中…';setTimeout(()=>{try{searchVariations(p)}catch(e){alert('規格違い検索に失敗しました：'+(e.message||e))}finally{btn.textContent='🔎 規格違いと思われる商品を探す';btn.disabled=!currentProduct}},20)};
+document.getElementById('variationSearch').onclick=()=>{const p=currentProduct;if(!p)return;const btn=document.getElementById('variationSearch');btn.disabled=true;btn.textContent='⏳ 規格違いを検索中…';setTimeout(async()=>{try{await searchVariations(p)}catch(e){alert('規格違い検索に失敗しました：'+(e.message||e))}finally{btn.textContent='🔎 規格違いと思われる商品を探す';btn.disabled=!currentProduct}},20)};
 document.getElementById('toggleCost').onclick=()=>{costVisible=!costVisible;const b=document.getElementById('toggleCost');b.textContent='原価表示：'+(costVisible?'ON':'OFF');b.setAttribute('aria-pressed',String(costVisible));if(currentProduct)show(currentProduct);};
-function search(){if(!masterValid())return;currentProduct=null;document.getElementById('variationSearch').disabled=true;document.getElementById('imageSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden');let v=q.value.replace(/\D/g,'').slice(0,13);if(q.value!==v)q.value=v;if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}if(v.length<4){res.innerHTML='<div class="muted">JANの下4桁〜JAN13桁を入力してください。</div>';return}let matches=[];if(v.length===13){for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0')===v)matches.push(i)}else if(v.length===6){let start=lower(v),end=start;while(end<DATA.length&&DATA[end][0]===v)end++;for(let i=start;i<end;i++)matches.push(i)}else{for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0').endsWith(v))matches.push(i)}let n=matches.length;if(!n){res.innerHTML='<div class="status warn">該当商品なし</div>';return}if(n===1){show(DATA[matches[0]]);return}showPagedCandidates(matches,'末尾'+v.length+'桁が一致');}
+function search(){nameRequest++;if(!masterValid())return;currentProduct=null;document.getElementById('variationSearch').disabled=true;document.getElementById('imageSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden');let v=q.value.replace(/\D/g,'').slice(0,13);if(q.value!==v)q.value=v;if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}if(v.length<4){res.innerHTML='<div class="muted">JANの下4桁〜JAN13桁を入力してください。</div>';return}let matches=[];if(v.length===13){for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0')===v)matches.push(i)}else if(v.length===6){let start=lower(v),end=start;while(end<DATA.length&&DATA[end][0]===v)end++;for(let i=start;i<end;i++)matches.push(i)}else{for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0').endsWith(v))matches.push(i)}let n=matches.length;if(!n){res.innerHTML='<div class="status warn">該当商品なし</div>';return}if(n===1){show(DATA[matches[0]]);return}showPagedCandidates(matches,'末尾'+v.length+'桁が一致');}
 
  // あいまい検索：50件ずつ表示。検索結果の上限で候補を消さない。
  // 商品マスターが更新された場合、索引は新しいデータで再構築する。
  let searchIndexData=null,searchIndex=null,makerIndex=null;
+ let bEngineData=null,bEngine=null;
  const PAGE_SIZE=50;
  function normalizeName(s){
   return String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP')
    .replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));
  }
  function compactName(s){return normalizeName(s).replace(/[\s\-‐‑‒–—―ーｰ_・･./／\\]+/gu,'')}
- function ensureSearchIndex(){
-  if(searchIndexData===DATA&&searchIndex)return;
-  const idx=new Array(DATA.length),makers=new Map();
-  for(let i=0;i<DATA.length;i++){
-   const p=DATA[i],maker=normalizeName(p[2]),product=normalizeName(p[3]);
-   const specs=normalizeName([p[4],p[5]].join(' ')),code=normalizeName(p[1]);
-   const all=[maker,product,specs,code].join(' ');
-   idx[i]={maker,product,specs,all,compact:compactName(all),productCompact:compactName(product)};
-   if(!makers.has(maker))makers.set(maker,[]);
-   makers.get(maker).push(i);
-  }
-  searchIndex=idx;makerIndex=makers;searchIndexData=DATA;
+ const fastMetrics=window.NyanFastMetrics={loads:[],indexes:[],searches:[]};
+ let fastJob=null,fastTarget=null,fastTicket=0,fastGeneration=null;
+ const fastMode='chunk';
+ const fastState=document.createElement('div');fastState.className='hint';fastState.setAttribute('role','status');document.getElementById('nameSearch').after(fastState);
+ function ensureSearchIndex(){if(searchIndexData!==DATA||!searchIndex)throw Error('検索準備が完了していません');}
+ function warmIndex(){
+  if(fastTarget===DATA&&fastJob)return fastJob;
+  const target=DATA,ticket=++fastTicket;fastTarget=target;searchIndexData=null;searchIndex=null;makerIndex=null;bEngineData=null;bEngine=null;
+  if(!target.length){fastJob=null;return Promise.resolve();}
+  fastState.textContent='検索の準備中…（JAN検索は利用できます）';
+  const m={mode:fastMode,count:target.length,started:performance.now()};fastMetrics.indexes.push(m);if(fastMetrics.indexes.length>30)fastMetrics.indexes.shift();
+  fastJob=(async()=>{
+   try{const out=await (fastMode==='chunk'?FastRuntime.ready(target,fastGeneration,'nyan-b-search-index-v1-staff',m,()=>ticket===fastTicket&&target===DATA):FastRuntime.prepare(target,'','nyan-b-search-index-v1-staff',fastMode,m));
+   if(ticket!==fastTicket||DATA!==target)return;
+   searchIndex=out.index;makerIndex=out.makers;searchIndexData=target;
+   const t=performance.now();bEngine=NyanB.create(target,searchIndex);bEngineData=target;m.engineCreate_ms=performance.now()-t;m.ready_ms=performance.now()-m.started;
+   fastState.textContent='✓ 検索準備完了（'+(m.ready_ms/1000).toFixed(2)+'秒）';
+   }catch(e){if(ticket===fastTicket){fastTarget=null;fastJob=null;fastState.textContent='検索準備に失敗しました。再検索で再試行します。';}throw e;}
+  })();fastJob.catch(e=>{if(ticket===fastTicket)console.error(e)});return fastJob;
  }
+
+ function searchGeneration(){try{if(!globalThis.crypto?.getRandomValues)return null;const bytes=new Uint32Array(4);crypto.getRandomValues(bytes);return Array.from(bytes).join('-')}catch{return null}}
+ const indexCacheName='nyan-b-search-index-v1-staff';
+ async function dbGet(){const record=await dbGetRaw();if(record&&typeof record.raw==='string'&&!record.nyanBGeneration){const updated={...record,nyanBGeneration:searchGeneration()};if(updated.nyanBGeneration){try{await dbPut(updated);return updated}catch(e){/* Original master remains usable even if metadata migration fails. */}}}return record;}
  function candidateButton(i){
   const p=DATA[i],holder=document.createElement('div');holder.className='candidate-entry';
   const b=document.createElement('button');b.className='candidate';b.type='button';
@@ -676,36 +745,22 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
    pager.append(prev,info,next);
   }
  }
- function searchByName(){
+ let nameRequest=0;
+ async function searchByName(){
+  const request=++nameRequest,searchStart=performance.now();
   if(!masterValid())return;
-  currentProduct=null;document.getElementById('variationSearch').disabled=true;document.getElementById('imageSearch').disabled=true;
+  currentProduct=null;document.getElementById('imageSearch').disabled=true;document.getElementById('variationSearch').disabled=true;
   detail.classList.add('hidden');res.classList.remove('hidden');
   const query=normalizeName(document.getElementById('nameQuery').value).trim();
   const words=query.split(/\s+/u).filter(Boolean),compactWords=words.map(compactName);
   if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
   if(!words.length){res.innerHTML='<div class="status warn">メーカー名・商品名・規格のキーワードを入力してください。</div>';return}
-  ensureSearchIndex();
-  const hits=[];
-  for(let i=0;i<DATA.length;i++){
-   const x=searchIndex[i];
-   if(!words.every((w,j)=>x.all.includes(w)||compactWords[j]&&x.compact.includes(compactWords[j])))continue;
-   let score=0;
-   if(x.product===query)score+=1000;
-   if(x.product.startsWith(query))score+=500;
-   if(x.productCompact===compactName(query))score+=800;
-   for(const w of words){
-    if(x.product===w)score+=150;
-    else if(x.product.startsWith(w))score+=100;
-    else if(x.product.includes(w))score+=60;
-    if(x.maker===w)score+=50;
-    else if(x.maker.startsWith(w))score+=25;
-    if(x.specs.includes(w))score+=20;
-   }
-   hits.push({i,score});
-  }
-  if(!hits.length){res.innerHTML='<div class="status warn">該当商品がありません。</div>';return}
-  hits.sort((a,b)=>b.score-a.score||a.i-b.i);
-  const ids=hits.map(x=>x.i);
+  const target=DATA;try{await warmIndex()}catch(e){if(DATA===target)res.innerHTML='<div class="status warn">検索準備に失敗しました。再検索してください。</div>';return}if(request!==nameRequest||DATA!==target)return;
+  const cpuStart=performance.now();
+  if(bEngineData!==DATA){bEngine=NyanB.create(DATA,searchIndex);bEngineData=DATA;}
+  const ids=bEngine.search(query);
+  const measurement={query,count:ids.length,search_ms:performance.now()-cpuStart,...(window.NyanLastBTiming||{}),waitAndSearch_ms:performance.now()-searchStart};fastMetrics.searches.push(measurement);if(fastMetrics.searches.length>300)fastMetrics.searches.shift();requestAnimationFrame(()=>requestAnimationFrame(()=>measurement.displayProxy_ms=performance.now()-searchStart));
+  if(!ids.length){res.innerHTML='<div class="status warn">該当商品がありません。</div>';return}
   if(ids.length===1){show(DATA[ids[0]]);return}
   showPagedCandidates(ids,'メーカー名・商品名・規格検索');
  }
@@ -738,9 +793,9 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   }
   function variationTokens(s){return variationBase(s).replace(/[　\t\r\n]+/g,' ').trim().split(/ +/).map(compactName)}
   function prefixMatches(a,b,count){return a.length>=count&&b.length>=count&&a.slice(0,count).every((v,i)=>v===b[i])}
-  function searchVariations(source){
+  async function searchVariations(source){
    if(!masterValid()||!DATA.length)return;
-   ensureSearchIndex();
+   const target=DATA;await warmIndex();if(DATA!==target)return;
    const maker=normalizeName(source[2]),rows=makerIndex.get(maker)||[];
    const sourceName=normalizeName(source[3]),tokens=variationTokens(source[3]);
    const series=variationSeries(source[3])||variationSeriesFallback(source[3],rows);
@@ -786,6 +841,7 @@ function search(){if(!masterValid())return;currentProduct=null;document.getEleme
   try{recognition.start()}catch(e){status.textContent='音声認識を開始できません：'+e.message}
  };
 })();
+document.getElementById('openCart').addEventListener('click',()=>{nameRequest++},true);
 document.getElementById('nameSearch').onclick=searchByName;
 document.getElementById('nameQuery').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchByName()}});
 function googleImagesUrl(p){const jan=String(p[1]??'').replace(/\D/g,'');return 'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(jan)}
@@ -898,7 +954,7 @@ async function updateFrom配信元(force=false){
   const record={raw,filename:DATA_FILENAME,remote:true,remoteSource:DROPBOX_MASTER_URL,downloadedAt:now,checkedAt:now,remoteTag,remoteModified,remoteLength};
   await dbPut(record);
   rememberMasterLastRead(now);
-  masterExpiry=now+REMOTE_VALID_MS;DATA=parsed;camBtn.disabled=false;
+  masterExpiry=now+REMOTE_VALID_MS;DATA=parsed;void warmIndex();camBtn.disabled=false;
   loadStatus.innerHTML='<span class="ok">✓ 配信元自動更新：'+DATA.length.toLocaleString()+'件（最終取得：'+new Date(now).toLocaleString('ja-JP')+'）</span>';
   progress.textContent='✓ 更新完了：'+DATA.length.toLocaleString()+'件';
   if(!scanning){document.getElementById('settings').open=false;search();}
@@ -913,7 +969,7 @@ async function updateFrom配信元(force=false){
 }
 function expiryLabel(ms){return new Date(ms).toLocaleDateString('ja-JP')+' 0:00';}
 function resetMaster(message){
- DATA=[];masterExpiry=null;currentProduct=null;document.getElementById('variationSearch').disabled=true;camBtn.disabled=true;
+ DATA=[];void warmIndex();masterExpiry=null;currentProduct=null;document.getElementById('variationSearch').disabled=true;camBtn.disabled=true;
  document.getElementById('imageSearch').disabled=true;
  document.getElementById('nameQuery').value='';q.value='';
  detail.classList.add('hidden');res.classList.remove('hidden');
@@ -932,15 +988,16 @@ async function expireMaster(){
  finally{expiring=false;}
 }
 function dbOpen(){return new Promise((resolve,reject)=>{let r=indexedDB.open('nyan-staff-master-v2',1);r.onupgradeneeded=()=>r.result.createObjectStore('files');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
-async function dbGet(){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readonly'),r=tx.objectStore('files').get('master');r.onsuccess=()=>{db.close();resolve(r.result)};r.onerror=()=>{db.close();reject(r.error)}})}
-async function dbPut(record){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').put(record,'master');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error)}})}
-async function dbDelete(){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').delete('master');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+async function dbGetRaw(){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readonly'),r=tx.objectStore('files').get('master');r.onsuccess=()=>{db.close();resolve(r.result)};r.onerror=()=>{db.close();reject(r.error)}})}
+async function dbPut(record){if(!record.nyanBGeneration)record={...record,nyanBGeneration:searchGeneration()};let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').put(record,'master');tx.oncomplete=()=>{db.close();fastGeneration=record.nyanBGeneration||null;resolve()};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error)}})}
+async function dbDelete(){await FastRuntime.cache(indexCacheName,null,true).catch(()=>{});let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').delete('master');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
 function applyData(record,source){
+ fastGeneration=record?.nyanBGeneration||null;
  if(!record||typeof record!=='object'||typeof record.raw!=='string'||typeof record.filename!=='string')throw Error('旧形式の保存データです。JSONを選び直してください');
  const expiry=expiryForRecord(record);
  const d=JSON.parse(record.raw.replace(/^\uFEFF/,''));
  validateData(d);
- masterExpiry=expiry;DATA=d;camBtn.disabled=false;
+ masterExpiry=expiry;DATA=d;void warmIndex();camBtn.disabled=false;
  rememberMasterLastRead(record.downloadedAt);
  loadStatus.innerHTML='<span class="ok">✓ '+source+'：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
  document.getElementById('settings').open=false;search();
@@ -956,7 +1013,7 @@ document.getElementById('masterFile').addEventListener('change',async e=>{
   loadStatus.textContent='端末内に保存中…';
   const loadedAt=Date.now();await dbPut({raw,filename:f.name,downloadedAt:loadedAt});
   rememberMasterLastRead(loadedAt);
-  masterExpiry=expiry;DATA=parsed;camBtn.disabled=false;
+  masterExpiry=expiry;DATA=parsed;void warmIndex();camBtn.disabled=false;
   loadStatus.innerHTML='<span class="ok">✓ 読み込み完了：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
   document.getElementById('settings').open=false;
   search();
