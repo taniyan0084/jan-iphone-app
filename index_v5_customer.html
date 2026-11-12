@@ -1,0 +1,1404 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>にゃんSearch Ver.5 お客様用</title><link rel="manifest" href="manifest_v5.webmanifest"><meta name="theme-color" content="#173b66"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="にゃんSearch お客様用"><style>
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f2f5f9;color:#162235}header{background:#173b66;color:#fff;padding:15px;font-size:20px;font-weight:700}.wrap{max-width:640px;margin:auto;padding:14px}.box{background:white;padding:15px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 5px #dce2ea}label{display:block;font-weight:700;margin-bottom:8px}input[type=text]{font-size:30px;letter-spacing:3px;width:100%;padding:12px;border:2px solid #9fb1c4;border-radius:9px}button{font-size:16px;padding:10px 14px;border:0;border-radius:8px;background:#e5eef7;color:#173b66;margin:3px}button.primary{background:#1768b0;color:white}button:disabled{opacity:.45}.pager{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:12px}.pager button{font-size:14px}.variation-action{display:block;margin-top:8px;width:100%;background:#1768b0;color:white}.hint{font-size:13px;color:#59697b;margin-top:8px;line-height:1.6}.candidate{display:block;width:100%;text-align:left;background:white;border-bottom:1px solid #e1e6ed;padding:13px 4px;border-radius:0}.candidate strong{display:block;font-size:16px}.candidate small{display:block;color:#576679;margin-top:4px}.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e6ebef}.row span:last-child{text-align:right;font-weight:700}.red-price{color:#c51d29!important}.muted{color:#64748b}.hidden{display:none!important}.status{font-size:15px;font-weight:700;margin:12px 0}.warn{color:#b45309}.head{font-size:20px;font-weight:750;line-height:1.45}.spec{color:#526276;margin-top:7px}.tag{display:inline-block;background:#e6f1fa;border-radius:5px;padding:3px 6px;margin:5px 5px 0 0;font-size:13px}#reader{width:100%;min-height:240px;background:#17212b;border-radius:10px;overflow:hidden}#reader video{width:100%!important;height:auto!important;object-fit:contain!important}#reader{min-height:300px}#reader__scan_region{width:100%!important}#reader__scan_region video{width:100%!important}#cameraBox{margin-top:10px}.ok{color:#08764b}#loadStatus{word-break:break-word}#nameQuery{font-size:20px;letter-spacing:normal}#nameSearch{margin-top:10px}#voiceSearch{margin-top:10px}#voiceStatus{font-size:13px;margin-top:5px}input[type=file]{width:100%;max-width:100%;font-size:14px}#imageSearch:disabled{opacity:.45}#priceRows .row span:last-child{display:flex;align-items:center;justify-content:flex-end;gap:8px}#priceRows .row button{font-size:14px;padding:7px 10px;margin:0;white-space:nowrap}#imagePanel{margin-top:14px;border-top:2px solid #e6ebef;padding-top:12px}#imagePanel iframe{width:100%;height:460px;border:1px solid #dce2ea;border-radius:8px;background:white}#imagePanel .hint{margin-bottom:8px}summary{cursor:pointer;font-weight:700}details{margin-top:8px}
+body.iphone-center-test #reader{width:58%;min-height:0;margin:0 auto}body.iphone-center-test #reader video{display:block;width:100%!important;height:auto!important}
+/* カート・注文依頼 Ver.5（検索エンジンはVer.4維持） */
+.cart-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+#openCart{background:#08764b;color:#fff;font-weight:700;flex:1;min-height:45px}
+#cartQuickTotal{font-weight:700;font-size:14px}
+#cartNotice{margin-top:6px;font-size:13px;color:#08764b;min-height:0}
+.candidate-entry{border-bottom:1px solid #dfe5ed;padding:3px 0 12px}
+.candidate-entry .candidate{border-bottom:0;margin:0;padding:11px 4px 5px}
+.cart-add-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
+.cart-add-controls label{font-size:14px;margin:0;display:flex;align-items:center;gap:5px}
+.cart-add-controls input{width:85px;font-size:17px;letter-spacing:normal;border:1px solid #9fb1c4;border-radius:7px;padding:8px;text-align:right}
+.cart-add-controls button{background:#08764b;color:#fff;min-height:39px;margin:0;font-size:14px}
+.cart-presence{font-size:12px;color:#08764b;font-weight:700}
+.cart-unit-label{color:#526276;font-size:13px}
+#cartPanel input[type=text],#cartPanel input[type=number],#cartPanel textarea{width:100%;font-size:16px;letter-spacing:normal;border:1px solid #9fb1c4;border-radius:7px;padding:10px}
+#cartPanel textarea{resize:vertical;min-height:68px;font-family:inherit}
+#cartPanel .cart-field{margin-top:13px}
+#cartPanel .cart-field label{font-size:14px;margin:0 0 4px}
+#cartPanel .cart-order-row{border-bottom:1px solid #e5ebf0;padding:12px 0}
+#cartPanel .cart-order-title{font-weight:700;font-size:15px}
+#cartPanel .cart-order-detail{font-size:12px;color:#59697b;margin-top:3px}
+#cartPanel .cart-order-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#cartPanel .cart-order-tools input{width:90px}
+#cartPanel .cart-order-tools button{margin:0}
+#cartPanel .cart-order-note{margin-top:9px}
+#cartPanel .cart-totals{font-size:18px;font-weight:700;margin:14px 0}
+#cartPanel .cart-email-btn{background:#1768b0;color:#fff;min-height:46px;width:100%;margin:9px 0 4px}
+#cartPanel .cart-email-btn:disabled{opacity:.45}
+#cartPanel .cart-danger{color:#a52323;background:#fcecec}
+#cartPanel .cart-action-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#cartPanel .cart-action-row button{font-size:13px}
+#cartPanel .cart-mail-note{font-size:13px;line-height:1.6;color:#59697b;margin:10px 0}
+.cart-maker-subtotal{background:#edf6f1;border-left:4px solid #08764b;padding:10px 12px;margin:6px 0 14px;font-size:14px;font-weight:700;color:#07593a}#cartStorageAlert{font-size:13px;font-weight:700;color:#a52323;white-space:pre-wrap;margin-top:6px}#cartPanel .cart-status{font-size:13px;font-weight:700;color:#08764b;white-space:pre-wrap;margin-top:6px}
+@media(max-width:420px){.cart-add-controls{gap:6px}.cart-add-controls input{width:72px}.cart-add-controls button{padding:8px 10px}}
+</style><script>
+/* Index values and row order intentionally match the supplied B engine. */
+(function(host){
+const norm=s=>String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+96));
+const strip=s=>s.replace(/[\s\-‐‑‒–—―ーｰ_・･./／\\]+/gu,'');
+function builder(data){const index=new Array(data.length),makers=new Map(),memo=new Map();let pos=0;return {index,makers,step(limit=Infinity){const start=performance.now();while(pos<data.length){const p=data[pos],raw=String(p[2]??'');let maker=memo.get(raw);if(maker===undefined){maker=norm(raw);memo.set(raw,maker)}const product=norm(p[3]),specs=norm([p[4],p[5]].join(' ')),code=/^[0-9]*$/.test(String(p[1]??''))?String(p[1]??''):norm(p[1]);const all=[maker,product,specs,code].join(' ');index[pos]={maker,product,specs,all,compact:strip(all),productCompact:strip(product)};if(!makers.has(maker))makers.set(maker,[]);makers.get(maker).push(pos++);if(pos%256===0&&performance.now()-start>=limit)break;}return pos===data.length;}}}
+async function build(data,mode='chunk',current=()=>true){const b=builder(data),start=performance.now();if(mode==='sync')b.step();else while(!b.step(8)){if(!current())throw Error('旧マスターの索引作成を中止');await new Promise(r=>setTimeout(r,0));}return {index:b.index,makers:b.makers,build_ms:performance.now()-start};}
+host.FastCore={builder,build,norm,strip};if(typeof module!=='undefined')module.exports=host.FastCore;
+})(typeof self!=='undefined'?self:globalThis);
+(function(){
+FastCore.packChecksum=function(pack){let h=2166136261;const feed=n=>{h=Math.imul(h^n,16777619)>>>0};for(const pool of pack.pools){feed(pool.length);for(const value of pool){feed(value.length);for(let j=0;j<value.length;j++)feed(value.charCodeAt(j))}}for(const id of pack.rows)feed(id);return h;};
+FastCore.pack=function(index){const pools=[[],[],[]],maps=[new Map(),new Map(),new Map()],rows=new Uint32Array(index.length*3);for(let i=0;i<index.length;i++){const p=index[i];[p.maker,p.product,p.specs].forEach((v,k)=>{let n=maps[k].get(v);if(n===undefined){n=pools[k].length;pools[k].push(v);maps[k].set(v,n)}rows[i*3+k]=n})}const pack={pools,rows,count:index.length};pack.checksum=FastCore.packChecksum(pack);return pack;};
+FastCore.unpack=async function(data,pack,current=()=>true){if(pack?.count!==data.length||!(pack.rows instanceof Uint32Array)||pack.rows.length!==data.length*3||!Array.isArray(pack.pools)||pack.pools.length!==3||pack.pools.some(p=>!Array.isArray(p)||p.some(s=>typeof s!=='string')))throw Error('cache shape');if(pack.checksum!==FastCore.packChecksum(pack))throw Error('cache checksum');const index=new Array(data.length),makers=new Map();let start=performance.now();for(let i=0;i<data.length;i++){const vals=[0,1,2].map(k=>pack.pools[k][pack.rows[i*3+k]]);if(vals.some(v=>v===undefined))throw Error('cache row');const [maker,product,specs]=vals,p=data[i],code=/^[0-9]*$/.test(String(p[1]??''))?String(p[1]??''):FastCore.norm(p[1]),all=[maker,product,specs,code].join(' ');index[i]={maker,product,specs,all,compact:FastCore.strip(all),productCompact:FastCore.strip(product)};if(!makers.has(maker))makers.set(maker,[]);makers.get(maker).push(i);if(i%512===0&&performance.now()-start>=8){if(!current())throw Error('旧マスターの復元を中止');await new Promise(r=>setTimeout(r,0));start=performance.now()}}return {index,makers};};
+})();
+
+/* Optional index cache; master JSON remains authoritative. No cart writes. */
+(function(host){
+const VERSION='fast-index-v1';
+function db(name){return new Promise((ok,no)=>{const r=indexedDB.open(name,1);r.onupgradeneeded=()=>r.result.createObjectStore('index');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function cache(name,value,write=false){const d=await db(name);return new Promise((ok,no)=>{let result;const tx=d.transaction('index',write?'readwrite':'readonly'),s=tx.objectStore('index'),r=write?s.put(value,'current'):s.get('current');r.onsuccess=()=>result=r.result;tx.oncomplete=()=>{d.close();ok(result)};tx.onerror=tx.onabort=()=>{d.close();no(tx.error)}})}
+// Non-cryptographic fingerprint is NOT used as cache authority: raw equality is checked.
+async function prepare(data,raw,name,mode,metrics){
+const start=performance.now();let out;
+if(mode==='cache'){const t=performance.now();try{const v=await cache(name);if(v?.version===VERSION&&v.raw===raw&&v.index?.length===data.length&&v.makers instanceof Map){out=v;metrics.cacheHit=true}}catch(e){metrics.cacheReadError=String(e)}metrics.cacheRead_ms=performance.now()-t;}
+if(!out){if(mode==='worker'&&typeof Worker!=='undefined'){const t=performance.now();try{out=await new Promise((ok,no)=>{const worker=new Worker('../fast-worker.js');const timer=setTimeout(()=>{worker.terminate();no(Error('Worker timeout'))},120000);worker.onerror=e=>{clearTimeout(timer);worker.terminate();no(Error(e.message))};worker.onmessage=e=>{clearTimeout(timer);worker.terminate();e.data.error?no(Error(e.data.error)):ok(e.data)};worker.postMessage(data.map(p=>p.slice(0,6)))});metrics.workerWall_ms=performance.now()-t;}catch(e){metrics.workerError=String(e)}}
+if(!out)out=await FastCore.build(data,mode==='sync'?'sync':'chunk');metrics.build_ms=out.build_ms;
+if(mode==='cache'){const t=performance.now();try{await cache(name,{version:VERSION,raw,index:out.index,makers:out.makers},true);metrics.cacheWrite_ms=performance.now()-t}catch(e){metrics.cacheWriteError=String(e)}}}
+metrics.indexTotal_ms=performance.now()-start;return out;}
+host.FastRuntime={prepare,cache};
+})(window);
+(function(){
+FastRuntime.ready=async function(data,generation,name,metrics,current=()=>true){const start=performance.now();const version='packed-normalization-v1';let out;
+if(generation){const t=performance.now();try{const cached=await FastRuntime.cache(name);if(cached?.version===version&&cached.generation===generation){out=await FastCore.unpack(data,cached.pack,current);metrics.cacheHit=true}}catch(e){metrics.cacheError=String(e)}metrics.cacheRestore_ms=performance.now()-t;}
+if(!out){if(!current())throw Error('旧マスターの索引作成を中止');out=await FastCore.build(data,'chunk',current);if(!current())throw Error('旧マスターの索引作成を中止');metrics.build_ms=out.build_ms;if(generation){const t=performance.now();const pack=FastCore.pack(out.index);metrics.pack_ms=performance.now()-t;metrics.packStringChars=pack.pools.reduce((s,p)=>s+p.reduce((s,v)=>s+v.length,0),0);metrics.packTypedBytes=pack.rows.byteLength;
+// A cache write is optional; its failure does not affect master or cart.
+FastRuntime.pendingSave=new Promise(resolve=>FastRuntime.cache(name,{version,generation,pack},true).then(()=>{metrics.cacheWrite_ms=performance.now()-t;resolve(true)},e=>{metrics.cacheWriteError=String(e);resolve(false)}));}}
+metrics.total_ms=performance.now()-start;return out;};
+})();
+
+/* B方式関数は前回比較ZIPのworker.jsから無改変で再利用。createは商品群の再照合用ラッパー。 */
+(function(host){'use strict';const definitions=[{"canonical": "鱒レンジャー", "alias": "マスレンジャー", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "ますレンジャー", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "マス レンジャー", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "鱒レン", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}, {"canonical": "鱒レンジャー", "alias": "マスレン", "maker": "大橋漁具", "rule": {"makerEquals": "大橋漁具", "productIncludes": "鱒レンジャー"}, "evidence": "仕様書5-1。大橋漁具かつ商品名に鱒レンジャーを含む行だけに適用", "status": "対象確認済み・今回指示書により試験使用"}];
+function create(DATA,idx){
+ const groups=new Map();const aliases=definitions.map(d=>{const key=JSON.stringify(d.rule);if(!groups.has(key)){const ids=[],maker=norm(d.rule.makerEquals),product=norm(d.rule.productIncludes);for(let i=0;i<DATA.length;i++)if(String(DATA[i][2]??'')===d.rule.makerEquals&&String(DATA[i][3]??'').includes(d.rule.productIncludes))ids.push(i);groups.set(key,{ids,idset:new Set(ids)})}return {...d,...groups.get(key)}});
+function norm(s){return String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+96))}
+function compact(s){return norm(s).replace(/[\s\-‐‑‒–—―ーｰ_・･./／\\]+/gu,'')}
+function plan(q){const words=norm(q).trim().split(/\s+/u).filter(Boolean); const key=compact(q);const a=aliases.find(a=>compact(a.alias)===key);return {words,cwords:words.map(compact),a};}
+function rank(q, ids){const n=norm(q).trim(),c=compact(q),{a,words}=plan(q);return ids.map(i=>{let x=idx[i],score=0;
+ if(x.product===n)score+=1000;if(x.product.startsWith(n))score+=500;if(x.productCompact===c)score+=800;
+ for(const w of words){if(x.product===w)score+=150;else if(x.product.startsWith(w))score+=100;else if(x.product.includes(w))score+=60;if(x.maker===w)score+=50;else if(x.maker.startsWith(w))score+=25;if(x.specs.includes(w))score+=20;}
+ let tier=String(DATA[i][1]).padStart(13,'0')===n?7:x.product===n?6:x.productCompact===c?6:a&&a.idset.has(i)?5.5:x.product.startsWith(n)?5:2;
+ return {i,score:tier*1000000+score}}).sort((a,b)=>b.score-a.score||a.i-b.i).map(x=>x.i)}
+function searchB(q){const timingStart=performance.now();let {words,cwords,a}=plan(q);if(!words.length)return [];let ids=[];for(let i=0;i<idx.length;i++){let x=idx[i];if(words.every((w,j)=>x.all.includes(w)||cwords[j]&&x.compact.includes(cwords[j]))||a&&a.idset.has(i))ids.push(i)}const rankingStart=performance.now();const ranked=rank(q,ids);window.NyanLastBTiming={filter_ms:rankingStart-timingStart,rank_ms:performance.now()-rankingStart};return ranked}
+ return {search:searchB,groupCount:aliases[0]?.ids.length||0};
+}
+host.NyanB={create,definitions};if(typeof module!=='undefined')module.exports=host.NyanB;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script></head><body><header>にゃんSearch Ver.5 お客様用</header><main class="wrap"><section class="box"><label for="q">JANコード（下4桁〜13桁）</label><input id="q" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" autocomplete="off" placeholder="下4桁〜JAN13桁を入力"><div class="hint">4桁から自動検索。4〜12桁は末尾一致、13桁は完全一致で検索します。</div><div style="margin-top:10px"><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div></section><section class="box"><label for="nameQuery">メーカー名・商品名・規格あいまい検索</label><input id="nameQuery" type="text" autocomplete="off" placeholder="例：しまの えぎ"><div class="hint">メーカー名・商品名・規格1・規格2を検索。ひらがな・カタカナ、全角・半角の違いにも対応。スペース区切りでAND検索します。</div><button class="primary" id="nameSearch" type="button">🔍 商品・規格検索</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="variationSearch" class="variation-action" type="button" disabled>🔎 規格違いと思われる商品を探す</button><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（Ver.5対応）</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">customer.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
+<script>
+'use strict';
+function validateData(d){
+ if(!Array.isArray(d)||!d.length)throw Error('商品データが空、または形式が違います');
+ for(let i=0;i<d.length;i++){
+  const p=d[i];if(!Array.isArray(p)||p.length!==17)throw Error('商品'+(i+1)+'は17項目必要です');
+  if(i&&String(d[i-1][0])>String(p[0]))throw Error('JAN末尾6桁の並び順が不正です');
+  if([8,10,12].some(k=>p[k]!==null))throw Error('お客様用データ以外は読み込めません（非公開項目を検出）');
+ }
+}
+let DATA=[],currentProduct=null,scanner=null,usingDetector=false,stream=null,scanTimer=0,scanning=false,cameraSession=0,cameraBusy=false;const q=document.getElementById('q'),res=document.getElementById('result'),detail=document.getElementById('detail'),camBtn=document.getElementById('camera'),camBox=document.getElementById('cameraBox'),camStatus=document.getElementById('camStatus'),loadStatus=document.getElementById('loadStatus');function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function lower(k){let l=0,h=DATA.length;while(l<h){let m=(l+h)>>1;if(DATA[m][0]<k)l=m+1;else h=m}return l}function money(v){if(v===null||v===undefined||v==='')return '—';let n=Number(v);return Number.isFinite(n)?'¥'+n.toLocaleString('ja-JP',{maximumFractionDigits:2}):esc(v)}function line(k,v){return '<div class="row"><span>'+k+'</span><span>'+v+'</span></div>'}function show(p){
+ if(!masterValid())return;
+ currentProduct=p;document.getElementById('imageSearch').disabled=false;document.getElementById('variationSearch').disabled=false;
+ res.classList.add('hidden');detail.classList.remove('hidden');
+ const val=(v)=>v===null||v===undefined||String(v).trim()===''?'—':esc(v);
+ const prices=line('定価',money(p[6]))+line('通常卸',money(p[7]));
+ detail.innerHTML='<button id="back">← 候補に戻る</button><div class="head">'+esc(p[3])+'</div><div class="spec">'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</div><div class="tag">'+esc(p[2])+'</div><div class="tag">JAN '+esc(p[1])+'</div><div style="margin-top:12px">'+line('倉庫在庫実数',p[9]===null||p[9]===undefined?'データなし':esc(p[9]))+line('メーカー在庫',p[11]===null||p[11]===undefined||String(p[11]).trim()===''?'要確認':esc(p[11]))+line('定番',val(p[14]))+line('廃盤',val(p[15]))+line('最低出荷単位',val(p[16]))+line('棚番',val(p[13])==='—'?'未登録':val(p[13]))+'</div><div id="priceRows">'+prices+'</div>';
+ document.getElementById('back').onclick=()=>{currentProduct=null;document.getElementById('imageSearch').disabled=true;document.getElementById('variationSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden')};
+ detail.appendChild(createAddControls(p));
+ 
+}
+function search(){nameRequest++;if(!masterValid())return;currentProduct=null;document.getElementById('imageSearch').disabled=true;document.getElementById('variationSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden');let v=q.value.replace(/\D/g,'').slice(0,13);if(q.value!==v)q.value=v;if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}if(v.length<4){res.innerHTML='<div class="muted">JANの下4桁〜JAN13桁を入力してください。</div>';return}let matches=[];if(v.length===13){for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0')===v)matches.push(i)}else if(v.length===6){let start=lower(v),end=start;while(end<DATA.length&&DATA[end][0]===v)end++;for(let i=start;i<end;i++)matches.push(i)}else{for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0').endsWith(v))matches.push(i)}let n=matches.length;if(!n){res.innerHTML='<div class="status warn">該当商品なし</div>';return}if(n===1){show(DATA[matches[0]]);return}showPagedCandidates(matches,'末尾'+v.length+'桁が一致');}
+
+ // あいまい検索：50件ずつ表示。検索結果の上限で候補を消さない。
+ // 商品マスターが更新された場合、索引は新しいデータで再構築する。
+ let searchIndexData=null,searchIndex=null,makerIndex=null;
+ let bEngineData=null,bEngine=null;
+ const PAGE_SIZE=50;
+ function normalizeName(s){
+  return String(s??'').normalize('NFKC').toLocaleLowerCase('ja-JP')
+   .replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));
+ }
+ function compactName(s){return normalizeName(s).replace(/[\s\-‐‑‒–—―ーｰ_・･./／\\]+/gu,'')}
+ const fastMetrics=window.NyanFastMetrics={loads:[],indexes:[],searches:[]};
+ let fastJob=null,fastTarget=null,fastTicket=0,fastGeneration=null;
+ const fastMode='chunk';
+ const fastState=document.createElement('div');fastState.className='hint';fastState.setAttribute('role','status');document.getElementById('nameSearch').after(fastState);
+ function ensureSearchIndex(){if(searchIndexData!==DATA||!searchIndex)throw Error('検索準備が完了していません');}
+ function warmIndex(){
+  if(fastTarget===DATA&&fastJob)return fastJob;
+  const target=DATA,ticket=++fastTicket;fastTarget=target;searchIndexData=null;searchIndex=null;makerIndex=null;bEngineData=null;bEngine=null;
+  if(!target.length){fastJob=null;return Promise.resolve();}
+  fastState.textContent='検索の準備中…（JAN検索は利用できます）';
+  const m={mode:fastMode,count:target.length,started:performance.now()};fastMetrics.indexes.push(m);if(fastMetrics.indexes.length>30)fastMetrics.indexes.shift();
+  fastJob=(async()=>{
+   try{const out=await (fastMode==='chunk'?FastRuntime.ready(target,fastGeneration,'nyan-b-search-index-v1-customer',m,()=>ticket===fastTicket&&target===DATA):FastRuntime.prepare(target,'','nyan-b-search-index-v1-customer',fastMode,m));
+   if(ticket!==fastTicket||DATA!==target)return;
+   searchIndex=out.index;makerIndex=out.makers;searchIndexData=target;
+   const t=performance.now();bEngine=NyanB.create(target,searchIndex);bEngineData=target;m.engineCreate_ms=performance.now()-t;m.ready_ms=performance.now()-m.started;
+   fastState.textContent='✓ 検索準備完了（'+(m.ready_ms/1000).toFixed(2)+'秒）';
+   }catch(e){if(ticket===fastTicket){fastTarget=null;fastJob=null;fastState.textContent='検索準備に失敗しました。再検索で再試行します。';}throw e;}
+  })();fastJob.catch(e=>{if(ticket===fastTicket)console.error(e)});return fastJob;
+ }
+
+ function searchGeneration(){try{if(!globalThis.crypto?.getRandomValues)return null;const bytes=new Uint32Array(4);crypto.getRandomValues(bytes);return Array.from(bytes).join('-')}catch{return null}}
+ const indexCacheName='nyan-b-search-index-v1-customer';
+ async function dbGet(){const record=await dbGetRaw();if(record&&typeof record.raw==='string'&&!record.nyanBGeneration){const updated={...record,nyanBGeneration:searchGeneration()};if(updated.nyanBGeneration){try{await dbPut(updated);return updated}catch(e){/* Original master remains usable even if metadata migration fails. */}}}return record;}
+ function candidateButton(i){
+  const p=DATA[i],holder=document.createElement('div');holder.className='candidate-entry';
+  const b=document.createElement('button');b.className='candidate';b.type='button';
+  b.innerHTML='<strong>'+esc(p[3])+'</strong><small>'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</small><small>'+esc(p[2])+' ／ JAN '+esc(p[1])+'</small>';
+  b.onclick=()=>show(p);
+  holder.append(b,createAddControls(p));return holder;
+ }
+ 
+/* NYAN_BODY_MAIL_BEGIN: only order composition; search/master code is unchanged. */
+const NyanBodyMail=(()=>{
+ const LIMIT=128000,HEADER=['JAN','数量','品名','規格1','規格2'].join('\t');
+ const cell=v=>{const s=String(v??'');return /[\t\r\n"]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+ function uri(subject,body,cc){return 'mailto:order@0084.fishing?subject='+encodeURIComponent(subject)+(cc?'&cc='+encodeURIComponent(cc):'')+'&body='+encodeURIComponent(body)}
+ function compile(plan){
+  if(!plan||plan.version!==1||typeof plan.orderId!=='string'||!/^[A-Za-z0-9-]{1,80}$/.test(plan.orderId)||!Array.isArray(plan.rows)||!plan.rows.length||!plan.meta||typeof plan.meta.store!=='string'||!plan.meta.store.trim())throw Error('注文情報を確認してください。');
+  const cc=String(plan.meta.cc||'');if(cc&&!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(cc))throw Error('控え用メールアドレスを確認してください。');
+  const seen=new Set();for(const r of plan.rows){if(!r||!/^\d{8,13}$/.test(r.jan)||seen.has(r.jan)||!Number.isInteger(r.qty)||r.qty<1||r.qty>9999)throw Error('注文明細のJAN・数量を確認してください。');seen.add(r.jan)}
+  const make=(rows,i,total)=>{
+   const subject='【にゃんSearch注文】'+plan.orderId+' '+i+'/'+total;
+   const head=['注文番号:'+plan.orderId,'通数:'+i+'/'+total,'店舗:'+plan.meta.store];
+   for(const [key,label]of [['customerCode','得意先'],['contact','連絡先'],['orderNote','注文備考']])if(plan.meta[key])head.push(label+':'+plan.meta[key]);
+   const notes=rows.filter(r=>r.note).map(r=>'商品備考 '+r.jan+':'+r.note);
+   const body=[...head,HEADER,...rows.map(r=>[r.jan,r.qty,r.name,r.spec1,r.spec2].map(cell).join('\t')),...(notes.length?['商品別備考（明細表の外）',...notes]:[])].join('\r\n');
+   return {subject,body,uri:uri(subject,body,cc),jans:rows.map(r=>r.jan)};
+  };
+  // Reserve the largest possible total-width before partitioning. Check final encoded URLs too.
+  const reserve='9'.repeat(String(plan.rows.length).length),groups=[];let group=[];
+  for(const r of plan.rows){const next=[...group,r];if(make(next,groups.length+1,reserve).uri.length<=LIMIT){group=next;continue}if(!group.length)throw Error('1商品と店舗情報だけでメールの文字数基準を超えます。内容は省略せず、メール作成を停止しました。補助のTXT・Excelをご利用ください。');groups.push(group);group=[r];if(make(group,groups.length+1,reserve).uri.length>LIMIT)throw Error('1商品と店舗情報だけでメールの文字数基準を超えます。内容は省略せず、メール作成を停止しました。補助のTXT・Excelをご利用ください。');}
+  groups.push(group);const parts=groups.map((rows,i)=>make(rows,i+1,groups.length));if(parts.some(p=>p.uri.length>LIMIT))throw Error('メールの文字数基準を超えました。注文を保持して停止しました。');return parts;
+ }
+ function create(rows,meta,id){const p={version:1,orderId:id,meta:{store:meta.store.trim(),customerCode:meta.customerCode.trim(),contact:meta.contact.trim(),orderNote:meta.orderNote.trim(),cc:meta.emailCc.trim()},rows:rows.map(r=>({jan:String(r.jan),name:String(r.name??''),spec1:String(r.spec1??''),spec2:String(r.spec2??''),qty:Number(r.qty),note:String(r.note||'')})),cursor:0,opened:[],confirmed:[]};const parts=compile(p);p.opened=parts.map(()=>false);p.confirmed=parts.map(()=>false);return p}
+ function normalize(p,lines){const parts=compile(p);if(!Array.isArray(p.opened)||!Array.isArray(p.confirmed)||p.opened.length!==parts.length||p.confirmed.length!==parts.length||p.opened.some(x=>typeof x!=='boolean')||p.confirmed.some((x,i)=>typeof x!=='boolean'||(x&&!p.opened[i]))||!Number.isInteger(p.cursor)||p.cursor<0||p.cursor>=parts.length||p.rows.length!==lines.length||p.rows.some(r=>!lines.some(l=>l.jan===r.jan&&Number(l.qty)===r.qty)))throw Error('保存された分割注文を確認できません。');return JSON.parse(JSON.stringify(p))}
+ return {LIMIT,HEADER,cell,uri,compile,create,normalize};
+})();
+/* NYAN_BODY_MAIL_END */
+
+ // カートは端末内保存。注文メールは既定のメールアプリでユーザーが送信する。
+ const CART_STORAGE_KEY='nyan-customer-cart-v5';
+ const ORDER_MAIL_ADDRESS='order@0084.fishing';
+ const CART_MAX_QTY=9999;
+ const cart=new Map();
+ const cartMeta={store:'',customerCode:'',contact:'',orderNote:'',emailMain:'',emailPc:'',emailCc:'',emailCcResolved:'1'};
+ let cartStorageOK=true;
+ function orderJAN(p){return String(p[1]??'').replace(/[^0-9]/g,'')}
+ function cartNumber(v){
+  if(v===null||v===undefined||String(v).trim()==='')return null;
+  const n=Number(String(v).replace(/,/g,''));
+  return Number.isFinite(n)&&n>=0?n:null;
+ }
+ function validCartQty(v){const n=Number(v);return /^\d+$/.test(String(v))&&Number.isInteger(n)&&n>=1&&n<=CART_MAX_QTY}
+
+ let cartRestoreError=false;
+ function updateCartStorageWarning(){
+  const el=document.getElementById('cartStorageAlert');if(!el)return;
+  el.textContent=cartRestoreError?'⚠ 保存されたカートの読み込みに失敗しました。元の保存データは保護されています。初期化する場合はカートを開いて確認してください。':(!cartStorageOK?'⚠ カートを端末に保存できません。タブを閉じると商品や入力情報が失われる可能性があります。':'');
+ }
+ function restoreCart(){
+  cartRestoreError=false;orderSendPending=null;let hasSavedData=false;
+  try{
+   const raw=localStorage.getItem(CART_STORAGE_KEY);
+   hasSavedData=!!raw;
+   if(!raw){cartStorageOK=true;updateCartStorageWarning();return}
+   const saved=JSON.parse(raw);
+   if(!saved||!Array.isArray(saved.rows))throw new Error('保存されたデータの形式が不正です');
+   for(const item of saved.rows){
+    if(!item||!/^\d{8,13}$/.test(String(item.jan))||!validCartQty(item.qty))continue;
+    const clean={jan:String(item.jan),maker:String(item.maker??''),name:String(item.name??''),spec1:String(item.spec1??''),spec2:String(item.spec2??''),unitPrice:cartNumber(item.unitPrice),listPrice:cartNumber(item.listPrice),qty:Number(item.qty),note:String(item.note??'').slice(0,1000),orderLineId:String(item.orderLineId||orderSendId())};
+    cart.set(clean.jan,clean);
+   }
+   if(saved.meta&&typeof saved.meta==='object')for(const key of Object.keys(cartMeta))cartMeta[key]=String(saved.meta[key]??'').slice(0,1000);
+   migrateOrderCc();
+   orderSendPending=orderSendNormalize(saved.pendingOrder);
+   cartStorageOK=true;
+  }catch(e){cartStorageOK=false;cartRestoreError=hasSavedData;cart.clear();}
+  updateCartStorageWarning();
+ }
+ function saveCart(){
+  if(cartRestoreError){updateCartStorageWarning();return false}
+  try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify({rows:[...cart.values()],meta:cartMeta,pendingOrder:orderSendPending}));cartStorageOK=true;updateCartStorageWarning();return true}
+  catch(e){cartStorageOK=false;updateCartStorageWarning();return false}
+ }
+ function cartSorted(){return [...cart.values()].sort((a,b)=>a.maker.localeCompare(b.maker,'ja')||a.jan.localeCompare(b.jan))}
+ function cartTotals(){
+  let total=0,missing=0,quantity=0;
+  for(const item of cart.values()){
+   quantity+=item.qty;
+   if(item.unitPrice===null)missing++;
+   else total=Math.round((total+item.unitPrice*item.qty+Number.EPSILON)*100)/100;
+  }
+  return {total,missing,quantity};
+ }
+ function renderCartMarkers(){
+  document.querySelectorAll('.cart-presence').forEach(node=>{
+   const r=cart.get(node.dataset.jan);
+   node.textContent=r?'カート内：'+r.qty.toLocaleString('ja-JP')+'個':'';
+  });
+ }
+ function updateCartHeader(message){
+  const totals=cartTotals(),count=cart.size;
+  document.getElementById('openCart').textContent='🛒 カートを見る（'+count+'種類／'+totals.quantity+'個）';
+  document.getElementById('cartQuickTotal').textContent='税抜 '+money(totals.total)+(totals.missing?' ※単価未登録'+totals.missing+'種類除外':'');
+  if(message)document.getElementById('cartNotice').textContent=message;
+  updateCartStorageWarning();
+  renderCartMarkers();
+  if(!document.getElementById('cartPanel').classList.contains('hidden'))renderCart();
+ }
+ function addToCart(p,n){
+  if(!validCartQty(n)){alert('数量は1～9,999の整数で入力してください。');return false}
+  const jan=orderJAN(p);
+  if(!/^\d{8,13}$/.test(jan)){alert('JANコードが不正なためカートに追加できません。');return false}
+  const old=cart.get(jan),sum=Number(n)+(old?old.qty:0);
+  if(sum>CART_MAX_QTY){alert('同一JANの数量は合計9,999個までです。');return false}
+  cart.set(jan,{jan,maker:String(p[2]??''),name:String(p[3]??''),spec1:String(p[4]??''),spec2:String(p[5]??''),unitPrice:cartNumber(p[7]),listPrice:cartNumber(p[6]),qty:sum,note:old?old.note:'',orderLineId:old?.orderLineId||orderSendId()});
+  saveCart();
+  updateCartHeader('✓ '+String(p[3]??'商品')+'：'+n+'個を追加しました（カート内 '+sum+'個）');
+  return true;
+ }
+ function createAddControls(p){
+  const wrap=document.createElement('div');wrap.className='cart-add-controls';
+  const label=document.createElement('label');label.textContent='数量';
+  const input=document.createElement('input');input.type='number';input.min='1';input.max='9999';input.step='1';input.value='1';input.setAttribute('aria-label',String(p[3]??'商品')+' の追加数量');
+  setupQuantityInput(input);label.appendChild(input);
+  const btn=document.createElement('button');btn.type='button';btn.textContent='🛒 カートへ追加';
+  const add=()=>{if(addToCart(p,input.value))input.value='1'};
+  btn.onclick=add;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+  const price=document.createElement('span');price.className='cart-unit-label';price.textContent='参考卸 '+money(p[7])+'（税抜）';
+  const presence=document.createElement('span');presence.className='cart-presence';presence.dataset.jan=orderJAN(p);
+  wrap.append(label,btn,price,presence);
+  const old=cart.get(orderJAN(p));presence.textContent=old?'カート内：'+old.qty+'個':'';
+  return wrap;
+ }
+ function showCart(){
+  const panel=document.getElementById('cartPanel');panel.classList.remove('hidden');
+  document.getElementById('openCart').setAttribute('aria-expanded','true');
+  renderCart();panel.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function hideCart(){document.getElementById('cartPanel').classList.add('hidden');document.getElementById('openCart').setAttribute('aria-expanded','false')}
+ function createCartField(id,labelText,value,handler,multiline=false){
+  const box=document.createElement('div');box.className='cart-field';
+  const lbl=document.createElement('label');lbl.htmlFor=id;lbl.textContent=labelText;
+  const el=document.createElement(multiline?'textarea':'input');el.id=id;
+  if(!multiline){el.type='text';el.maxLength=200}else el.maxLength=1000;
+  el.value=value;el.addEventListener('input',()=>{handler(el.value);saveCart()});
+  box.append(lbl,el);return box;
+ }
+
+ function renderCart(){
+  const contents=document.getElementById('cartContents'),form=document.getElementById('cartForm');
+  contents.replaceChildren();form.replaceChildren();
+  const list=cartSorted(),totals=cartTotals();
+  if(!list.length){
+   const empty=document.createElement('div');empty.className='hint';empty.textContent=cartRestoreError?'保存されたカートデータを読み込めませんでした。保存データは自動削除していません。':'カートは空です。商品詳細または検索結果から数量を入力して追加してください。';contents.appendChild(empty);
+   if(cartRestoreError){
+    const reset=document.createElement('button');reset.type='button';reset.className='cart-danger';reset.textContent='破損した保存データを初期化';
+    reset.onclick=()=>{if(!confirm('保存されているカートデータを初期化します。よろしいですか？'))return;try{localStorage.removeItem(CART_STORAGE_KEY);cartRestoreError=false;cartStorageOK=true;cart.clear();saveCart();updateCartHeader('保存データを初期化しました。')}catch(e){mailStatus('保存データの初期化に失敗しました。')}};
+    form.appendChild(reset);
+   }
+   const close=document.createElement('button');close.type='button';close.textContent='検索に戻る';close.onclick=hideCart;form.appendChild(close);return;
+  }
+  let groupName=null,groupAmount=0,groupMissing=0;
+  function appendGroup(){if(groupName===null)return;const el=document.createElement('div');el.className='cart-maker-subtotal';el.textContent=(groupName||'メーカー未登録')+' 小計（税抜）：'+money(groupAmount)+(groupMissing?' ※単価未登録 '+groupMissing+'種類を除く':'');contents.appendChild(el)}
+  for(const item of list){
+   if(groupName!==item.maker){appendGroup();groupName=item.maker;groupAmount=0;groupMissing=0}
+   if(item.unitPrice===null)groupMissing++;else groupAmount=Math.round((groupAmount+item.unitPrice*item.qty+Number.EPSILON)*100)/100;
+   const row=document.createElement('div');row.className='cart-order-row';
+   const name=document.createElement('div');name.className='cart-order-title';name.textContent=item.name;
+   const meta=document.createElement('div');meta.className='cart-order-detail';meta.textContent=item.maker+' / JAN '+item.jan+' / '+[item.spec1,item.spec2].filter(Boolean).join(' / ');
+   const price=document.createElement('div');price.className='cart-order-detail';price.textContent='参考卸 '+money(item.unitPrice)+' × '+item.qty+'個 = '+(item.unitPrice===null?'単価要確認':money(item.unitPrice*item.qty));
+   const tools=document.createElement('div');tools.className='cart-order-tools';
+   const lbl=document.createElement('label');lbl.textContent='数量';lbl.style.margin='0';
+   const input=document.createElement('input');input.type='number';input.min='1';input.max='9999';input.step='1';input.value=String(item.qty);input.setAttribute('aria-label',item.name+' のカート数量');
+   input.addEventListener('change',()=>{
+    if(!validCartQty(input.value)){alert('数量は1～9,999の整数で入力してください。');input.value=String(item.qty);return}
+    item.qty=Number(input.value);saveCart();updateCartHeader('カートの数量を変更しました。');
+   });
+   setupQuantityInput(input);lbl.appendChild(input);
+   const remove=document.createElement('button');remove.type='button';remove.className='cart-danger';remove.textContent='削除';remove.onclick=()=>{if(confirm(item.name+' をカートから削除しますか？')){cart.delete(item.jan);saveCart();updateCartHeader('商品をカートから削除しました。')}};
+   tools.append(lbl,remove);
+   const noteBox=createCartField('cartNote-'+item.jan,'商品別備考（任意）',item.note,value=>{item.note=value},true);noteBox.classList.add('cart-order-note');
+   row.append(name,meta,price,tools,noteBox);contents.appendChild(row);
+  }
+  appendGroup();
+  const summary=document.createElement('div');summary.className='cart-totals';summary.textContent='参考合計（税抜）：'+money(totals.total)+(totals.missing?' ※単価未登録'+totals.missing+'種類は含めていません':'');contents.appendChild(summary);
+  const explanatory=document.createElement('div');explanatory.className='hint';explanatory.textContent='表示金額は通常卸に基づく参考価格で、実際の取引価格・請求額とは異なる場合があります。';contents.appendChild(explanatory);
+  form.append(
+   createCartField('orderStore','店舗名・注文者名（必須）',cartMeta.store,v=>cartMeta.store=v),
+   createCartField('orderCustomerCode','得意先コード（任意）',cartMeta.customerCode,v=>cartMeta.customerCode=v),
+   createCartField('orderContact','連絡先（任意）',cartMeta.contact,v=>cartMeta.contact=v),
+   createCartField('orderNote','注文全体の備考（任意）',cartMeta.orderNote,v=>cartMeta.orderNote=v,true)
+  );
+  appendOrderCc(form);
+  const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent=bodyMailPlan()?'作成中の注文を確認':'注文メールを作成';mailBtn.onclick=startBodyOrder;
+  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='メールに注文内容を入力します。To・CC・商品明細を確認して送信してください。送信後はにゃんSearchへ戻って確認してください。';
+  const status=document.createElement('div');status.id='cartMailStatus';status.className='cart-status';status.setAttribute('role','status');
+  const fallbacks=document.createElement('div');fallbacks.className='cart-action-row';
+  const download=document.createElement('button');download.type='button';download.textContent='📥 Excelを保存';download.onclick=saveExcelOrder;
+  const fallbackMail=document.createElement('button');fallbackMail.type='button';fallbackMail.textContent='✉ メールを開く（ファイルは手動添付）';fallbackMail.onclick=prepareCartMail;
+  const textDownload=document.createElement('button');textDownload.type='button';textDownload.textContent='📥 TXTを保存';textDownload.onclick=saveTextOrder;
+  const excelShare=document.createElement('button');excelShare.type='button';excelShare.textContent='📤 Excelを共有';excelShare.onclick=shareOrderFile;
+  const textShare=document.createElement('button');textShare.type='button';textShare.textContent='TXTを共有（補助）';textShare.onclick=shareTextOrderFile;
+  fallbacks.append(textDownload,download,excelShare,textShare,fallbackMail);
+  const helperMenu=document.createElement('details');const helperLabel=document.createElement('summary');helperLabel.textContent='補助：TXT・Excelの保存／共有';helperMenu.append(helperLabel,fallbacks);
+  const action=document.createElement('div');action.className='cart-action-row';
+  const clear=document.createElement('button');clear.type='button';clear.className='cart-danger';clear.textContent='カートを空にする';clear.onclick=()=>{if(confirm('カートの商品をすべて削除しますか？')){cart.clear();saveCart();updateCartHeader('カートを空にしました。')}};
+  const close=document.createElement('button');close.type='button';close.textContent='カートを閉じる';close.onclick=hideCart;
+  action.append(clear,close);
+  const storageNote=document.createElement('div');storageNote.className='hint';storageNote.textContent='カート・連絡先はこのブラウザの端末内保存です。別のPC・スマホとは共有しません。';
+  const recipient=document.createElement('div');recipient.className='cart-action-row';
+  const address=document.createElement('span');address.textContent='宛先：'+ORDER_MAIL_ADDRESS;
+  const copyRecipient=document.createElement('button');copyRecipient.type='button';copyRecipient.textContent='宛先をコピー';copyRecipient.onclick=copyOrderRecipient;
+  const manualRecipient=document.createElement('input');manualRecipient.type='text';manualRecipient.id='orderRecipientManual';manualRecipient.value=ORDER_MAIL_ADDRESS;manualRecipient.readOnly=true;manualRecipient.className='hidden';manualRecipient.setAttribute('aria-label','注文メールの宛先（手動コピー用）');
+  recipient.append(address,copyRecipient,manualRecipient);
+  form.append(mailBtn,mailHint,status);appendBodyMailProgress(form);form.append(helperMenu,action,storageNote);
+ }
+
+ // Excel (.xlsx) is generated entirely on the device. No external CDN/server required.
+ const XLSX_MIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+ let lastOrderFileName='';
+ let lastOrderSignature='';
+ function orderSignature(){return JSON.stringify({rows:[...cart.values()].map(({orderLineId,...row})=>row),meta:cartMeta})}
+ function xmlEscape(s){
+  return String(s??'').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g,'')
+   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+ }
+ function xlCol(n){let result='';while(n){n--;result=String.fromCharCode(65+n%26)+result;n=Math.floor(n/26)}return result}
+ function xlText(col,row,value,style=0){
+  return '<c r="'+xlCol(col)+row+'" s="'+style+'" t="inlineStr"><is><t xml:space="preserve">'+xmlEscape(value)+'</t></is></c>';
+ }
+ function xlNumber(col,row,value,style=0){
+  if(value===null||value===undefined||!Number.isFinite(Number(value)))return '';
+  return '<c r="'+xlCol(col)+row+'" s="'+style+'"><v>'+Number(value)+'</v></c>';
+ }
+ function xlSheet(rows,widths,autoFilter=false){
+  const count=rows.length,columns=widths.length;
+  const cols=widths.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('');
+  const body=rows.map((cells,i)=>'<row r="'+(i+1)+'">'+cells.join('')+'</row>').join('');
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+   '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+   '<dimension ref="A1:'+xlCol(columns)+count+'"/>'+ 
+   '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews>'+ 
+   '<sheetFormatPr defaultRowHeight="17"/><cols>'+cols+'</cols><sheetData>'+body+'</sheetData>'+ 
+   (autoFilter&&count>1?'<autoFilter ref="A1:'+xlCol(columns)+count+'"/>':'')+'</worksheet>';
+ }
+ function zipStored(files){
+  const enc=new TextEncoder(),local=[],central=[];let offset=0;
+  const tab=new Uint32Array(256);
+  for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);tab[n]=c>>>0}
+  const u16=n=>[n&255,(n>>>8)&255];
+  const u32=n=>[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
+  const pack=parts=>{const bytes=parts.map(p=>p instanceof Uint8Array?p:Uint8Array.from(p));const total=bytes.reduce((a,b)=>a+b.length,0);const ret=new Uint8Array(total);let pos=0;for(const b of bytes){ret.set(b,pos);pos+=b.length}return ret};
+  for(const [path,contents] of files){
+   const name=enc.encode(path),data=enc.encode(contents);let crc=0xffffffff;
+   for(let k=0;k<data.length;k++)crc=tab[(crc^data[k])&255]^(crc>>>8);
+   crc=(crc^0xffffffff)>>>0;
+   const localHeader=pack([[0x50,0x4b,0x03,0x04],u16(20),u16(0x800),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),name]);
+   local.push(localHeader,data);
+   const centralHeader=pack([[0x50,0x4b,0x01,0x02],u16(20),u16(20),u16(0x800),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),name]);
+   central.push(centralHeader);offset+=localHeader.length+data.length;
+  }
+  const cd=pack(central),end=pack([[0x50,0x4b,0x05,0x06],u16(0),u16(0),u16(files.length),u16(files.length),u32(cd.length),u32(offset),u16(0)]);
+  return pack([...local,cd,end]);
+ }
+ function currentJstDate(){
+  const d=new Date(Date.now()+9*60*60*1000);return d.toISOString().slice(0,19).replace('T','_').replace(/:/g,'');
+ }
+ function exportRows(){
+  // Existing V4 cart records have no MSRP: look up only wanted JANs in the actual master.
+  const lookup=new Map(),wanted=new Set([...cart.keys()]);
+  if(wanted.size){for(const p of DATA){const jan=String(p[1]??'');if(wanted.has(jan)){lookup.set(jan,p);if(lookup.size===wanted.size)break}}}
+  return cartSorted().map(item=>{
+   const product=lookup.get(item.jan);
+   const listPrice=product?cartNumber(product[6]):(item.listPrice??null);
+   return {...item,listPrice};
+  });
+ }
+ function xlsxBytes(){
+  const items=exportRows(),t=cartTotals();
+  const rows=[[...['JAN','メーカー','商品名','規格1','規格2','数量','定価','参考卸単価（税抜）','参考小計（税抜）','商品備考'].map((v,j)=>xlText(j+1,1,v,1))]];
+  items.forEach((r,i)=>{
+   const n=i+2;rows.push([
+    xlText(1,n,r.jan,2),xlText(2,n,r.maker),xlText(3,n,r.name),xlText(4,n,r.spec1),xlText(5,n,r.spec2),
+    xlNumber(6,n,r.qty,4),xlNumber(7,n,r.listPrice,3),xlNumber(8,n,r.unitPrice,3),
+    r.unitPrice===null?'':'<c r="I'+n+'" s="3"><f>F'+n+'*H'+n+'</f><v>'+Number((r.qty*r.unitPrice).toFixed(2))+'</v></c>',
+    xlText(10,n,r.note)
+   ]);
+  });
+  const now=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
+  const summary=[['項目','内容'],['店舗名・注文者名',cartMeta.store.trim()],['得意先コード',cartMeta.customerCode.trim()],
+   ['連絡先',cartMeta.contact.trim()],['控え用メール',cartMeta.emailMain.trim()],['PC控え用メール',cartMeta.emailPc.trim()],
+   ['注文作成日時（日本時間）',now],['送信先',ORDER_MAIL_ADDRESS],['商品種類数',cart.size],['商品数量合計',t.quantity],
+   ['参考合計（税抜）',t.total],['参考卸単価未登録の商品種類数',t.missing],['注文全体の備考',cartMeta.orderNote.trim()],
+   ['注意','参考価格は実際の取引価格・請求額とは異なる場合があります。'],['注意','在庫・出荷時期は確約されません。']];
+  const summaryRows=summary.map((row,i)=>row.map((v,j)=>typeof v==='number'?xlNumber(j+1,i+1,v,(i===10?3:4)):xlText(j+1,i+1,v,i===0?1:0)));
+  const groups=new Map();
+  for(const item of items){const key=item.maker||'メーカー未登録';if(!groups.has(key))groups.set(key,{rows:0,qty:0,price:0,missing:0});const r=groups.get(key);r.rows++;r.qty+=item.qty;if(item.unitPrice===null)r.missing++;else r.price=Math.round((r.price+item.unitPrice*item.qty+Number.EPSILON)*100)/100}
+  const groupsData=[['メーカー','商品種類数','数量合計','参考小計（税抜）','単価未登録商品数']];
+  for(const [name,r] of groups)groupsData.push([name,r.rows,r.qty,r.price,r.missing]);
+  groupsData.push(['全メーカー合計',cart.size,t.quantity,t.total,t.missing]);
+  const groupRows=groupsData.map((row,i)=>row.map((v,j)=>typeof v==='number'?xlNumber(j+1,i+1,v,j===3?3:4):xlText(j+1,i+1,v,i===0?1:(i===groupsData.length-1?1:0))));
+  const types='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+  const rels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const book='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets><sheet name="注文明細" sheetId="1" r:id="rId1"/><sheet name="注文情報" sheetId="2" r:id="rId2"/><sheet name="メーカー別小計" sheetId="3" r:id="rId3"/></sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>';
+  const bookRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+  const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;¥&quot;#,##0.##"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Yu Gothic"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Yu Gothic"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF173B66"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  return zipStored([
+   ['[Content_Types].xml',types],['_rels/.rels',rels],['xl/workbook.xml',book],['xl/_rels/workbook.xml.rels',bookRels],['xl/styles.xml',styles],
+   ['xl/worksheets/sheet1.xml',xlSheet(rows,[20,22,38,22,20,12,17,22,22,38],true)],
+   ['xl/worksheets/sheet2.xml',xlSheet(summaryRows,[31,80])],
+   ['xl/worksheets/sheet3.xml',xlSheet(groupRows,[29,15,16,23,23])]
+  ]);
+ }
+ function orderFileName(){
+  const name=cartMeta.store.trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').replace(/\s+/g,'_').slice(0,30)||'注文';
+  return 'にゃんSearch注文_'+currentJstDate()+'_'+name+'.xlsx';
+ }
+ function buildOrderFile(){return new File([xlsxBytes()],orderFileName(),{type:XLSX_MIME})}
+ function downloadOrderFile(file){
+  const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }
+ function ccAddresses(){
+  return cartMeta.emailCcResolved==='1'&&cartMeta.emailCc.trim()?[cartMeta.emailCc.trim()]:[];
+ }
+ function orderSubject(){return '【にゃんSearch注文依頼】'+cartMeta.store.trim()}
+ function orderMailContent(filename){
+  const t=cartTotals();return ['にゃんSearch 注文依頼','',
+   '宛先：'+ORDER_MAIL_ADDRESS,
+   '店舗名・注文者名：'+cartMeta.store.trim(),
+   '得意先コード：'+(cartMeta.customerCode.trim()||'記載なし'),
+   '連絡先：'+(cartMeta.contact.trim()||'記載なし'),
+   '商品種類：'+cart.size+'種類',
+   '注文数量：'+t.quantity+'個',
+   '参考合計（税抜）：'+money(t.total)+(t.missing?'（未登録単価 '+t.missing+'種類を除く）':''),
+   '','注文明細は添付注文ファイル「'+filename+'」をご確認ください。',
+   '','注文全体の備考：'+(cartMeta.orderNote.trim()||'なし'),
+   '','※送信前に注文ファイルの添付・宛先・CCをご確認ください。',
+   '※参考価格は実際の取引価格・請求額と異なる場合があります。',
+   '※在庫・出荷時期は確約されません。'].join('\n');
+ }
+ function validateOrderMail(){
+  if(!cart.size){alert('カートに商品がありません。');return false}
+  if(!cartMeta.store.trim()){alert('「店舗名・注文者名」を入力してください。');document.getElementById('orderStore')?.focus();return false}
+  if(!masterValid()||!DATA.length){alert('商品マスターを読み込んでから注文依頼を作成してください。');return false}
+  if(cartMeta.emailCcResolved!=='1'){alert('以前の控え用アドレスが2件あります。今回使用するCCを選択してください。');return false}
+  for(const [name,email] of [['控え用CC',cartMeta.emailCc]]){
+   if(email.trim()&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){alert(name+'のアドレスを確認してください。');return false}
+  }
+  return true;
+ }
+ function mailStatus(s){const el=document.getElementById('cartMailStatus');if(el)el.textContent=s}
+ async function copyOrderRecipient(){
+  const manual=document.getElementById('orderRecipientManual');
+  try{
+   if(!navigator.clipboard||typeof navigator.clipboard.writeText!=='function')throw Error('Clipboard unavailable');
+   await navigator.clipboard.writeText(ORDER_MAIL_ADDRESS);
+   if(manual)manual.classList.add('hidden');
+   mailStatus('宛先をコピーしました：'+ORDER_MAIL_ADDRESS+'。メールアプリの宛先欄に貼り付けてください。');
+  }catch(error){
+   if(manual){manual.classList.remove('hidden');manual.focus();manual.select();manual.setSelectionRange(0,manual.value.length)}
+   mailStatus('宛先を自動コピーできませんでした。表示されたアドレスを長押ししてコピーし、メールアプリの宛先欄に貼り付けてください。');
+  }
+ }
+
+ const ORDER_SHARE_TITLE='【にゃんSearch 注文依頼】';
+ const ORDER_SHARE_TEXT='注文ファイルを添付しました。大橋漁具宛ての注文です。';
+ let orderShareBusy=false;
+ function saveUnsharedOrder(file,format){
+  try{downloadOrderFile(file);mailStatus('メールアプリへ共有できなかったため'+format+'を保存しました。保存されない場合は「'+format+'を保存」を押し、メールに手動添付してください。')}
+  catch(error){mailStatus('共有・自動保存ができませんでした。「'+format+'を保存」から保存し、メールに手動添付してください。')}
+ }
+ async function sharePreparedOrder(format,builder,includeMailText){
+  if(!orderSendCanStart())return;
+  if(orderShareBusy){mailStatus('共有処理中です。共有画面を閉じてから再度お試しください。');return}
+  if(!validateOrderMail())return;
+  let file;
+  try{file=builder()}catch(error){mailStatus(format+'の生成に失敗しました。カートを確認して再度お試しください。');return}
+  lastOrderFileName=file.name;lastOrderSignature=orderSignature();
+  const payload=includeMailText?{files:[file],title:ORDER_SHARE_TITLE,text:ORDER_SHARE_TEXT}:{files:[file]};
+  try{
+   if(typeof navigator.share!=='function'||(typeof navigator.canShare==='function'&&!navigator.canShare(payload))){saveUnsharedOrder(file,format);return}
+  }catch(error){saveUnsharedOrder(file,format);return}
+  // Keep the native share call inside the original click task, without an earlier await.
+  orderShareBusy=true;
+  try{
+   await shareWithOrderConfirmation(payload);
+   mailStatus(format+'を共有先へ渡しました。メールアプリで宛先 '+ORDER_MAIL_ADDRESS+'・控え用CC・添付を確認してから送信してください。共有だけでは送信完了ではありません。');
+  }catch(error){
+   if(error?.name==='AbortError')mailStatus('共有が中断されました。注文カートは残っています。必要な場合は「'+format+'を保存」を押してください。');
+   else saveUnsharedOrder(file,format);
+  }finally{orderShareBusy=false}
+ }
+ function shareTextOrderFile(){return sharePreparedOrder('TXT',buildTextOrderFile,true)}
+ function shareOrderFile(){return sharePreparedOrder('Excel',buildOrderFile,false)}
+
+ // UTF-8 (BOM) / CRLF order text. JAN stays a string, including leading zeroes.
+ function setupQuantityInput(input){
+  input.type='text';input.inputMode='numeric';input.pattern='[0-9]*';input.maxLength=4;input.autocomplete='off';input.classList.add('cart-qty');
+  let entering=false;
+  input.addEventListener('focus',()=>{entering=true;input.select();setTimeout(()=>{if(document.activeElement===input&&entering)input.select()},0)});
+  input.addEventListener('pointerup',event=>{if(entering){event.preventDefault();input.select();entering=false}});
+  input.addEventListener('click',()=>{if(entering){input.select();entering=false}});
+  input.addEventListener('input',()=>{entering=false});input.addEventListener('blur',()=>{entering=false});
+ }
+ function orderTableCell(value){
+  let text=String(value??'').replace(/\\/g,'\\\\').replace(/\r\n|\r|\n/g,'\\n').replace(/\t/g,'\\t').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
+  if(/^\s*[=+@-]/.test(text))text="'"+text;
+  return text.includes('"')?'"'+text.replace(/"/g,'""')+'"':text;
+ }
+ function orderTableDate(time){
+  const p=new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(time));
+  const part=k=>p.find(x=>x.type===k).value;return part('year')+'/'+part('month')+'/'+part('day')+' '+part('hour')+':'+part('minute');
+ }
+ function orderText(){
+  const totals=cartTotals(),created=orderTableDate(Date.now()),groups=new Map();
+  for(const row of cart.values()){const maker=row.maker||'メーカー未登録';groups.set(maker,Math.round(((groups.get(maker)||0)+(row.unitPrice===null?0:row.unitPrice*row.qty)+Number.EPSILON)*100)/100)}
+  const headers=['JAN','メーカー','商品名','規格1','規格2','数量','定価','参考卸単価（税抜）','参考金額（税抜）','商品備考','店舗名・注文者名','得意先コード','連絡先','注文全体の備考','控え用メール','PC控え用メール','注文作成日時（日本時間）','宛先','CC','商品種類数','注文数量合計','参考合計（税抜）','メーカー小計（税抜）','単価未登録商品種類数','単価状態','価格・在庫の注意'];
+  const lines=[headers];
+  for(const row of cart.values())lines.push([String(row.jan),row.maker,row.name,row.spec1,row.spec2,row.qty,row.listPrice,row.unitPrice,row.unitPrice===null?'':Number((row.unitPrice*row.qty).toFixed(2)),row.note,cartMeta.store.trim(),cartMeta.customerCode,cartMeta.contact,cartMeta.orderNote,cartMeta.emailMain,cartMeta.emailPc,created,ORDER_MAIL_ADDRESS,ccAddresses().join(', '),cart.size,totals.quantity,totals.total,groups.get(row.maker||'メーカー未登録'),totals.missing,row.unitPrice===null?'単価未登録':'登録済み','参考価格は実際の取引価格・請求額と異なる場合があります。在庫・出荷時期は確約されません。']);
+  return lines.map(row=>row.map(orderTableCell).join('\t')).join('\r\n')+'\r\n';
+ }
+ async function copyConfirmationRecipient(){
+  const manual=document.getElementById('orderSentRecipientManual'),status=document.getElementById('orderSentCopyStatus');
+  try{if(!navigator.clipboard?.writeText)throw Error('Clipboard unavailable');await navigator.clipboard.writeText(ORDER_MAIL_ADDRESS);manual.hidden=true;status.textContent='宛先をコピーしました'}
+  catch(error){manual.hidden=false;manual.focus();manual.select();manual.setSelectionRange(0,manual.value.length);status.textContent='自動コピーできませんでした。下の宛先を選択して手動でコピーしてください。'}
+ }
+ const MASTER_LAST_READ_KEY=CART_STORAGE_KEY+'-master-last-read';
+ let masterLastReadAt=null;
+ function renderMasterLastRead(){const el=document.getElementById('masterLastRead');if(el)el.textContent='商品マスター最終読み込み：'+(masterLastReadAt?orderTableDate(masterLastReadAt):'未読み込み')}
+ function rememberMasterLastRead(time){
+  if(!Number.isFinite(time)||time<=0)return;
+  masterLastReadAt=Math.max(masterLastReadAt||0,time);
+  try{localStorage.setItem(MASTER_LAST_READ_KEY,String(masterLastReadAt))}catch(error){}
+  renderMasterLastRead();
+ }
+ function setupMasterLastRead(){
+  try{const time=Number(localStorage.getItem(MASTER_LAST_READ_KEY));if(Number.isFinite(time)&&time>0)masterLastReadAt=time}catch(error){}
+  const box=document.createElement('section');box.className='box';const text=document.createElement('div');text.id='masterLastRead';text.setAttribute('role','status');const hint=document.createElement('div');hint.className='hint';hint.textContent='この端末でJSONを最後に正常取得・保存した日時（日本時間）です。JSONファイル自体の更新日時ではありません。保存済みデータの復元では日時を更新しません。';box.append(text,hint);document.getElementById('settings').closest('section').before(box);renderMasterLastRead();
+ }
+
+ function buildTextOrderFile(){
+  return new File(['\uFEFF',orderText()],orderFileName().replace(/\.xlsx$/,'.txt'),{type:'text/plain'});
+ }
+ function saveTextOrder(){
+  if(!validateOrderMail())return;
+  try{const file=buildTextOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('TXTを保存しました：'+file.name+'。メールに手動添付して宛先・CCを確認してください。')}
+  catch(e){mailStatus('TXTの保存に失敗しました。「TXTを保存」から再度お試しください：'+(e.message||e))}
+ }
+
+
+ function saveExcelOrder(){
+  if(!validateOrderMail())return;
+  try{const file=buildOrderFile();lastOrderFileName=file.name;lastOrderSignature=orderSignature();downloadOrderFile(file);mailStatus('Excelを保存しました：'+file.name+'。メール送信時はこのファイルを添付してください。')}
+  catch(e){mailStatus('Excelの保存に失敗しました：'+(e.message||e))}
+ }
+ function prepareCartMail(){
+  if(!orderSendCanStart())return;
+  if(!validateOrderMail())return;
+  if(!lastOrderFileName||lastOrderSignature!==orderSignature()){mailStatus('現在の注文内容に対応したTXTまたはExcelを先に保存してください。注文変更後は再生成が必要です。');return}
+  const cc=ccAddresses();
+  const uri='mailto:'+ORDER_MAIL_ADDRESS+'?subject='+encodeURIComponent(orderSubject())+
+   (cc.length?'&cc='+encodeURIComponent(cc.join(',')):'')+'&body='+encodeURIComponent(orderMailContent(lastOrderFileName));
+  if(uri.length>6000){mailStatus('メール本文が長すぎます。備考を短くして再度お試しください。');return}
+  mailStatus('メールアプリで保存済み注文ファイル「'+lastOrderFileName+'」を手動添付し、宛先・CCを確認して送信してください。ファイルは自動添付されません。');
+  const confirmation=orderSendBegin('メール','ready');if(confirmation.blocked)return;
+  window.location.href=uri;
+ }
+
+ // Pending order and cart are committed together in the existing cart storage record.
+ let orderSendPending=null,orderSendRestored=false,orderSendWarning='',orderSendDialogId=null,orderSendPrepared=null;
+ function orderSendId(){return globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}
+ function orderSendFingerprint(row){return JSON.stringify([row.maker,row.name,row.spec1,row.spec2,row.unitPrice,row.listPrice,row.note])}
+ function orderSendNormalize(value){
+  if(value==null)return null;
+  if(!value||value.version!==1||typeof value.id!=='string'||!['opening','ready'].includes(value.phase)||!Array.isArray(value.lines)||!value.lines.length){orderSendWarning='前回の送信確認情報を読み取れません。カートは自動削除しません。';return null}
+  const seen=new Set();
+  for(const line of value.lines){if(!line||!/^\d{8,13}$/.test(line.jan)||typeof line.lineId!=='string'||!validCartQty(line.qty)||typeof line.fingerprint!=='string'||seen.has(line.jan)){orderSendWarning='前回の送信確認情報を読み取れません。カートは自動削除しません。';return null}seen.add(line.jan)}
+  const result={version:1,id:value.id,phase:value.phase,hasLeft:!!value.hasLeft,createdAt:Number(value.createdAt)||Date.now(),kind:String(value.kind||'注文'),lines:value.lines.map(line=>({...line,qty:Number(line.qty)}))};
+  if(result.kind==='本文メール'){try{result.bodyMail=NyanBodyMail.normalize(value.bodyMail,result.lines);if(result.bodyMail.orderId!==result.id)throw Error('ID mismatch')}catch{result.bodyMailError=true;orderSendWarning='分割注文の保存情報を確認できません。カートは自動削除しません。';}}
+  return result;
+ }
+ function orderSendReadLatest(){
+  const before=[...cart.values()].map(row=>({...row})),meta={...cartMeta},pending=orderSendPending;
+  try{
+   if(localStorage.getItem(CART_STORAGE_KEY)===null)return true;
+   cart.clear();restoreCart();
+   if(cartRestoreError)throw Error('Saved cart unreadable');
+   return true;
+  }catch(error){cart.clear();for(const row of before)cart.set(row.jan,row);Object.assign(cartMeta,meta);orderSendPending=pending;orderSendWarning='保存されたカートを確認できないため、送信後の削除を停止しています。';return false}
+ }
+ function orderSendRefresh(){
+  const banner=document.getElementById('orderSendBanner');if(!banner)return;
+  const text=document.getElementById('orderSendBannerText'),review=document.getElementById('orderSendReview');
+  banner.hidden=!orderSendPending&&!orderSendWarning;
+  text.textContent=orderSendWarning||(orderSendPending?'注文メールの送信状況が未確認です。カートの商品はまだ残っています。':'');
+  review.hidden=!orderSendPending;review.disabled=!!orderSendPending&&orderSendPending.phase==='opening'&&!orderSendRestored;
+ }
+ function orderSendCanStart(){
+  if(!orderSendReadLatest()){orderSendRefresh();return false}
+  if(!orderSendPending){
+   for(const row of cart.values())if(!row.orderLineId)row.orderLineId=orderSendId();
+   orderSendPrepared={lines:[...cart.values()].map(row=>({jan:row.jan,lineId:row.orderLineId,qty:row.qty,fingerprint:orderSendFingerprint(row)})),saved:saveCart()};
+   return true;
+  }
+  orderSendMaybeAsk(true);mailStatus('前回の注文メールの送信状況を確認してください。未送信なら「まだ送信していない」を選ぶと再作成できます。');return false;
+ }
+ function orderSendBegin(kind,phase='opening',bodyMail=null){
+  const prepared=orderSendPrepared;orderSendPrepared=null;
+  if(!orderSendReadLatest())return {id:null};
+  if(orderSendPending){orderSendMaybeAsk(true);return {blocked:true}}
+  if(cartRestoreError||prepared?.saved===false){orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。';orderSendRefresh();return {id:null}}
+  for(const row of cart.values())if(!row.orderLineId)row.orderLineId=orderSendId();
+  const record={version:1,id:bodyMail?.orderId||orderSendId(),phase,hasLeft:false,createdAt:Date.now(),kind,
+   lines:prepared?.lines||[...cart.values()].map(row=>({jan:row.jan,lineId:row.orderLineId,qty:row.qty,fingerprint:orderSendFingerprint(row)}))};
+  if(!record.lines.length)return {id:null};
+  if(bodyMail)record.bodyMail=bodyMail;
+  orderSendPending=record;orderSendRestored=false;
+  if(!saveCart()){orderSendPending=null;orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。必要な場合は手動で整理してください。';orderSendRefresh();return {id:null}}
+  orderSendWarning='';orderSendRefresh();return {id:record.id};
+ }
+ function orderSendFinish(ticket,success){
+  if(!ticket?.id||!orderSendReadLatest()||orderSendPending?.id!==ticket.id)return;
+  const before=orderSendPending;
+  if(success)orderSendPending={...before,phase:'ready'};else orderSendPending=null;
+  if(!saveCart()){orderSendPending=before;orderSendWarning='送信確認の保存に失敗しました。カートは残しています。';}
+  if(!success)orderSendCloseDialog();
+  orderSendRefresh();if(success)setTimeout(()=>orderSendMaybeAsk(),0);
+ }
+ async function shareWithOrderConfirmation(payload){
+  const ticket=orderSendBegin(payload.files?.[0]?.name?.endsWith('.xlsx')?'Excel':'TXT');
+  if(ticket.blocked){const error=new Error('Previous order needs confirmation');error.name='AbortError';throw error}
+  try{const result=await navigator.share(payload);orderSendFinish(ticket,true);return result}
+  catch(error){orderSendFinish(ticket,false);throw error}
+ }
+ function orderSendMarkLeft(){
+  if(!orderSendPending||!orderSendReadLatest()||!orderSendPending||orderSendPending.hasLeft)return;
+  orderSendPending.hasLeft=true;
+  if(!saveCart())orderSendWarning='送信確認の保存に失敗しました。カートは残しています。';
+  orderSendRefresh();
+ }
+ function orderSendCloseDialog(){const dialog=document.getElementById('orderSentDialog');if(dialog?.open)dialog.close();orderSendDialogId=null}
+ function orderSendMaybeAsk(force=false){
+  if(!orderSendPending||document.visibilityState!=='visible'||(typeof document.hasFocus==='function'&&!document.hasFocus()))return;
+  if(orderSendPending.phase==='opening'&&!orderSendRestored)return;
+  if(bodyMailPlan()&&!orderSendPending.bodyMailError&&!bodyMailPlan().opened[bodyMailPlan().cursor]){if(force)showCart();return;}
+  if(!force&&!orderSendRestored&&!orderSendPending.hasLeft)return;
+  const dialog=document.getElementById('orderSentDialog');if(!dialog||dialog.open)return;
+  orderSendDialogId=orderSendPending.id;
+  document.getElementById('orderSentCopyStatus').textContent='';document.getElementById('orderSentRecipientManual').hidden=true;
+  document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'実際に送信した場合だけ「送信した」を選んでください。送信済みの注文分だけを削除し、後から追加・変更した商品と登録情報は残します。';
+  const body=bodyMailPlan(),badBody=orderSendPending.bodyMailError;
+  document.getElementById('orderSentYes').disabled=!!badBody;document.getElementById('orderSentAdd').disabled=!!badBody||!!body?.confirmed.some(Boolean);
+  if(body){const parts=NyanBodyMail.compile(body);document.getElementById('orderSentExplanation').textContent=(body.cursor+1)+'/'+parts.length+'通目を実際に送信しましたか？ 全通の送信確認が終わるまでカートは残します。';}
+  try{dialog.showModal();document.getElementById('orderSentNo').focus()}catch(error){orderSendWarning='送信状況の確認画面を開けませんでした。下の「送信状況を確認」から再度お試しください。';orderSendRefresh()}
+ }
+ function orderSendApplyDecision(action,id){
+  const sent=action===true,addBeforeSend=action==='add';
+  if(!orderSendReadLatest()){orderSendRefresh();return}
+  if(!orderSendPending||orderSendPending.id!==id){orderSendCloseDialog();orderSendRefresh();updateCartHeader();return}
+  if(decideBodyMail(action))return;
+  const before=[...cart.values()].map(row=>({...row})),pending=orderSendPending;
+  if(sent){
+   for(const line of pending.lines){
+    const row=cart.get(line.jan);
+    if(!row||row.orderLineId!==line.lineId||orderSendFingerprint(row)!==line.fingerprint||row.qty<line.qty)continue;
+    if(row.qty===line.qty)cart.delete(line.jan);else row.qty-=line.qty;
+   }
+  }
+  orderSendPending=null;
+  if(!saveCart()){
+   cart.clear();for(const row of before)cart.set(row.jan,row);orderSendPending=pending;
+   orderSendWarning='保存できなかったためカートの変更を取り消しました。送信確認は未確定です。';orderSendRefresh();updateCartHeader();return;
+  }
+  orderSendRestored=false;orderSendPrepared=null;orderSendWarning='';orderSendCloseDialog();orderSendRefresh();
+  updateCartHeader(addBeforeSend?'カートを保持し、前の注文の送信確認を解除しました。未送信の場合のみ、商品を追加・変更して「注文メールを作成」を押してください。以前の下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。':sent?(cart.size?'送信済みの注文分を削除しました。追加・変更された商品はカートに残しています。':'カートを空にしました'):'カートを保持しました。注文メールを再度作成できます。');
+ }
+ async function orderSendDecide(sent){
+  const id=orderSendDialogId;if(!id)return;
+  const yes=document.getElementById('orderSentYes'),no=document.getElementById('orderSentNo'),add=document.getElementById('orderSentAdd');yes.disabled=true;no.disabled=true;add.disabled=true;
+  try{
+   if(navigator.locks?.request)await navigator.locks.request(CART_STORAGE_KEY+'-send-confirm',()=>orderSendApplyDecision(sent,id));
+   else orderSendApplyDecision(sent,id);
+  }catch(error){orderSendWarning='送信確認を保存できませんでした。カートは自動削除しません。';orderSendRefresh()}
+  finally{yes.disabled=false;no.disabled=false;add.disabled=false}
+ }
+ function orderSendSetup(){
+  const banner=document.createElement('section');banner.id='orderSendBanner';banner.className='box';banner.hidden=true;
+  const text=document.createElement('p');text.id='orderSendBannerText';text.setAttribute('role','status');
+  const review=document.createElement('button');review.id='orderSendReview';review.type='button';review.textContent='送信状況を確認';review.onclick=()=>orderSendMaybeAsk(true);banner.append(text,review);
+  document.getElementById('cartNotice').after(banner);
+  const dialog=document.createElement('dialog');dialog.id='orderSentDialog';dialog.setAttribute('aria-labelledby','orderSentQuestion');dialog.style.cssText='max-width:520px;width:calc(100% - 32px);border:1px solid #9fb1c4;border-radius:12px;padding:22px;color:#162235';
+  const title=document.createElement('h2');title.id='orderSentQuestion';title.textContent='注文メールは送信しましたか？';title.style.fontSize='20px';
+  const explanation=document.createElement('p');explanation.id='orderSentExplanation';
+  const yes=document.createElement('button');yes.id='orderSentYes';yes.type='button';yes.className='primary';yes.textContent='送信した';yes.onclick=()=>void orderSendDecide(true);
+  const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='まだ送信していない';no.onclick=()=>void orderSendDecide(false);
+  const add=document.createElement('button');add.id='orderSentAdd';add.type='button';add.textContent='送信前に追加注文';add.setAttribute('aria-describedby','orderSentAddHint');add.onclick=()=>void orderSendDecide('add');
+  const addHint=document.createElement('p');addHint.id='orderSentAddHint';addHint.className='hint';addHint.textContent='メールが未送信の場合のみ「送信前に追加注文」を選んでください。商品を追加・変更して注文メールを作り直せます。以前開いたGmailなどの下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。';
+  const copy=document.createElement('button');copy.type='button';copy.id='orderSentCopy';copy.textContent='宛先をコピー';copy.onclick=()=>void copyConfirmationRecipient();
+  const copyStatus=document.createElement('p');copyStatus.id='orderSentCopyStatus';copyStatus.setAttribute('role','status');
+  const manual=document.createElement('input');manual.id='orderSentRecipientManual';manual.type='text';manual.readOnly=true;manual.value=ORDER_MAIL_ADDRESS;manual.hidden=true;manual.setAttribute('aria-label','送信確認の宛先（手動コピー用）');manual.style.cssText='font-size:16px;letter-spacing:normal;width:100%';
+  dialog.append(title,explanation,yes,no,add,addHint,copy,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
+  orderSendRestored=!!orderSendPending;orderSendRefresh();
+  window.addEventListener('blur',orderSendMarkLeft);window.addEventListener('pagehide',orderSendMarkLeft);
+  window.addEventListener('focus',()=>setTimeout(()=>orderSendMaybeAsk(),0));window.addEventListener('pageshow',()=>setTimeout(()=>orderSendMaybeAsk(),0));
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')orderSendMarkLeft();else setTimeout(()=>orderSendMaybeAsk(),0)});
+  window.addEventListener('storage',event=>{if(event.key===CART_STORAGE_KEY){orderSendRefresh();if(!orderSendPending)orderSendCloseDialog();else setTimeout(()=>orderSendMaybeAsk(),0)}});
+  setTimeout(()=>orderSendMaybeAsk(),0);
+ }
+
+function migrateOrderCc(){
+ if(cartMeta.emailCcResolved==='1')return;
+ const a=cartMeta.emailMain.trim(),b=cartMeta.emailPc.trim();
+ if(a&&b&&a.toLowerCase()!==b.toLowerCase())return;
+ setOrderCc(a||b,false);
+}
+function setOrderCc(value,persist=true){cartMeta.emailCc=String(value);cartMeta.emailCcResolved='1';cartMeta.emailMain=String(value);cartMeta.emailPc='';if(persist)saveCart()}
+function appendOrderCc(form){
+ const box=createCartField('orderEmailCc','注文控え用CCメールアドレス（任意・この端末に記憶）',cartMeta.emailCc,v=>setOrderCc(v,false));box.querySelector('input').type='email';box.querySelector('input').style.cssText='width:100%;font-size:18px;padding:10px;letter-spacing:normal';form.append(box);
+ if(cartMeta.emailCcResolved!=='1'){
+  const hint=document.createElement('p');hint.className='hint';hint.textContent='以前の控え用アドレスが2件あります。今回使用する1件を選ぶか、上の欄に入力してください。';form.append(hint);
+  for(const value of [cartMeta.emailMain,cartMeta.emailPc,'']){const b=document.createElement('button');b.type='button';b.textContent=value?'このアドレスを使う：'+value:'CCを使わない';b.onclick=()=>{setOrderCc(value);renderCart()};form.append(b)}
+ }
+}
+function bodyMailPlan(){return orderSendPending?.kind==='本文メール'?orderSendPending.bodyMail:null}
+function appendBodyMailProgress(form){
+ const pending=orderSendPending;if(pending?.kind!=='本文メール')return;
+ const box=document.createElement('section');box.className='box';box.id='bodyMailProgress';
+ if(pending.bodyMailError){box.textContent='保存された分割注文を読み取れません。カートを保持しています。メールは作成せず、送信状況を確認してください。';form.append(box);return}
+ const p=pending.bodyMail,parts=NyanBodyMail.compile(p),info=document.createElement('p');info.textContent='注文番号 '+p.orderId+'：'+parts.length+'通。メール作成だけでは送信済みになりません。';box.append(info);
+ const list=document.createElement('ol');parts.forEach((part,i)=>{const li=document.createElement('li');li.textContent=(i+1)+'/'+parts.length+'：'+(p.confirmed[i]?'送信したことを確認済み':p.opened[i]?'送信状況を確認してください':'未作成');list.append(li)});box.append(list);
+ if(p.confirmed.some(Boolean)&&p.meta.cc!==cartMeta.emailCc.trim()){const note=document.createElement('p');note.className='hint';note.textContent='作成中の注文は全通で同じCCを使います：'+(p.meta.cc||'CCなし')+'。入力欄の変更は次の注文から反映します。';box.append(note)}
+ const next=p.confirmed.findIndex(x=>!x);
+ if(next>=0){
+  if(p.opened[next]){const review=document.createElement('button');review.type='button';review.textContent=(next+1)+'通目の送信状況を確認';review.onclick=()=>{if(!orderSendReadLatest())return;const current=bodyMailPlan();if(!current||orderSendPending.bodyMailError)return;current.cursor=next;if(saveCart())orderSendMaybeAsk(true)};box.append(review)}
+  const launch=document.createElement('button');launch.type='button';launch.className='primary';launch.textContent=p.opened[next]?'同じメールを再作成（未送信の場合）':next===0?'1通目のメールを作成':'次のメールを作成（'+(next+1)+'/'+parts.length+'）';launch.onclick=()=>{if(p.opened[next]&&!confirm('未送信の場合だけ再作成してください。送信済みメールを重複して送らないよう確認しましたか？'))return;openBodyMail(next)};box.append(launch);
+ }
+ form.append(box);
+}
+function startBodyOrder(){
+ if(!orderSendReadLatest())return;
+ if(orderSendPending){renderCart();orderSendRefresh();if(orderSendPending.kind!=='本文メール')orderSendMaybeAsk(true);return}
+ if(!orderSendCanStart()||!validateOrderMail())return;
+ try{
+  const id='N'+Date.now().toString(36)+'-'+orderSendId().replace(/-/g,'').slice(0,12),plan=NyanBodyMail.create(cartSorted(),cartMeta,id),parts=NyanBodyMail.compile(plan);
+  if(parts.length>1&&!confirm('この注文は'+parts.length+'通のメールになります。各メールを送信後ににゃんSearchへ戻り、送信状況を確認して次のメールを作成してください。'))return;
+  const ticket=orderSendBegin('本文メール','ready',plan);if(!ticket.id)return;openBodyMail(0);
+ }catch(e){mailStatus(e.message||String(e))}
+}
+function openBodyMail(index){
+ if(!orderSendReadLatest())return;
+ const p=bodyMailPlan();if(!p||orderSendPending.bodyMailError)return;
+ try{
+  const before=JSON.parse(JSON.stringify(orderSendPending)),nextPlan=JSON.parse(JSON.stringify(p));
+  const cc=cartMeta.emailCc.trim();if(nextPlan.meta.cc!==cc){if(nextPlan.confirmed.some(Boolean)){if(!confirm('一部を送信確認済みのため、この注文は全通で元のCC（'+(nextPlan.meta.cc||'CCなし')+'）を使います。変更したCCは次の注文に使用します。続けますか？'))return;}else{if(nextPlan.opened.some(Boolean)&&!confirm('変更したCCで同じ注文番号のメールを作り直します。以前の未送信下書きは送らず、新しい下書きを使用してください。'))return;nextPlan.meta.cc=cc;const count=NyanBodyMail.compile(nextPlan).length;nextPlan.opened=Array(count).fill(false);nextPlan.confirmed=Array(count).fill(false);nextPlan.cursor=0;}}
+  const parts=NyanBodyMail.compile(nextPlan),first=nextPlan.confirmed.findIndex(x=>!x);if(index!==first||!parts[index])throw Error('先のメールの送信状況を確認してください。');
+  nextPlan.cursor=index;nextPlan.opened[index]=true;orderSendPending.bodyMail=nextPlan;orderSendPending.hasLeft=false;
+  if(!saveCart()){orderSendPending=before;throw Error('注文の途中状態を保存できないため、メール作成を停止しました。カートは残っています。')}
+  renderCart();orderSendRefresh();mailStatus((index+1)+'/'+parts.length+'通目を開きます。To・CC・本文の末尾まで確認して送信してください。');
+  window.location.href=parts[index].uri;
+ }catch(e){mailStatus(e.message||String(e))}
+}
+function decideBodyMail(action){
+ const pending=orderSendPending;if(pending?.kind!=='本文メール')return false;
+ if(pending.bodyMailError){orderSendWarning='分割注文の情報を確認できないため、カートの自動削除を停止しました。';orderSendCloseDialog();orderSendRefresh();return true}
+ const p=pending.bodyMail;
+ if(action==='add'){if(p.confirmed.some(Boolean)){orderSendWarning='一部を送信確認済みのため、この注文を作り直せません。未確認のメールを確認してください。';orderSendRefresh();return true}return false}
+ if(action===true){
+  if(!p.opened[p.cursor])return true;
+  const before=JSON.parse(JSON.stringify(pending));p.confirmed[p.cursor]=true;
+  if(p.confirmed.every(Boolean))return false;
+  p.cursor=p.confirmed.findIndex(x=>!x);pending.hasLeft=false;
+  if(!saveCart()){orderSendPending=before;orderSendWarning='送信確認を保存できません。カートは残しています。';orderSendRefresh();return true}
+ }else{pending.hasLeft=false;if(!saveCart()){orderSendWarning='途中状態を保存できません。カートは残しています。';orderSendRefresh();return true}}
+ orderSendRestored=false;orderSendCloseDialog();orderSendRefresh();renderCart();return true;
+}
+
+ restoreCart();
+ setupMasterLastRead();
+ document.getElementById('openCart').onclick=()=>{const panel=document.getElementById('cartPanel');if(panel.classList.contains('hidden'))showCart();else hideCart()};
+ updateCartHeader();
+ window.addEventListener('storage',e=>{if(e.key!==CART_STORAGE_KEY)return;cart.clear();for(const k of Object.keys(cartMeta))cartMeta[k]='';restoreCart();updateCartHeader('別タブで更新されたカートを再読み込みしました。')});
+ orderSendSetup();
+
+ function showPagedCandidates(hits,title,page=0){
+  const pages=Math.ceil(hits.length/PAGE_SIZE),current=Math.min(Math.max(0,page),Math.max(0,pages-1));
+  detail.classList.add('hidden');res.classList.remove('hidden');
+  res.innerHTML='<div class="status">'+esc(title)+'：'+hits.length.toLocaleString('ja-JP')+'件</div><div id="candidates"></div><div id="candidatePager"></div>';
+  const c=document.getElementById('candidates');
+  for(let j=current*PAGE_SIZE;j<Math.min(hits.length,(current+1)*PAGE_SIZE);j++)c.appendChild(candidateButton(hits[j]));
+  if(pages>1){
+   const pager=document.getElementById('candidatePager');pager.className='pager';
+   const prev=document.createElement('button');prev.textContent='← 前の50件';prev.disabled=current===0;
+   const info=document.createElement('span');info.className='hint';info.textContent=(current+1)+' / '+pages+'ページ';
+   const next=document.createElement('button');next.textContent='次の50件 →';next.disabled=current>=pages-1;
+   prev.onclick=()=>showPagedCandidates(hits,title,current-1);
+   next.onclick=()=>showPagedCandidates(hits,title,current+1);
+   pager.append(prev,info,next);
+  }
+ }
+ let nameRequest=0;
+ async function searchByName(){
+  const request=++nameRequest,searchStart=performance.now();
+  if(!masterValid())return;
+  currentProduct=null;document.getElementById('imageSearch').disabled=true;document.getElementById('variationSearch').disabled=true;
+  detail.classList.add('hidden');res.classList.remove('hidden');
+  const query=normalizeName(document.getElementById('nameQuery').value).trim();
+  const words=query.split(/\s+/u).filter(Boolean),compactWords=words.map(compactName);
+  if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
+  if(!words.length){res.innerHTML='<div class="status warn">メーカー名・商品名・規格のキーワードを入力してください。</div>';return}
+  const target=DATA;try{await warmIndex()}catch(e){if(DATA===target)res.innerHTML='<div class="status warn">検索準備に失敗しました。再検索してください。</div>';return}if(request!==nameRequest||DATA!==target)return;
+  const cpuStart=performance.now();
+  if(bEngineData!==DATA){bEngine=NyanB.create(DATA,searchIndex);bEngineData=DATA;}
+  const ids=bEngine.search(query);
+  const measurement={query,count:ids.length,search_ms:performance.now()-cpuStart,...(window.NyanLastBTiming||{}),waitAndSearch_ms:performance.now()-searchStart};fastMetrics.searches.push(measurement);if(fastMetrics.searches.length>300)fastMetrics.searches.shift();requestAnimationFrame(()=>requestAnimationFrame(()=>measurement.displayProxy_ms=performance.now()-searchStart));
+  if(!ids.length){res.innerHTML='<div class="status warn">該当商品がありません。</div>';return}
+  if(ids.length===1){show(DATA[ids[0]]);return}
+  showPagedCandidates(ids,'メーカー名・商品名・規格検索');
+ }
+  // 商品名からシリーズを推定する。年式・空白・区切り記号を正規化する。
+  // 例：１３アオリＢＢ－Ｃ３千ＨＧ → アオリbb
+  function variationBase(s){
+   return normalizeName(s).trim().replace(/^[0-9]{2}(?=[^0-9\s])/u,'').replace(/^[\s　]+/u,'');
+  }
+  function variationSeries(s){
+   const name=variationBase(s);
+   // ハイフンの後ろが型番らしい場合、手前をシリーズ名とする。
+   const m=/^(.{3,}?)[\-‐‑‒–—―－]([a-z]?\d|[a-z]\d|\d|[a-z]{1,3}\d).*/iu.exec(name);
+   if(m)return compactName(m[1]);
+   // 空白で分かれる規格（例：アオリBB C3000HG）
+   const spaced=/^(.{3,}?)\s+(?:[a-z]?\d|\d).*/iu.exec(name);
+   return spaced?compactName(spaced[1]):'';
+  }
+  // 区切りなし型番（アオリBB2500等）は、同メーカーの既知シリーズを補助的に利用する。
+  // 最も長く一致するシリーズを選び、残りが型番らしい場合だけ採用する。
+  function variationSeriesFallback(s,rows){
+   const base=compactName(variationBase(s));
+   let best='';
+   for(const i of rows){
+    const known=variationSeries(DATA[i][3]);
+    if(!known||known.length<=best.length||!base.startsWith(known))continue;
+    const suffix=base.slice(known.length);
+    if(/^(?:\d|[a-z]{1,3}\d)/u.test(suffix))best=known;
+   }
+   return best;
+  }
+  function variationTokens(s){return variationBase(s).replace(/[　\t\r\n]+/g,' ').trim().split(/ +/).map(compactName)}
+  function prefixMatches(a,b,count){return a.length>=count&&b.length>=count&&a.slice(0,count).every((v,i)=>v===b[i])}
+  async function searchVariations(source){
+   if(!masterValid()||!DATA.length)return;
+   const target=DATA;await warmIndex();if(DATA!==target)return;
+   const maker=normalizeName(source[2]),rows=makerIndex.get(maker)||[];
+   const sourceName=normalizeName(source[3]),tokens=variationTokens(source[3]);
+   const series=variationSeries(source[3])||variationSeriesFallback(source[3],rows);
+   const minDepth=tokens.length>1&&(tokens[0]==='デカパック'||tokens[0].length<=2)?2:1;
+   let depthFound=0;
+   const tokenCache=new Map();
+   const tokensFor=i=>{if(!tokenCache.has(i))tokenCache.set(i,variationTokens(DATA[i][3]));return tokenCache.get(i)};
+   for(let depth=minDepth;depth<tokens.length;depth++){
+    const next=new Set();
+    for(const i of rows){const t=tokensFor(i);if(prefixMatches(tokens,t,depth)&&t.length>depth)next.add(t[depth]);if(next.size>=2)break}
+    if(next.size>=2){depthFound=depth;break}
+   }
+   if(!depthFound){let count=0;for(const i of rows)if(prefixMatches(tokens,tokensFor(i),minDepth))count++;
+    if(count>=2)depthFound=minDepth;
+   }
+   const hits=[];
+   for(const i of rows){
+    const name=normalizeName(DATA[i][3]),t=tokensFor(i);
+    // シリーズ文字列が先頭（年式を除いた位置）にある場合、型番表記が異なっても拾う。
+    const candidateBase=compactName(variationBase(DATA[i][3]));
+    const sameSeries=series&&candidateBase.startsWith(series)&&
+     (candidateBase.length===series.length||/^[0-9a-z]/u.test(candidateBase.slice(series.length))||
+      variationSeries(DATA[i][3])===series);
+    if(name===sourceName||sameSeries||(depthFound&&prefixMatches(tokens,t,depthFound)))hits.push(i);
+   }
+   currentProduct=null;document.getElementById('imageSearch').disabled=true;document.getElementById('variationSearch').disabled=true;
+   if(!hits.length){detail.classList.add('hidden');res.classList.remove('hidden');res.innerHTML='<div class="status warn">規格違いと思われる商品は見つかりませんでした。</div>';return}
+   showPagedCandidates(hits,'規格違いと思われる商品');
+  }
+  document.getElementById('variationSearch').onclick=()=>{
+   if(!currentProduct)return;
+   const source=currentProduct,btn=document.getElementById('variationSearch');
+   btn.disabled=true;btn.textContent='⏳ 規格違いを検索中…';
+   setTimeout(async()=>{try{await searchVariations(source)}catch(e){alert('規格違い検索に失敗しました：'+(e.message||e));}
+    finally{btn.textContent='🔎 規格違いと思われる商品を探す';btn.disabled=!currentProduct;}},20);
+  };
+// ブラウザ標準の音声認識。非対応端末では通常の文字検索を使用。
+(function setupVoiceSearch(){
+ const btn=document.getElementById('voiceSearch'),status=document.getElementById('voiceStatus');
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){btn.disabled=true;status.textContent='このブラウザは音声認識に対応していません。文字入力で検索してください。';return;}
+ let recognition=null,active=false;
+ btn.onclick=()=>{
+  if(active){try{recognition.stop()}catch(e){}return;}
+  recognition=new SpeechRecognition();recognition.lang='ja-JP';recognition.interimResults=false;recognition.maxAlternatives=1;
+  recognition.onstart=()=>{active=true;btn.textContent='■ 音声入力を終了';status.textContent='🎤 話してください…'};
+  recognition.onresult=e=>{const transcript=e.results?.[0]?.[0]?.transcript?.trim()||'';if(transcript){document.getElementById('nameQuery').value=transcript;status.textContent='認識結果：'+transcript;searchByName()}};
+  recognition.onerror=e=>{status.textContent='音声認識できませんでした（'+(e.error||'不明')+'）。マイクの許可と通信環境を確認してください。'};
+  recognition.onend=()=>{active=false;btn.textContent='🎤 音声検索'};
+  try{recognition.start()}catch(e){status.textContent='音声認識を開始できません：'+e.message}
+ };
+})();
+document.getElementById('openCart').addEventListener('click',()=>{nameRequest++},true);
+document.getElementById('nameSearch').onclick=searchByName;
+document.getElementById('nameQuery').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchByName()}});
+function googleImagesUrl(p){const jan=String(p[1]??'').replace(/\D/g,'');return 'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(jan)}
+function openGoogleImages(){if(!masterValid()||!currentProduct)return;const jan=String(currentProduct[1]??'').replace(/\D/g,'');if(jan.length!==13){alert('画像検索にはJAN13桁が必要です。');return}const url=googleImagesUrl(currentProduct);if(window.AndroidApp&&window.AndroidApp.openExternalUrl)window.AndroidApp.openExternalUrl(url);else window.open(url,'_blank')}
+document.getElementById('imageSearch').onclick=openGoogleImages;
+// JSON_YYYYMMDD.json / YYYYMMDD_JSON.json の日付を基準に30日間有効。
+// 有効期限は作成日+30日の午前0時（端末のローカル日付）。
+const MASTER_DAYS=30;
+let masterExpiry=null, expiring=false;
+function parseMasterDate(filename){
+ const m=/^(?:JSON_(\d{8})|(\d{8})_JSON)\.json$/i.exec(filename);
+ if(!m)throw Error('ファイル名は customer.json または日付入りJSONにしてください');
+ const d=m[1]||m[2],y=Number(d.slice(0,4)),mo=Number(d.slice(4,6)),day=Number(d.slice(6,8));
+ const date=new Date(y,mo-1,day);
+ if(date.getFullYear()!==y||date.getMonth()!==mo-1||date.getDate()!==day)throw Error('ファイル名の日付が正しくありません');
+ const today=new Date();today.setHours(0,0,0,0);
+ if(date>today)throw Error('ファイル名の作成日が未来になっています');
+ const expiry=new Date(y,mo-1,day+MASTER_DAYS);
+ if(today>=expiry)throw Error('このJSONは作成日から30日が経過しているため読み込めません');
+ return expiry.getTime();
+}
+// 配信元の共有リンクを直接取得（GitHub Pagesで接続確認済み）。
+// 同じ共有リンクのファイルを配信元側で上書きする運用を想定。
+const DROPBOX_MASTER_URL='https://dl.dropboxusercontent.com/scl/fi/0ask2pz3luo1frzgf2nst/customer.json?rlkey=3aqtuzzfg0evpl4izow9e2k7h&dl=1';
+const DATA_FILENAME='customer.json';
+
+const REMOTE_VALID_MS=MASTER_DAYS*24*60*60*1000;
+let remoteBusy=false;
+function expiryForRecord(record){
+ if(record&&record.remote===true){
+  if(!Number.isFinite(record.downloadedAt))throw Error('自動取得データの日時が不正です');
+  const expiry=record.downloadedAt+REMOTE_VALID_MS;
+  if(Date.now()>=expiry)throw Error('自動取得データの有効期限が切れました');
+  return expiry;
+ }
+ if(record.filename===DATA_FILENAME){if(!Number.isFinite(record.downloadedAt))throw Error('保存日時がありません。JSONを再読込してください');return record.downloadedAt+REMOTE_VALID_MS;}
+ return parseMasterDate(record.filename);
+}
+async function updateFrom配信元(force=false){
+ if(remoteBusy)return;
+ remoteBusy=true;
+ const btn=document.getElementById('remoteUpdate');
+ const progress=document.getElementById('remoteProgress');
+ const originalLabel='🔄 配信元から今すぐ更新';
+ const showProgress=(message)=>{progress.textContent=message;btn.textContent=message;};
+ btn.disabled=true;
+ let controller=null,timeoutId=0;
+ try{
+  showProgress('⏳ 保存データを確認中…');
+  let previous=null;
+  try{previous=await dbGet()}catch(e){}
+  const hadData=DATA.length>0;
+  loadStatus.textContent=hadData?'配信元の更新を確認中…（検索は引き続き可能）':'配信元から商品マスターを取得中…';
+  showProgress('⏳ 配信元に接続中…');
+  controller=new AbortController();
+  timeoutId=setTimeout(()=>controller.abort(),240000);
+  // 起動時はHEADで軽量確認。更新情報が取得できない場合、52MBの再ダウンロードはしない。
+  let remoteTag=null,remoteModified=null,remoteLength=null;
+  if(!force&&DATA.length){
+   if(!previous||previous.remote!==true||previous.remoteSource!==DROPBOX_MASTER_URL){
+    progress.textContent='✓ 保存済みマスターを使用（配信元版の更新確認は手動更新で実行）';
+    loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
+    return;
+   }
+   try{
+    const head=await fetch(DROPBOX_MASTER_URL,{method:'HEAD',cache:'no-store',signal:controller.signal});
+    if(head.ok){
+     remoteTag=head.headers.get('etag');remoteModified=head.headers.get('last-modified');remoteLength=head.headers.get('content-length');
+     const sameTag=!!(remoteTag&&previous.remoteTag&&remoteTag===previous.remoteTag);
+     const sameModified=!!(remoteModified&&previous.remoteModified&&remoteModified===previous.remoteModified&&remoteLength&&previous.remoteLength&&remoteLength===previous.remoteLength);
+     if(sameTag||sameModified){
+      previous.checkedAt=Date.now();await dbPut(previous);
+      progress.textContent='✓ 配信元確認済み：変更なし（保存済みマスターを使用）';
+      loadStatus.textContent='✓ 最新マスターを確認しました（'+DATA.length.toLocaleString('ja-JP')+'件）';
+      return;
+     }
+     // 比較に使える情報があり、保存時と違う場合だけ本体を再取得する。
+     const changedTag=!!(remoteTag&&previous.remoteTag&&remoteTag!==previous.remoteTag);
+     const changedModified=!!(remoteModified&&previous.remoteModified&&remoteModified!==previous.remoteModified);
+     if(changedTag||changedModified){
+      showProgress('⏳ 配信元の変更を検出。最新版を取得します…');
+     }else{
+      progress.textContent='✓ 保存済みマスターを使用（更新情報を比較できません。必要なら「今すぐ更新」）';
+      loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
+      return;
+     }
+    }else{
+     progress.textContent='✓ 保存済みマスターを使用（配信元の更新情報を取得できません）';
+     loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
+     return;
+    }
+   }catch(e){
+    progress.textContent='✓ 保存済みマスターを使用（配信元の更新確認に失敗。手動更新は可能）';
+    loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
+    return;
+   }
+  }
+  const response=await fetch(DROPBOX_MASTER_URL,{cache:'no-store',signal:controller.signal});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  remoteTag=response.headers.get('etag')||remoteTag;
+  remoteModified=response.headers.get('last-modified')||remoteModified;
+  remoteLength=response.headers.get('content-length')||remoteLength;
+  showProgress('⏳ 商品マスターをダウンロード中…');
+  const raw=(await response.text()).replace(/^\uFEFF/,'');
+  showProgress('⏳ JSONを解析中…');
+  const parsed=JSON.parse(raw);
+  validateData(parsed);
+  showProgress('⏳ 端末内に保存中…');
+  const now=Date.now();
+  const record={raw,filename:DATA_FILENAME,remote:true,remoteSource:DROPBOX_MASTER_URL,downloadedAt:now,checkedAt:now,remoteTag,remoteModified,remoteLength};
+  await dbPut(record);
+  rememberMasterLastRead(now);
+  masterExpiry=now+REMOTE_VALID_MS;DATA=parsed;void warmIndex();camBtn.disabled=false;
+  loadStatus.innerHTML='<span class="ok">✓ 配信元自動更新：'+DATA.length.toLocaleString()+'件（最終取得：'+new Date(now).toLocaleString('ja-JP')+'）</span>';
+  progress.textContent='✓ 更新完了：'+DATA.length.toLocaleString()+'件';
+  if(!scanning){document.getElementById('settings').open=false;search();}
+ }catch(e){
+  const reason=e.name==='AbortError'?'通信が240秒でタイムアウト':(e.message||e);
+  progress.textContent='✖ 更新失敗：'+reason;
+  loadStatus.textContent='配信元更新失敗：'+reason+(DATA.length?' ／ 保存済みデータで検索できます。':' ／ 手動JSON読込も利用できます。');
+ }finally{
+  if(timeoutId)clearTimeout(timeoutId);
+  btn.disabled=false;btn.textContent=originalLabel;remoteBusy=false;
+ }
+}
+function expiryLabel(ms){return new Date(ms).toLocaleDateString('ja-JP')+' 0:00';}
+function resetMaster(message){
+ DATA=[];void warmIndex();masterExpiry=null;currentProduct=null;camBtn.disabled=true;
+ document.getElementById('imageSearch').disabled=true;
+ document.getElementById('nameQuery').value='';q.value='';
+ detail.classList.add('hidden');res.classList.remove('hidden');
+ res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';
+ loadStatus.textContent=message;
+}
+function masterValid(){
+ if(!DATA.length)return true;
+ if(!Number.isFinite(masterExpiry)||Date.now()>=masterExpiry){void expireMaster();return false;}
+ return true;
+}
+async function expireMaster(){
+ if(expiring)return;expiring=true;
+ resetMaster('30日間の有効期限が終了しました。新しいJSONを読み込んでください。');
+ try{await stopCamera();await dbDelete();}catch(e){loadStatus.textContent='期限切れデータの削除に失敗しました。アプリを再起動してください：'+(e.message||e);}
+ finally{expiring=false;}
+}
+function dbOpen(){return new Promise((resolve,reject)=>{let r=indexedDB.open('nyan-customer-master-v2',1);r.onupgradeneeded=()=>r.result.createObjectStore('files');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function dbGetRaw(){let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readonly'),r=tx.objectStore('files').get('master');r.onsuccess=()=>{db.close();resolve(r.result)};r.onerror=()=>{db.close();reject(r.error)}})}
+async function dbPut(record){if(!record.nyanBGeneration)record={...record,nyanBGeneration:searchGeneration()};let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').put(record,'master');tx.oncomplete=()=>{db.close();fastGeneration=record.nyanBGeneration||null;resolve()};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error)}})}
+async function dbDelete(){await FastRuntime.cache(indexCacheName,null,true).catch(()=>{});let db=await dbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').delete('master');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+function applyData(record,source){
+ fastGeneration=record?.nyanBGeneration||null;
+ if(!record||typeof record!=='object'||typeof record.raw!=='string'||typeof record.filename!=='string')throw Error('旧形式の保存データです。JSONを選び直してください');
+ const expiry=expiryForRecord(record);
+ const d=JSON.parse(record.raw.replace(/^\uFEFF/,''));
+ validateData(d);
+ masterExpiry=expiry;DATA=d;void warmIndex();camBtn.disabled=false;
+ rememberMasterLastRead(record.downloadedAt);
+ loadStatus.innerHTML='<span class="ok">✓ '+source+'：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
+ document.getElementById('settings').open=false;search();
+}
+document.getElementById('masterFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ loadStatus.textContent='読み込み中…';
+ try{
+  const expiry=f.name.toLowerCase()===DATA_FILENAME?Date.now()+REMOTE_VALID_MS:parseMasterDate(f.name);
+  const raw=(await f.text()).replace(/^\uFEFF/,'');
+  const parsed=JSON.parse(raw);
+  validateData(parsed);
+  loadStatus.textContent='端末内に保存中…';
+  const loadedAt=Date.now();await dbPut({raw,filename:f.name,downloadedAt:loadedAt});
+  rememberMasterLastRead(loadedAt);
+  masterExpiry=expiry;DATA=parsed;void warmIndex();camBtn.disabled=false;
+  loadStatus.innerHTML='<span class="ok">✓ 読み込み完了：'+DATA.length.toLocaleString()+'件（期限：'+expiryLabel(expiry)+'）</span>';
+  document.getElementById('settings').open=false;
+  search();
+  alert('商品マスターの読み込みが完了しました。\n\nファイル名：'+f.name+'\n商品件数：'+DATA.length.toLocaleString()+'件\n\n端末内に保存しました。');
+ }catch(err){
+  loadStatus.textContent='読み込みまたは保存に失敗しました：'+(err.message||err);
+  alert('商品マスターの読み込み・保存に失敗しました。\n'+(err.message||err));
+ }finally{e.target.value=''}
+});
+document.getElementById('remoteUpdate').onclick=()=>void updateFrom配信元(true);
+document.getElementById('forget').onclick=async()=>{
+ if(!confirm('端末内に保存したマスターを削除しますか？'))return;
+ try{
+  await stopCamera();await dbDelete();resetMaster('保存済みマスターを削除しました');
+  alert('保存済みの商品マスターを削除しました。');
+ }catch(e){loadStatus.textContent='削除失敗：'+(e.message||e);alert('削除失敗：'+(e.message||e))}
+};
+q.addEventListener('input',search);document.getElementById('clear').onclick=()=>{q.value='';document.getElementById('nameQuery').value='';search();q.focus()};
+function scanned(code){
+ if(!masterValid())return;
+ let digits=String(code).replace(/\D/g,'');
+ if(digits.length!==13&&digits.length!==8)return;
+ // カメラはJAN全桁一致で検索。手入力は4〜12桁末尾一致／13桁完全一致。
+ q.value='';
+ currentProduct=null;detail.classList.add('hidden');res.classList.remove('hidden');
+ camStatus.textContent='読み取り完了：'+digits;
+ if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
+ let found=[];
+ for(let i=0;i<DATA.length;i++)if(String(DATA[i][1])===digits)found.push(DATA[i]);
+ if(found.length===0){res.innerHTML='<div class="status warn">JAN '+esc(digits)+'：該当商品なし</div>';return}
+ if(found.length===1){show(found[0]);return}
+ // 同一JANが複数行ある場合のみ、誤った商品を選ばないよう候補を表示。
+ res.innerHTML='<div class="status">JAN '+esc(digits)+'：同一JANの商品が'+found.length+'件あります</div><div id="candidates"></div>';
+ let c=document.getElementById('candidates');
+ for(let p of found.slice(0,150)){
+  let b=document.createElement('button');b.className='candidate';
+  b.innerHTML='<strong>'+esc(p[3])+'</strong><small>'+esc([p[4],p[5]].filter(Boolean).join(' / '))+'</small><small>'+esc(p[2])+' ／ JAN '+esc(p[1])+'</small>';
+  b.onclick=()=>show(p);c.appendChild(b);
+ }
+ if(found.length>150)c.insertAdjacentHTML('beforeend','<div class="hint">先頭150件を表示</div>');
+}
+// iPhoneカメラ改善版：画面全体を読み取り対象とし、検出できないときは別方式に切り替える。
+function validCameraJAN(value){const digits=String(value??'').replace(/\D/g,'');return digits.length===13||digits.length===8?digits:null}
+async function releaseCameraHardware(){
+ clearTimeout(scanTimer);scanTimer=0;
+ const oldScanner=scanner;scanner=null;
+ if(oldScanner){try{await oldScanner.stop()}catch(e){}try{oldScanner.clear()}catch(e){}}
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ document.getElementById('reader').replaceChildren();
+}
+// iPhone / iPad だけ読み取り方式を端末内に記憶する。Androidの方式は従来のまま。
+const appleCamera=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if(appleCamera)document.body.classList.add('iphone-center-test');
+const SCANNER_PREF='nyan-customer-camera-v2';
+const switchBtn=document.getElementById('switchScanner');
+const retryBtn=document.getElementById('retryScanner');
+let currentEngine='',nativeAvailable=false,autoSwitched=false,engineTimer=0,engineBusy=false;
+function preferredEngine(){try{return localStorage.getItem(SCANNER_PREF)==='native'?'native':'wide'}catch(e){return 'wide'}}
+function rememberEngine(mode){if(!appleCamera)return;try{localStorage.setItem(SCANNER_PREF,mode)}catch(e){}}
+function clearEngineTimer(){clearTimeout(engineTimer);engineTimer=0}
+function setCameraStatus(message){camStatus.textContent=message}
+function updateSwitchButton(){
+ // iPhoneでは非対応端末でもボタンを表示し、理由を説明できるようにする。
+ switchBtn.classList.add('hidden');
+ switchBtn.disabled=engineBusy||!scanning||!currentEngine;
+ switchBtn.textContent=nativeAvailable?'🔄 読み取り方式を手動で切り替える':'ℹ️ 読み取り方式について';
+}
+function scheduleAppleFallback(session,mode){
+ clearEngineTimer();
+ if(!appleCamera||autoSwitched||!nativeAvailable)return;
+ // 起動・カメラ合わせの時間を考慮し、方式が起動してから8秒後に一度だけ変更。
+ engineTimer=setTimeout(()=>{
+  if(session!==cameraSession||!scanning||engineBusy||currentEngine!==mode)return;
+  autoSwitched=true;
+  void switchEngine(session,mode==='wide'?'native':'wide',true);
+ },8000);
+}
+async function stopCamera(){
+ cameraSession++;scanning=false;cameraBusy=false;engineBusy=false;
+ clearEngineTimer();switchBtn.classList.add('hidden');retryBtn.classList.add('hidden');currentEngine='';
+ await releaseCameraHardware();camBox.classList.add('hidden');
+}
+async function finishCameraRead(digits,session,mode){
+ if(session!==cameraSession||!scanning)return;
+ rememberEngine(mode);
+ await stopCamera();scanned(digits);
+}
+async function supportsNative(){
+ if(!('BarcodeDetector' in window))return false;
+ try{const f=await BarcodeDetector.getSupportedFormats();return f.includes('ean_13')||f.includes('ean_8')}catch(e){return false}
+}
+async function startNativeScanner(session){
+ if(session!==cameraSession||!scanning)return;
+ await releaseCameraHardware();
+ if(session!==cameraSession||!scanning)return;
+ const formats=(await BarcodeDetector.getSupportedFormats()).filter(f=>f==='ean_13'||f==='ean_8');
+ if(!formats.length)throw Error('この端末はJANのネイティブ認識に非対応です');
+ const detector=new BarcodeDetector({formats});
+ stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+ if(session!==cameraSession||!scanning){await releaseCameraHardware();return}
+ const v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.autoplay=true;v.srcObject=stream;
+ document.getElementById('reader').appendChild(v);await v.play();
+ if(session!==cameraSession||!scanning)return;
+ currentEngine='native';engineBusy=false;cameraBusy=false;
+ setCameraStatus('JANを画面内に映してください（読み取り方式：標準）');
+ updateSwitchButton();
+ scheduleAppleFallback(session,'native');
+ async function loop(){
+  if(session!==cameraSession||!scanning||currentEngine!=='native')return;
+  try{
+   const codes=await detector.detect(v);
+   if(session!==cameraSession||!scanning||currentEngine!=='native')return;
+   for(const code of codes){const digits=validCameraJAN(code.rawValue);if(digits){clearEngineTimer();void finishCameraRead(digits,session,'native');return}}
+  }catch(e){}
+  if(session!==cameraSession||!scanning||currentEngine!=='native')return;
+  scanTimer=setTimeout(loop,160);
+ }
+ void loop();
+}
+// iPhone向け実験：ZXing-C++ WebAssembly版。Android側の処理は変更しない。
+let wasmLoadPromise=null;
+function loadWasmReader(){
+ if(window.ZXingWASM&&typeof window.ZXingWASM.readBarcodes==='function')return Promise.resolve();
+ if(wasmLoadPromise)return wasmLoadPromise;
+ wasmLoadPromise=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.5/dist/iife/reader/index.js';
+  script.onload=()=>window.ZXingWASM&&typeof window.ZXingWASM.readBarcodes==='function'?resolve():reject(Error('ZXing WASMの読み込みに失敗しました'));
+  script.onerror=()=>reject(Error('ZXing WASMをダウンロードできません。インターネット接続を確認してください'));
+  document.head.appendChild(script);
+ }).catch(e=>{wasmLoadPromise=null;throw e});
+ return wasmLoadPromise;
+}
+async function startWasmScanner(session){
+ if(session!==cameraSession||!scanning)return;
+ await releaseCameraHardware();
+ if(session!==cameraSession||!scanning)return;
+ setCameraStatus('ZXing WebAssemblyを読み込み中…（初回は通信が必要）');
+ await loadWasmReader();
+ if(session!==cameraSession||!scanning)return;
+ stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+ if(session!==cameraSession||!scanning){await releaseCameraHardware();return}
+ const video=document.createElement('video');
+ video.setAttribute('playsinline','');video.muted=true;video.autoplay=true;video.srcObject=stream;
+ document.getElementById('reader').appendChild(video);
+ await video.play();
+ if(session!==cameraSession||!scanning)return;
+ const canvas=document.createElement('canvas');const ctx=canvas.getContext('2d',{willReadFrequently:true});
+ if(!ctx)throw Error('画像解析を開始できません');
+ currentEngine='wide';engineBusy=false;cameraBusy=false;
+ setCameraStatus('ZXing WebAssembly方式：'+(appleCamera?'中央約1/3の範囲でJANを解析しています。':'JANを画面内に映してください。')+' 読めない場合は「カメラを再起動」。');
+ updateSwitchButton();
+ async function loop(){
+  if(session!==cameraSession||!scanning||currentEngine!=='wide')return;
+  try{
+   if(video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0){
+    // iPhoneだけ映像の中央を実際に切り出してZXingに渡す。Androidは全画面のまま。
+    const cropW=appleCamera?Math.round(video.videoWidth*0.75):video.videoWidth;
+    const cropH=appleCamera?Math.round(video.videoHeight*0.45):video.videoHeight;
+    const sx=Math.floor((video.videoWidth-cropW)/2);
+    const sy=Math.floor((video.videoHeight-cropH)/2);
+    const scale=Math.min(1,1280/cropW,720/cropH);
+    canvas.width=Math.max(1,Math.round(cropW*scale));
+    canvas.height=Math.max(1,Math.round(cropH*scale));
+    ctx.drawImage(video,sx,sy,cropW,cropH,0,0,canvas.width,canvas.height);
+    const results=await window.ZXingWASM.readBarcodes(ctx.getImageData(0,0,canvas.width,canvas.height),{
+     formats:['EAN13','EAN8'],tryHarder:true,maxNumberOfSymbols:1
+    });
+    if(session!==cameraSession||!scanning||currentEngine!=='wide')return;
+    for(const item of results){
+     const digits=validCameraJAN(item.text);
+     if(digits){void finishCameraRead(digits,session,'wide');return}
+    }
+   }
+  }catch(err){
+   // 単発のフレーム解析失敗ではカメラを停止しない。
+   if(session!==cameraSession||!scanning)return;
+  }
+  if(session!==cameraSession||!scanning||currentEngine!=='wide')return;
+  scanTimer=setTimeout(loop,120);
+ }
+ void loop();
+}
+
+async function startWideScanner(session){
+ if(session!==cameraSession||!scanning)return;
+ await releaseCameraHardware();
+ if(session!==cameraSession||!scanning)return;
+ await loadZXing();
+ if(session!==cameraSession||!scanning)return;
+ const qr=new Html5Qrcode('reader',{verbose:false,formatsToSupport:[Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8]});
+ scanner=qr;
+ // 読み取り枠を指定しないことで、カメラ映像全体を対象にする。
+ await qr.start({facingMode:'environment'},{fps:appleCamera?10:12},text=>{
+  if(session!==cameraSession||!scanning||currentEngine!=='wide')return;
+  const digits=validCameraJAN(text);
+  if(digits){clearEngineTimer();void finishCameraRead(digits,session,'wide')}
+ },()=>{});
+ if(session!==cameraSession||!scanning){await releaseCameraHardware();return}
+ currentEngine='wide';engineBusy=false;cameraBusy=false;
+ setCameraStatus('JAN全体を映して静止してください。反応しないときは「カメラを再起動」を押してください。');
+ updateSwitchButton();
+ // iPhone: 自動切替は行わず、カメラ再起動で復旧する。
+}
+async function switchEngine(session,mode,automatic=false){
+ if(session!==cameraSession||!scanning||engineBusy)return;
+ engineBusy=true;clearEngineTimer();
+ setCameraStatus((automatic?'自動で':'手動で')+'読み取り方式を切り替えています…');
+ try{
+  if(mode==='native')await startNativeScanner(session);else if(appleCamera){try{await startWasmScanner(session)}catch(wasmError){if(session!==cameraSession||!scanning)return;await startWideScanner(session);setCameraStatus('WASM起動失敗のため従来方式で動作中：'+(wasmError.message||wasmError))}}else await startWideScanner(session);
+  updateSwitchButton();
+ }catch(e){
+  if(session!==cameraSession||!scanning)return;
+  // 切替先が失敗したら元の方式へ復帰する。
+  const other=mode==='native'?'wide':'native';
+  setCameraStatus('別方式を起動できませんでした。元の方式に戻しています…');
+  try{if(other==='native')await startNativeScanner(session);else await startWideScanner(session)}
+  catch(err){if(session!==cameraSession)return;await stopCamera();alert('カメラ読み取りを開始できません：'+(err.message||err))}
+ }finally{if(session===cameraSession){engineBusy=false;updateSwitchButton()}}
+}
+async function startCamera(){
+ if(cameraBusy||scanning)return;
+ if(!masterValid())return;
+ if(!DATA.length){alert('先に商品マスターを読み込んでください');return}
+ if(!window.isSecureContext){alert('カメラを使うにはHTTPSでページを開いてください');return}
+ const session=++cameraSession;cameraBusy=true;scanning=true;autoSwitched=false;currentEngine='';
+ camBox.classList.remove('hidden');switchBtn.classList.add('hidden');retryBtn.classList.remove('hidden');switchBtn.disabled=true;setCameraStatus('カメラを起動中…');
+ try{
+  nativeAvailable=await supportsNative();
+  if(session!==cameraSession||!scanning)return;
+  updateSwitchButton();
+  if(appleCamera){
+   // 初回は広範囲方式、2回目以降はその端末で最後に成功した方式から開始。
+   await switchEngine(session,'wide');
+  }else{
+   // Android: 以前の高速なBarcodeDetector優先処理を維持。
+   if(nativeAvailable){
+    await switchEngine(session,'native');
+    // Androidは従来どおり、5秒で広範囲方式にフォールバック。
+    if(session===cameraSession&&scanning&&currentEngine==='native'){
+     engineTimer=setTimeout(()=>{if(session===cameraSession&&scanning&&currentEngine==='native')void switchEngine(session,'wide',true)},5000);
+    }
+   }else await switchEngine(session,'wide');
+  }
+ }catch(e){
+  if(session!==cameraSession)return;
+  await stopCamera();alert('カメラ起動失敗：'+(e.message||e));
+ }finally{if(session===cameraSession)cameraBusy=false}
+}
+retryBtn.onclick=async()=>{if(cameraBusy)return;await stopCamera();await startCamera()};
+switchBtn.onclick=()=>{
+ if(!appleCamera||!scanning||engineBusy)return;
+ if(!nativeAvailable){setCameraStatus('このiPhoneでは標準のJAN読み取り方式が利用できないため、広範囲方式のみ使用できます。');return;}
+ // 手動切り替えをした場合、次の自動切り替えは行わない。
+ autoSwitched=true;
+ void switchEngine(cameraSession,currentEngine==='wide'?'native':'wide');
+};
+function loadZXing(){return new Promise((resolve,reject)=>{if(window.Html5Qrcode){resolve();return}let s=document.createElement('script');s.src='https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';s.onload=resolve;s.onerror=()=>reject(Error('カメラ用ライブラリの読み込みに失敗'));document.head.appendChild(s)})}camBtn.onclick=()=>{if(window.AndroidApp){window.AndroidApp.openScanner()}else{startCamera()}};document.getElementById('stop').onclick=stopCamera;window.addEventListener('pagehide',stopCamera);(async()=>{
+ let record;
+ try{record=await dbGet()}catch(e){
+  loadStatus.textContent='⚠ IndexedDB読込失敗（自動取得停止）：'+(e.message||e);return;
+ }
+ if(record){
+  try{applyData(record,'端末保存から復元')}
+  catch(e){
+   const reason=String(e.message||e);
+   if(reason.includes('有効期限')||reason.includes('30日が経過')){
+    resetMaster('保存データの期限切れ：'+reason);
+    try{await dbDelete()}catch(err){loadStatus.textContent='⚠ 削除失敗：'+(err.message||err);return}
+   }else{
+    loadStatus.textContent='⚠ 保存データ復元失敗（削除・自動取得停止）：'+reason;return;
+   }
+  }
+ }else loadStatus.textContent='保存済みマスターなし：配信元から初回取得します';
+ await updateFrom配信元(false);
+})();
+window.addEventListener('focus',masterValid);document.addEventListener('visibilitychange',()=>{if(!document.hidden)masterValid()});
+setInterval(()=>{if(DATA.length)masterValid()},60000);
+if('serviceWorker' in navigator && window.isSecureContext){navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});}</script></body></html>
