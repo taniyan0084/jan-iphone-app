@@ -330,7 +330,7 @@ const NyanBodyMail=(()=>{
     item.qty=Number(input.value);saveCart();updateCartHeader('カートの数量を変更しました。');
    });
    setupQuantityInput(input);lbl.appendChild(input);
-   const remove=document.createElement('button');remove.type='button';remove.className='cart-danger';remove.textContent='削除';remove.onclick=()=>{if(confirm(item.name+' をカートから削除しますか？')){cart.delete(item.jan);saveCart();updateCartHeader('商品をカートから削除しました。')}};
+   const remove=document.createElement('button');remove.type='button';remove.className='cart-danger';remove.textContent='削除';remove.onclick=()=>{if(nyanConfirmCartDelete(item.name+' をカートから削除しますか？')){cart.delete(item.jan);saveCart();updateCartHeader('商品をカートから削除しました。')}};
    tools.append(lbl,remove);
    const noteBox=createCartField('cartNote-'+item.jan,'商品別備考（任意）',item.note,value=>{item.note=value},true);noteBox.classList.add('cart-order-note');
    row.append(name,meta,price,tools,noteBox);contents.appendChild(row);
@@ -357,15 +357,14 @@ const NyanBodyMail=(()=>{
   fallbacks.append(textDownload,download,excelShare,textShare,fallbackMail);
   const helperMenu=document.createElement('details');const helperLabel=document.createElement('summary');helperLabel.textContent='補助：TXT・Excelの保存／共有';helperMenu.append(helperLabel,fallbacks);
   const action=document.createElement('div');action.className='cart-action-row';
-  const clear=document.createElement('button');clear.type='button';clear.className='cart-danger';clear.textContent='カートを空にする';clear.onclick=()=>{if(confirm('カートの商品をすべて削除しますか？')){cart.clear();saveCart();updateCartHeader('カートを空にしました。')}};
+  const clear=document.createElement('button');clear.type='button';clear.className='cart-danger';clear.textContent='カートを空にする';clear.onclick=()=>{if(nyanConfirmCartDelete('カートの商品をすべて削除しますか？')){cart.clear();saveCart();updateCartHeader('カートを空にしました。')}};
   const close=document.createElement('button');close.type='button';close.textContent='カートを閉じる';close.onclick=hideCart;
   action.append(clear,close);
   const storageNote=document.createElement('div');storageNote.className='hint';storageNote.textContent='カート・連絡先はこのブラウザの端末内保存です。別のPC・スマホとは共有しません。';
   const recipient=document.createElement('div');recipient.className='cart-action-row';
   const address=document.createElement('span');address.textContent='宛先：'+ORDER_MAIL_ADDRESS;
-  const copyRecipient=document.createElement('button');copyRecipient.type='button';copyRecipient.textContent='宛先をコピー';copyRecipient.onclick=copyOrderRecipient;
   const manualRecipient=document.createElement('input');manualRecipient.type='text';manualRecipient.id='orderRecipientManual';manualRecipient.value=ORDER_MAIL_ADDRESS;manualRecipient.readOnly=true;manualRecipient.className='hidden';manualRecipient.setAttribute('aria-label','注文メールの宛先（手動コピー用）');
-  recipient.append(address,copyRecipient,manualRecipient);
+  recipient.append(address,manualRecipient);
   form.append(mailBtn,mailHint,status);appendBodyMailProgress(form);form.append(helperMenu,action,storageNote);
  }
 
@@ -684,7 +683,13 @@ const NyanBodyMail=(()=>{
   try{const result=await navigator.share(payload);orderSendFinish(ticket,true);return result}
   catch(error){orderSendFinish(ticket,false);throw error}
  }
+ let nyanNativeConfirmActive=false,nyanIgnoreConfirmFocusUntil=0;
+ function nyanConfirmCartDelete(message){
+  nyanNativeConfirmActive=true;
+  try{return window.confirm(message)}finally{nyanNativeConfirmActive=false;nyanIgnoreConfirmFocusUntil=Date.now()+1200}
+ }
  function orderSendMarkLeft(){
+  if(nyanNativeConfirmActive||Date.now()<nyanIgnoreConfirmFocusUntil)return;
   if(!orderSendPending||!orderSendReadLatest()||!orderSendPending||orderSendPending.hasLeft)return;
   orderSendPending.hasLeft=true;
   if(!saveCart())orderSendWarning='送信確認の保存に失敗しました。カートは残しています。';
@@ -692,6 +697,7 @@ const NyanBodyMail=(()=>{
  }
  function orderSendCloseDialog(){const dialog=document.getElementById('orderSentDialog');if(dialog?.open)dialog.close();orderSendDialogId=null}
  function orderSendMaybeAsk(force=false){
+  if(nyanNativeConfirmActive||Date.now()<nyanIgnoreConfirmFocusUntil)return;
   if(!orderSendPending||document.visibilityState!=='visible'||(typeof document.hasFocus==='function'&&!document.hasFocus()))return;
   if(orderSendPending.phase==='opening'&&!orderSendRestored)return;
   if(bodyMailPlan()&&!orderSendPending.bodyMailError&&!bodyMailPlan().opened[bodyMailPlan().cursor]){if(force)showCart();return;}
@@ -747,10 +753,9 @@ const NyanBodyMail=(()=>{
   const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='まだ送信していない';no.onclick=()=>void orderSendDecide(false);
   const add=document.createElement('button');add.id='orderSentAdd';add.type='button';add.textContent='送信前に追加注文';add.setAttribute('aria-describedby','orderSentAddHint');add.onclick=()=>void orderSendDecide('add');
   const addHint=document.createElement('p');addHint.id='orderSentAddHint';addHint.className='hint';addHint.textContent='メールが未送信の場合のみ「送信前に追加注文」を選んでください。商品を追加・変更して注文メールを作り直せます。以前開いたGmailなどの下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。';
-  const copy=document.createElement('button');copy.type='button';copy.id='orderSentCopy';copy.textContent='宛先をコピー';copy.onclick=()=>void copyConfirmationRecipient();
   const copyStatus=document.createElement('p');copyStatus.id='orderSentCopyStatus';copyStatus.setAttribute('role','status');
   const manual=document.createElement('input');manual.id='orderSentRecipientManual';manual.type='text';manual.readOnly=true;manual.value=ORDER_MAIL_ADDRESS;manual.hidden=true;manual.setAttribute('aria-label','送信確認の宛先（手動コピー用）');manual.style.cssText='font-size:16px;letter-spacing:normal;width:100%';
-  dialog.append(title,explanation,yes,no,add,addHint,copy,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
+  dialog.append(title,explanation,yes,no,add,addHint,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
   orderSendRestored=!!orderSendPending;orderSendRefresh();
   window.addEventListener('blur',orderSendMarkLeft);window.addEventListener('pagehide',orderSendMarkLeft);
   window.addEventListener('focus',()=>setTimeout(()=>orderSendMaybeAsk(),0));window.addEventListener('pageshow',()=>setTimeout(()=>orderSendMaybeAsk(),0));
@@ -784,11 +789,32 @@ function appendBodyMailProgress(form){
  const next=p.confirmed.findIndex(x=>!x);
  if(next>=0){
   if(p.opened[next]){const review=document.createElement('button');review.type='button';review.textContent=(next+1)+'通目の送信状況を確認';review.onclick=()=>{if(!orderSendReadLatest())return;const current=bodyMailPlan();if(!current||orderSendPending.bodyMailError)return;current.cursor=next;if(saveCart())orderSendMaybeAsk(true)};box.append(review)}
-  const launch=document.createElement('button');launch.type='button';launch.className='primary';launch.textContent=p.opened[next]?'同じメールを再作成（未送信の場合）':next===0?'1通目のメールを作成':'次のメールを作成（'+(next+1)+'/'+parts.length+'）';launch.onclick=()=>{if(p.opened[next]&&!confirm('未送信の場合だけ再作成してください。送信済みメールを重複して送らないよう確認しましたか？'))return;openBodyMail(next)};box.append(launch);
+  if(!p.opened[next]){const launch=document.createElement('button');launch.type='button';launch.className='primary';launch.textContent=next===0?'1通目のメールを作成':'次のメールを作成（'+(next+1)+'/'+parts.length+'）';launch.onclick=()=>openBodyMail(next);box.append(launch);}
  }
  form.append(box);
 }
 function startBodyOrder(){
+ if(orderSendPending){startBodyOrderConfirmed();return}
+ if(!cart.size){validateOrderMail();return}
+ // No pending order is created until final confirmation is explicitly accepted.
+ if(!validateOrderMail())return;
+ const existing=document.getElementById('orderPreflightDialog');if(existing){existing.querySelector('#orderPreflightSummary').textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・注文先・CCに間違いがないか確認してください。';existing.showModal();return}
+ const dialog=document.createElement('dialog');dialog.id='orderPreflightDialog';
+ dialog.setAttribute('aria-labelledby','orderPreflightTitle');
+ dialog.style.cssText='max-width:520px;width:calc(100% - 32px);border:1px solid #9fb1c4;border-radius:12px;padding:20px;color:#162235';
+ const h=document.createElement('h2');h.id='orderPreflightTitle';h.textContent='注文内容の最終確認';h.style.marginTop='0';
+ const summary=document.createElement('p');summary.id='orderPreflightSummary';
+ const warning=document.createElement('p');warning.textContent='※注文確定後は、アプリから注文内容を変更できません。変更・キャンセルをご希望の場合は、担当者までご連絡ください。';
+ warning.style.cssText='font-weight:700;line-height:1.7';
+ const fix=document.createElement('button');fix.type='button';fix.textContent='注文内容を修正する';
+ fix.onclick=()=>{dialog.close();showCart()};
+ const proceed=document.createElement('button');proceed.type='button';proceed.className='primary';proceed.textContent='注文を確定してメールを作成';
+ proceed.onclick=()=>{dialog.close();startBodyOrderConfirmed()};
+ dialog.append(h,summary,warning,fix,proceed);document.body.append(dialog);
+ summary.textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・注文先・CCに間違いがないか確認してください。';
+ dialog.showModal();
+}
+function startBodyOrderConfirmed(){
  if(!orderSendReadLatest())return;
  if(orderSendPending){renderCart();orderSendRefresh();if(orderSendPending.kind!=='本文メール')orderSendMaybeAsk(true);return}
  if(!orderSendCanStart()||!validateOrderMail())return;
@@ -833,6 +859,16 @@ function decideBodyMail(action){
  window.addEventListener('storage',e=>{if(e.key!==CART_STORAGE_KEY)return;cart.clear();for(const k of Object.keys(cartMeta))cartMeta[k]='';restoreCart();updateCartHeader('別タブで更新されたカートを再読み込みしました。')});
  orderSendSetup();
 
+ // Search results: provide a close button and immediate cart access without changing search behavior.
+ const searchResultActions=document.createElement('div');
+ searchResultActions.className='cart-action-row';searchResultActions.id='searchResultActions';searchResultActions.hidden=true;
+ const searchClose=document.createElement('button');searchClose.type='button';searchClose.textContent='検索結果を閉じる';
+ searchClose.onclick=()=>{res.classList.add('hidden');detail.classList.add('hidden');searchResultActions.hidden=true};
+ const searchOpenCart=document.createElement('button');searchOpenCart.type='button';searchOpenCart.textContent='🛒 カートを見る';searchOpenCart.onclick=showCart;
+ searchResultActions.append(searchClose,searchOpenCart);res.before(searchResultActions);
+ const syncSearchActions=()=>{searchResultActions.hidden=res.classList.contains('hidden')||(!res.querySelector('#candidates')&&!res.querySelector('.status'))};
+ new MutationObserver(syncSearchActions).observe(res,{attributes:true,attributeFilter:['class'],childList:true});
+ syncSearchActions();
  function showPagedCandidates(hits,title,page=0){
   const pages=Math.ceil(hits.length/PAGE_SIZE),current=Math.min(Math.max(0,page),Math.max(0,pages-1));
   detail.classList.add('hidden');res.classList.remove('hidden');
