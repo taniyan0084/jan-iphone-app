@@ -772,7 +772,7 @@ function migrateOrderCc(){
 }
 function setOrderCc(value,persist=true){cartMeta.emailCc=String(value);cartMeta.emailCcResolved='1';cartMeta.emailMain=String(value);cartMeta.emailPc='';if(persist)saveCart()}
 function appendOrderCc(form){
- const box=createCartField('orderEmailCc','注文控え用CCメールアドレス（任意・この端末に記憶）',cartMeta.emailCc,v=>setOrderCc(v,false));box.querySelector('input').type='email';box.querySelector('input').style.cssText='width:100%;font-size:18px;padding:10px;letter-spacing:normal';form.append(box);
+ const box=createCartField('orderEmailCc','お客様のメールアドレス',cartMeta.emailCc,v=>setOrderCc(v,false));box.querySelector('input').type='email';box.querySelector('input').style.cssText='width:100%;font-size:18px;padding:10px;letter-spacing:normal';form.append(box);
  if(cartMeta.emailCcResolved!=='1'){
   const hint=document.createElement('p');hint.className='hint';hint.textContent='以前の控え用アドレスが2件あります。今回使用する1件を選ぶか、上の欄に入力してください。';form.append(hint);
   for(const value of [cartMeta.emailMain,cartMeta.emailPc,'']){const b=document.createElement('button');b.type='button';b.textContent=value?'このアドレスを使う：'+value:'CCを使わない';b.onclick=()=>{setOrderCc(value);renderCart()};form.append(b)}
@@ -805,12 +805,12 @@ function startBodyOrder(){
  const h=document.createElement('h2');h.id='orderPreflightTitle';h.textContent='注文内容の最終確認';h.style.marginTop='0';
  const summary=document.createElement('p');summary.id='orderPreflightSummary';
  const warning=document.createElement('p');warning.textContent='※注文確定後は、アプリから注文内容を変更できません。変更・キャンセルをご希望の場合は、担当者までご連絡ください。';
- warning.style.cssText='font-weight:700;line-height:1.7';
- const fix=document.createElement('button');fix.type='button';fix.textContent='注文内容を修正する';
+ warning.style.cssText='font-weight:700;line-height:1.7;color:#c62828';
+ const fix=document.createElement('button');fix.type='button';fix.textContent='カートに戻る';
  fix.onclick=()=>{dialog.close();showCart()};
- const proceed=document.createElement('button');proceed.type='button';proceed.className='primary';proceed.textContent='注文を確定してメールを作成';
+ const proceed=document.createElement('button');proceed.type='button';proceed.className='primary';proceed.textContent='注文確定';
  proceed.onclick=()=>{dialog.close();startBodyOrderConfirmed()};
- dialog.append(h,summary,warning,fix,proceed);document.body.append(dialog);
+ dialog.append(h,summary,warning,proceed,fix);document.body.append(dialog);
  summary.textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・注文先・CCに間違いがないか確認してください。';
  dialog.showModal();
 }
@@ -866,8 +866,33 @@ function decideBodyMail(action){
  searchClose.onclick=()=>{res.classList.add('hidden');detail.classList.add('hidden');searchResultActions.hidden=true};
  const searchOpenCart=document.createElement('button');searchOpenCart.type='button';searchOpenCart.textContent='🛒 カートを見る';searchOpenCart.onclick=showCart;
  searchResultActions.append(searchClose,searchOpenCart);res.before(searchResultActions);
- const syncSearchActions=()=>{searchResultActions.hidden=res.classList.contains('hidden')||(!res.querySelector('#candidates')&&!res.querySelector('.status'))};
- new MutationObserver(syncSearchActions).observe(res,{attributes:true,attributeFilter:['class'],childList:true});
+ function makeCandidateCameraButton(){
+  const button=document.createElement('button');button.type='button';button.className='candidate-camera-btn';
+  button.textContent='📷 カメラでJANを読む';
+  button.disabled=camBtn.disabled;
+  button.onclick=()=>{
+   if(camBtn.disabled)return;
+   camBtn.click();
+   if(!window.AndroidApp)requestAnimationFrame(()=>camBox.scrollIntoView({behavior:'smooth',block:'start'}));
+  };
+  return button;
+ }
+ const syncSearchActions=()=>{
+  searchResultActions.hidden=res.classList.contains('hidden')||(!res.querySelector('#candidates')&&!res.querySelector('.status'));
+  const candidates=res.querySelector('#candidates');
+  if(!candidates||!candidates.querySelector('.candidate'))return;
+  if(!res.querySelector('#candidateCameraTop')){
+   const top=document.createElement('div');top.id='candidateCameraTop';top.className='cart-action-row';top.append(makeCandidateCameraButton());
+   candidates.before(top);
+  }
+  if(!res.querySelector('#candidateCameraBottom')){
+   const bottom=document.createElement('div');bottom.id='candidateCameraBottom';bottom.className='cart-action-row';bottom.append(makeCandidateCameraButton());
+   const pager=res.querySelector('#candidatePager');
+   if(pager)pager.before(bottom);else candidates.after(bottom);
+  }
+  for(const btn of res.querySelectorAll('.candidate-camera-btn'))btn.disabled=camBtn.disabled;
+ };
+ new MutationObserver(syncSearchActions).observe(res,{attributes:true,attributeFilter:['class'],childList:true,subtree:false});
  syncSearchActions();
  function showPagedCandidates(hits,title,page=0){
   const pages=Math.ceil(hits.length/PAGE_SIZE),current=Math.min(Math.max(0,page),Math.max(0,pages-1));
@@ -1172,6 +1197,12 @@ document.getElementById('forget').onclick=async()=>{
  }catch(e){loadStatus.textContent='削除失敗：'+(e.message||e);alert('削除失敗：'+(e.message||e))}
 };
 q.addEventListener('input',search);document.getElementById('clear').onclick=()=>{q.value='';document.getElementById('nameQuery').value='';search();q.focus()};
+function scrollToScannedProduct(target){
+ if(!target)return;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(target.isConnected&&!target.classList.contains('hidden'))target.scrollIntoView({behavior:'smooth',block:'start'});
+ }));
+}
 function scanned(code){
  if(!masterValid())return;
  let digits=String(code).replace(/\D/g,'');
@@ -1183,8 +1214,8 @@ function scanned(code){
  if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
  let found=[];
  for(let i=0;i<DATA.length;i++)if(String(DATA[i][1])===digits)found.push(DATA[i]);
- if(found.length===0){res.innerHTML='<div class="status warn">JAN '+esc(digits)+'：該当商品なし</div>';return}
- if(found.length===1){show(found[0]);return}
+ if(found.length===0){res.innerHTML='<div class="status warn">JAN '+esc(digits)+'：該当商品なし</div>';scrollToScannedProduct(res);return}
+ if(found.length===1){show(found[0]);scrollToScannedProduct(detail);return}
  // 同一JANが複数行ある場合のみ、誤った商品を選ばないよう候補を表示。
  res.innerHTML='<div class="status">JAN '+esc(digits)+'：同一JANの商品が'+found.length+'件あります</div><div id="candidates"></div>';
  let c=document.getElementById('candidates');
@@ -1194,6 +1225,7 @@ function scanned(code){
   b.onclick=()=>show(p);c.appendChild(b);
  }
  if(found.length>150)c.insertAdjacentHTML('beforeend','<div class="hint">先頭150件を表示</div>');
+ scrollToScannedProduct(res);
 }
 // iPhoneカメラ改善版：画面全体を読み取り対象とし、検出できないときは別方式に切り替える。
 function validCameraJAN(value){const digits=String(value??'').replace(/\D/g,'');return digits.length===13||digits.length===8?digits:null}
