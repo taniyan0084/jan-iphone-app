@@ -1062,45 +1062,48 @@ async function updateFrom配信元(force=false){
   showProgress('⏳ 配信元に接続中…');
   controller=new AbortController();
   timeoutId=setTimeout(()=>controller.abort(),240000);
-  // 起動時はHEADで軽量確認。更新情報が取得できない場合、52MBの再ダウンロードはしない。
+  // 起動時の軽量HEAD確認を優先し、変更が検出された場合だけマスター本体を取得する。
+  // Dropbox側で比較用ヘッダーが公開されない場合は、12時間ごとに1回だけ本体を取得する。
+  // 起動のたびに52MBのデータを取得することは避ける。
   let remoteTag=null,remoteModified=null,remoteLength=null;
+  const FALLBACK_REFRESH_MS=12*60*60*1000;
   if(!force&&DATA.length){
-   if(!previous||previous.remote!==true||previous.remoteSource!==DROPBOX_MASTER_URL){
-    progress.textContent='✓ 保存済みマスターを使用（配信元版の更新確認は手動更新で実行）';
-    loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
+   let changed=false,verifiedSame=false,verificationReason='';
+   if(previous?.remote===true&&previous.remoteSource===DROPBOX_MASTER_URL){
+    try{
+     const head=await fetch(DROPBOX_MASTER_URL,{method:'HEAD',cache:'no-store',signal:controller.signal});
+     if(!head.ok)throw Error('HTTP '+head.status);
+     remoteTag=head.headers.get('etag');
+     remoteModified=head.headers.get('last-modified');
+     remoteLength=head.headers.get('content-length');
+     const hasTag=!!(remoteTag&&previous.remoteTag);
+     const hasDate=!!(remoteModified&&previous.remoteModified&&remoteLength&&previous.remoteLength);
+     changed=(hasTag&&remoteTag!==previous.remoteTag)||(hasDate&&(remoteModified!==previous.remoteModified||remoteLength!==previous.remoteLength));
+     verifiedSame=!changed&&(hasTag||hasDate);
+     if(!changed&&!verifiedSame)verificationReason='配信元が更新日・識別子を返さないため';
+    }catch(e){
+     verificationReason='更新情報の取得に失敗したため（'+(e.message||e)+'）';
+    }
+   }else{
+    verificationReason='保存済みマスターに比較用情報がないため';
+   }
+   if(verifiedSame){
+    previous.checkedAt=Date.now();await dbPut(previous);
+    progress.textContent='✓ 配信元確認済み：変更なし（保存済みマスターを使用）';
+    loadStatus.textContent='✓ 最新マスターを確認しました（'+DATA.length.toLocaleString('ja-JP')+'件）';
     return;
    }
-   try{
-    const head=await fetch(DROPBOX_MASTER_URL,{method:'HEAD',cache:'no-store',signal:controller.signal});
-    if(head.ok){
-     remoteTag=head.headers.get('etag');remoteModified=head.headers.get('last-modified');remoteLength=head.headers.get('content-length');
-     const sameTag=!!(remoteTag&&previous.remoteTag&&remoteTag===previous.remoteTag);
-     const sameModified=!!(remoteModified&&previous.remoteModified&&remoteModified===previous.remoteModified&&remoteLength&&previous.remoteLength&&remoteLength===previous.remoteLength);
-     if(sameTag||sameModified){
-      previous.checkedAt=Date.now();await dbPut(previous);
-      progress.textContent='✓ 配信元確認済み：変更なし（保存済みマスターを使用）';
-      loadStatus.textContent='✓ 最新マスターを確認しました（'+DATA.length.toLocaleString('ja-JP')+'件）';
-      return;
-     }
-     // 比較に使える情報があり、保存時と違う場合だけ本体を再取得する。
-     const changedTag=!!(remoteTag&&previous.remoteTag&&remoteTag!==previous.remoteTag);
-     const changedModified=!!(remoteModified&&previous.remoteModified&&remoteModified!==previous.remoteModified);
-     if(changedTag||changedModified){
-      showProgress('⏳ 配信元の変更を検出。最新版を取得します…');
-     }else{
-      progress.textContent='✓ 保存済みマスターを使用（更新情報を比較できません。必要なら「今すぐ更新」）';
-      loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
-      return;
-     }
-    }else{
-     progress.textContent='✓ 保存済みマスターを使用（配信元の更新情報を取得できません）';
-     loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
+   if(changed){
+    showProgress('⏳ 配信元の変更を検出。最新版を取得します…');
+   }else{
+    const lastDownload=Number(previous?.downloadedAt)||0;
+    if(lastDownload>0&&Date.now()-lastDownload<FALLBACK_REFRESH_MS){
+     const due=new Date(lastDownload+FALLBACK_REFRESH_MS).toLocaleString('ja-JP');
+     progress.textContent='⚠ '+verificationReason+'、保存済みマスターを使用（次回の再取得は'+due+'以降）';
+     loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）。更新を急ぐ場合は「今すぐ更新」を押してください。';
      return;
     }
-   }catch(e){
-    progress.textContent='✓ 保存済みマスターを使用（配信元の更新確認に失敗。手動更新は可能）';
-    loadStatus.textContent='✓ 保存済みマスターで検索できます（'+DATA.length.toLocaleString('ja-JP')+'件）';
-    return;
+    showProgress('⏳ '+verificationReason+'、定期自動更新で最新版を取得します…');
    }
   }
   const response=await fetch(DROPBOX_MASTER_URL,{cache:'no-store',signal:controller.signal});
