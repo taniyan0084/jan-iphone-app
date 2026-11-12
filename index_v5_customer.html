@@ -703,9 +703,9 @@ const NyanBodyMail=(()=>{
   const dialog=document.getElementById('orderSentDialog');if(!dialog||dialog.open)return;
   orderSendDialogId=orderSendPending.id;
   document.getElementById('orderSentCopyStatus').textContent='';document.getElementById('orderSentRecipientManual').hidden=true;
-  document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'実際に送信した場合だけ「送信した」を選んでください。送信済みの注文分だけを削除し、後から追加・変更した商品と登録情報は残します。';
+  document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'メールを実際に送信した場合は「送信した」、送信していない場合は「送信していない（カートに戻る）」を選んでください。';
   const body=bodyMailPlan(),badBody=orderSendPending.bodyMailError;
-  document.getElementById('orderSentYes').disabled=!!badBody;document.getElementById('orderSentAdd').disabled=!!badBody||!!body?.confirmed.some(Boolean);
+  document.getElementById('orderSentYes').disabled=!!badBody;document.getElementById('orderSentNo').disabled=!!badBody||!!body?.confirmed.some(Boolean);
   if(body){const parts=NyanBodyMail.compile(body);document.getElementById('orderSentExplanation').textContent=(body.cursor+1)+'/'+parts.length+'通目を実際に送信しましたか？ 全通の送信確認が終わるまでカートは残します。';}
   try{dialog.showModal();document.getElementById('orderSentNo').focus()}catch(error){orderSendWarning='送信状況の確認画面を開けませんでした。下の「送信状況を確認」から再度お試しください。';orderSendRefresh()}
  }
@@ -728,16 +728,16 @@ const NyanBodyMail=(()=>{
    orderSendWarning='保存できなかったためカートの変更を取り消しました。送信確認は未確定です。';orderSendRefresh();updateCartHeader();return;
   }
   orderSendRestored=false;orderSendPrepared=null;orderSendWarning='';orderSendCloseDialog();orderSendRefresh();
-  updateCartHeader(addBeforeSend?'カートを保持し、前の注文の送信確認を解除しました。未送信の場合のみ、商品を追加・変更して「注文メールを作成」を押してください。以前の下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。':sent?(cart.size?'送信済みの注文分を削除しました。追加・変更された商品はカートに残しています。':'カートを空にしました'):'カートを保持しました。注文メールを再度作成できます。');
+  updateCartHeader(addBeforeSend?'カートを保持し、前の注文の送信確認を解除しました。未送信の場合は、商品を変更せずそのまま、または追加・変更して「注文メールを作成」を押してください。以前の下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。':sent?(cart.size?'送信済みの注文分を削除しました。追加・変更された商品はカートに残しています。':'カートを空にしました'):'カートを保持しました。注文メールを再度作成できます。');
  }
  async function orderSendDecide(sent){
   const id=orderSendDialogId;if(!id)return;
-  const yes=document.getElementById('orderSentYes'),no=document.getElementById('orderSentNo'),add=document.getElementById('orderSentAdd');yes.disabled=true;no.disabled=true;add.disabled=true;
+  const yes=document.getElementById('orderSentYes'),no=document.getElementById('orderSentNo');yes.disabled=true;no.disabled=true;
   try{
    if(navigator.locks?.request)await navigator.locks.request(CART_STORAGE_KEY+'-send-confirm',()=>orderSendApplyDecision(sent,id));
    else orderSendApplyDecision(sent,id);
   }catch(error){orderSendWarning='送信確認を保存できませんでした。カートは自動削除しません。';orderSendRefresh()}
-  finally{yes.disabled=false;no.disabled=false;add.disabled=false}
+  finally{yes.disabled=false;no.disabled=!!orderSendPending?.bodyMailError||!!bodyMailPlan()?.confirmed.some(Boolean)}
  }
  function orderSendSetup(){
   const banner=document.createElement('section');banner.id='orderSendBanner';banner.className='box';banner.hidden=true;
@@ -748,12 +748,11 @@ const NyanBodyMail=(()=>{
   const title=document.createElement('h2');title.id='orderSentQuestion';title.textContent='注文メールは送信しましたか？';title.style.fontSize='20px';
   const explanation=document.createElement('p');explanation.id='orderSentExplanation';
   const yes=document.createElement('button');yes.id='orderSentYes';yes.type='button';yes.className='primary';yes.textContent='送信した';yes.onclick=()=>void orderSendDecide(true);
-  const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='まだ送信していない';no.onclick=()=>void orderSendDecide(false);
-  const add=document.createElement('button');add.id='orderSentAdd';add.type='button';add.textContent='送信前に追加注文';add.setAttribute('aria-describedby','orderSentAddHint');add.onclick=()=>void orderSendDecide('add');
-  const addHint=document.createElement('p');addHint.id='orderSentAddHint';addHint.className='hint';addHint.textContent='メールが未送信の場合のみ「送信前に追加注文」を選んでください。商品を追加・変更して注文メールを作り直せます。以前開いたGmailなどの下書きは自動更新されません。古い下書きは送らず、新しく作成した注文メールを使ってください。';
+  const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='送信していない（カートに戻る）';no.setAttribute('aria-describedby','orderSentNoHint');no.onclick=()=>void orderSendDecide('add');
+  const noHint=document.createElement('p');noHint.id='orderSentNoHint';noHint.className='hint';noHint.textContent='メールを送信していない場合のみ選んでください。カートの内容を保持して通常操作に戻り、商品を変更せずにメールを作り直すこともできます。以前開いたGmailなどの下書きは自動更新・削除されません。古い下書きは送信しないでください。';
   const copyStatus=document.createElement('p');copyStatus.id='orderSentCopyStatus';copyStatus.setAttribute('role','status');
   const manual=document.createElement('input');manual.id='orderSentRecipientManual';manual.type='text';manual.readOnly=true;manual.value=ORDER_MAIL_ADDRESS;manual.hidden=true;manual.setAttribute('aria-label','送信確認の宛先（手動コピー用）');manual.style.cssText='font-size:16px;letter-spacing:normal;width:100%';
-  dialog.append(title,explanation,yes,no,add,addHint,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide(false)});document.body.append(dialog);
+  dialog.append(title,explanation,yes,no,noHint,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide('add')});document.body.append(dialog);
   orderSendRestored=!!orderSendPending;orderSendRefresh();
   window.addEventListener('blur',orderSendMarkLeft);window.addEventListener('pagehide',orderSendMarkLeft);
   window.addEventListener('focus',()=>setTimeout(()=>orderSendMaybeAsk(),0));window.addEventListener('pageshow',()=>setTimeout(()=>orderSendMaybeAsk(),0));
@@ -802,7 +801,7 @@ function startBodyOrder(){
  dialog.style.cssText='max-width:520px;width:calc(100% - 32px);border:1px solid #9fb1c4;border-radius:12px;padding:20px;color:#162235';
  const h=document.createElement('h2');h.id='orderPreflightTitle';h.textContent='注文内容の最終確認';h.style.marginTop='0';
  const summary=document.createElement('p');summary.id='orderPreflightSummary';
- const warning=document.createElement('p');warning.textContent='※注文確定後は、アプリから注文内容を変更できません。変更・キャンセルをご希望の場合は、担当者までご連絡ください。';
+ const warning=document.createElement('p');warning.textContent='※注文メール送信後は、アプリから注文内容を変更・キャンセルできません。変更・キャンセルをご希望の場合は、担当者までご連絡ください。';
  warning.style.cssText='font-weight:700;line-height:1.7;color:#c62828';
  const fix=document.createElement('button');fix.type='button';fix.textContent='カートに戻る';
  fix.onclick=()=>{dialog.close();showCart()};
