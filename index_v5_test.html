@@ -358,14 +358,16 @@ const NyanBodyMail=(()=>{
   const summary=document.createElement('div');summary.className='cart-totals';summary.textContent='参考合計（税抜）：'+money(totals.total)+(totals.missing?' ※単価未登録'+totals.missing+'種類は含めていません':'');contents.appendChild(summary);
   const explanatory=document.createElement('div');explanatory.className='hint';explanatory.textContent='表示金額は通常卸に基づく参考価格で、実際の取引価格・請求額とは異なる場合があります。';contents.appendChild(explanatory);
   form.append(
-   createCartField('orderStore','店舗名・注文者名（必須）',cartMeta.store,v=>cartMeta.store=v),
+   createCartField('orderStore','店舗名・注文者名',cartMeta.store,v=>cartMeta.store=v),
    createCartField('orderCustomerCode','得意先コード（任意）',cartMeta.customerCode,v=>cartMeta.customerCode=v),
    createCartField('orderContact','連絡先（任意）',cartMeta.contact,v=>cartMeta.contact=v),
    createCartField('orderNote','注文全体の備考（任意）',cartMeta.orderNote,v=>cartMeta.orderNote=v,true)
   );
+  const storeLabel=document.querySelector('label[for="orderStore"]');
+  if(storeLabel){const required=document.createElement('span');required.textContent=' ※必須';required.style.cssText='color:#c62828;font-weight:700';storeLabel.append(required)}
   appendOrderCc(form);
   const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent=bodyMailPlan()?'作成中の注文を確認':'注文メールを作成';mailBtn.onclick=startBodyOrder;
-  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='メールに注文内容を入力します。To・CC・商品明細を確認して送信してください。送信後はにゃんSearchへ戻って確認してください。';
+  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文Excelを保存して宛先・CC入りメールを開きます。Gmailの添付から今作った注文Excelを選んで送信してください。ファイルは自動添付されません。';
   const status=document.createElement('div');status.id='cartMailStatus';status.className='cart-status';status.setAttribute('role','status');
   const fallbacks=document.createElement('div');fallbacks.className='cart-action-row';
   const download=document.createElement('button');download.type='button';download.textContent='📥 Excelを保存';download.onclick=saveExcelOrder;
@@ -449,13 +451,11 @@ const NyanBodyMail=(()=>{
  }
  function xlsxBytes(){
   const items=exportRows(),t=cartTotals();
-  const rows=[[...['JAN','メーカー','商品名','規格1','規格2','数量','定価','参考卸単価（税抜）','参考小計（税抜）','商品備考'].map((v,j)=>xlText(j+1,1,v,1))]];
+  const rows=[[...['JAN','数量','品名','規格1','規格2','商品別備考'].map((v,j)=>xlText(j+1,1,v,1))]];
   items.forEach((r,i)=>{
    const n=i+2;rows.push([
-    xlText(1,n,r.jan,2),xlText(2,n,r.maker),xlText(3,n,r.name),xlText(4,n,r.spec1),xlText(5,n,r.spec2),
-    xlNumber(6,n,r.qty,4),xlNumber(7,n,r.listPrice,3),xlNumber(8,n,r.unitPrice,3),
-    r.unitPrice===null?'':'<c r="I'+n+'" s="3"><f>F'+n+'*H'+n+'</f><v>'+Number((r.qty*r.unitPrice).toFixed(2))+'</v></c>',
-    xlText(10,n,r.note)
+    xlText(1,n,r.jan,2),xlNumber(2,n,r.qty,4),xlText(3,n,r.name),
+    xlText(4,n,r.spec1),xlText(5,n,r.spec2),xlText(6,n,r.note)
    ]);
   });
   const now=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
@@ -478,16 +478,26 @@ const NyanBodyMail=(()=>{
   const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;¥&quot;#,##0.##"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Yu Gothic"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Yu Gothic"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF173B66"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
   return zipStored([
    ['[Content_Types].xml',types],['_rels/.rels',rels],['xl/workbook.xml',book],['xl/_rels/workbook.xml.rels',bookRels],['xl/styles.xml',styles],
-   ['xl/worksheets/sheet1.xml',xlSheet(rows,[20,22,38,22,20,12,17,22,22,38],true)],
+   ['xl/worksheets/sheet1.xml',xlSheet(rows,[21,12,40,23,23,54],true)],
    ['xl/worksheets/sheet2.xml',xlSheet(summaryRows,[31,80])],
    ['xl/worksheets/sheet3.xml',xlSheet(groupRows,[29,15,16,23,23])]
   ]);
  }
  function orderFileName(){
-  const name=cartMeta.store.trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').replace(/\s+/g,'_').slice(0,30)||'注文';
-  return 'にゃんSearch注文_'+currentJstDate()+'_'+name+'.xlsx';
+  const raw=cartMeta.store.trim().replace(/様+$/,'');
+  const safe=(raw||'注文').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').replace(/[. ]+$/g,'').slice(0,64)||'注文';
+  const ymd=currentJstDate().slice(0,8);
+  return safe+'様_'+ymd+'.xlsx';
  }
- function buildOrderFile(){return new File([xlsxBytes()],orderFileName(),{type:XLSX_MIME})}
+ // Download folder files cannot be enumerated by a PWA; reserve an app-local sequence.
+ function nextOrderFileName(){
+  const base=orderFileName(),key='nyan-order-filename-count:'+base;
+  let n=0;try{n=Number(localStorage.getItem(key))||0}catch(e){}
+  const name=n===0?base:base.replace(/\.xlsx$/,'('+n+').xlsx');
+  try{localStorage.setItem(key,String(n+1))}catch(e){}
+  return name;
+ }
+ function buildOrderFile(name=orderFileName()){return new File([xlsxBytes()],name,{type:XLSX_MIME})}
  function downloadOrderFile(file){
   const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
  }
@@ -726,7 +736,7 @@ const NyanBodyMail=(()=>{
   const dialog=document.getElementById('orderSentDialog');if(!dialog||dialog.open)return;
   orderSendDialogId=orderSendPending.id;
   document.getElementById('orderSentCopyStatus').textContent='';document.getElementById('orderSentRecipientManual').hidden=true;
-  document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'メールを実際に送信した場合は「送信した」、送信していない場合は「送信していない（カートに戻る）」を選んでください。';
+  document.getElementById('orderSentExplanation').textContent=(orderSendRestored?'前回の注文操作が未確認です。':'')+'注文Excelを添付してメールを送信した場合だけ「送信した（カートの中を削除）」、送信していない場合は「送信していない（カートに戻る）」を選んでください。';
   const body=bodyMailPlan(),badBody=orderSendPending.bodyMailError;
   document.getElementById('orderSentYes').disabled=!!badBody;document.getElementById('orderSentNo').disabled=!!badBody||!!body?.confirmed.some(Boolean);
   if(body){const parts=NyanBodyMail.compile(body);document.getElementById('orderSentExplanation').textContent=(body.cursor+1)+'/'+parts.length+'通目を実際に送信しましたか？ 全通の送信確認が終わるまでカートは残します。';}
@@ -770,9 +780,9 @@ const NyanBodyMail=(()=>{
   const dialog=document.createElement('dialog');dialog.id='orderSentDialog';dialog.setAttribute('aria-labelledby','orderSentQuestion');dialog.style.cssText='max-width:520px;width:calc(100% - 32px);border:1px solid #9fb1c4;border-radius:12px;padding:22px;color:#162235';
   const title=document.createElement('h2');title.id='orderSentQuestion';title.textContent='注文メールは送信しましたか？';title.style.fontSize='20px';
   const explanation=document.createElement('p');explanation.id='orderSentExplanation';
-  const yes=document.createElement('button');yes.id='orderSentYes';yes.type='button';yes.className='primary';yes.textContent='送信した';yes.onclick=()=>void orderSendDecide(true);
+  const yes=document.createElement('button');yes.id='orderSentYes';yes.type='button';yes.className='primary';yes.textContent='送信した（カートの中を削除）';yes.onclick=()=>void orderSendDecide(true);
   const no=document.createElement('button');no.id='orderSentNo';no.type='button';no.autofocus=true;no.textContent='送信していない（カートに戻る）';no.setAttribute('aria-describedby','orderSentNoHint');no.onclick=()=>void orderSendDecide('add');
-  const noHint=document.createElement('p');noHint.id='orderSentNoHint';noHint.className='hint';noHint.textContent='メールを送信していない場合のみ選んでください。カートの内容を保持して通常操作に戻り、商品を変更せずにメールを作り直すこともできます。以前開いたGmailなどの下書きは自動更新・削除されません。古い下書きは送信しないでください。';
+  const noHint=document.createElement('p');noHint.id='orderSentNoHint';noHint.className='hint';noHint.textContent='メールを送信していない場合のみ選んでください。カートは保持され、何も変更せずメールを作り直せます。以前のGmail下書きは自動更新・削除されません。古い下書きは送信しないでください。';
   const copyStatus=document.createElement('p');copyStatus.id='orderSentCopyStatus';copyStatus.setAttribute('role','status');
   const manual=document.createElement('input');manual.id='orderSentRecipientManual';manual.type='text';manual.readOnly=true;manual.value=ORDER_MAIL_ADDRESS;manual.hidden=true;manual.setAttribute('aria-label','送信確認の宛先（手動コピー用）');manual.style.cssText='font-size:16px;letter-spacing:normal;width:100%';
   dialog.append(title,explanation,yes,no,noHint,copyStatus,manual);dialog.addEventListener('cancel',event=>{event.preventDefault();void orderSendDecide('add')});document.body.append(dialog);
@@ -792,7 +802,7 @@ function migrateOrderCc(){
 }
 function setOrderCc(value,persist=true){cartMeta.emailCc=String(value);cartMeta.emailCcResolved='1';cartMeta.emailMain=String(value);cartMeta.emailPc='';if(persist)saveCart()}
 function appendOrderCc(form){
- const box=createCartField('orderEmailCc','お客様のメールアドレス',cartMeta.emailCc,v=>setOrderCc(v,false));box.querySelector('input').type='email';box.querySelector('input').style.cssText='width:100%;font-size:18px;padding:10px;letter-spacing:normal';form.append(box);
+ const box=createCartField('orderEmailCc','お客様のメールアドレス',cartMeta.emailCc,v=>setOrderCc(v,false));box.querySelector('label').style.cssText='color:#c62828;font-weight:700';box.querySelector('input').type='email';box.querySelector('input').style.cssText='width:100%;font-size:18px;padding:10px;letter-spacing:normal';form.append(box);
  if(cartMeta.emailCcResolved!=='1'){
   const hint=document.createElement('p');hint.className='hint';hint.textContent='以前の控え用アドレスが2件あります。今回使用する1件を選ぶか、上の欄に入力してください。';form.append(hint);
   for(const value of [cartMeta.emailMain,cartMeta.emailPc,'']){const b=document.createElement('button');b.type='button';b.textContent=value?'このアドレスを使う：'+value:'CCを使わない';b.onclick=()=>{setOrderCc(value);renderCart()};form.append(b)}
@@ -818,7 +828,7 @@ function startBodyOrder(){
  if(!cart.size){validateOrderMail();return}
  // No pending order is created until final confirmation is explicitly accepted.
  if(!validateOrderMail())return;
- const existing=document.getElementById('orderPreflightDialog');if(existing){existing.querySelector('#orderPreflightSummary').textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・注文先・CCに間違いがないか確認してください。';existing.showModal();return}
+ const existing=document.getElementById('orderPreflightDialog');if(existing){existing.querySelector('#orderPreflightSummary').textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・お客様のメールアドレスに間違いがないか確認してください。';existing.showModal();return}
  const dialog=document.createElement('dialog');dialog.id='orderPreflightDialog';
  dialog.setAttribute('aria-labelledby','orderPreflightTitle');
  dialog.style.cssText='max-width:520px;width:calc(100% - 32px);border:1px solid #9fb1c4;border-radius:12px;padding:20px;color:#162235';
@@ -831,18 +841,31 @@ function startBodyOrder(){
  const proceed=document.createElement('button');proceed.type='button';proceed.className='primary';proceed.textContent='注文確定';
  proceed.onclick=()=>{dialog.close();startBodyOrderConfirmed()};
  dialog.append(h,summary,warning,proceed,fix);document.body.append(dialog);
- summary.textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・注文先・CCに間違いがないか確認してください。';
+ summary.textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・お客様のメールアドレスに間違いがないか確認してください。';
  dialog.showModal();
 }
 function startBodyOrderConfirmed(){
  if(!orderSendReadLatest())return;
  if(orderSendPending){renderCart();orderSendRefresh();if(orderSendPending.kind!=='本文メール')orderSendMaybeAsk(true);return}
- if(!orderSendCanStart()||!validateOrderMail())return;
+ if(!validateOrderMail())return;
+ if(!orderSendCanStart())return;
  try{
-  const id='N'+Date.now().toString(36)+'-'+orderSendId().replace(/-/g,'').slice(0,12),plan=NyanBodyMail.create(cartSorted(),cartMeta,id),parts=NyanBodyMail.compile(plan);
-  if(parts.length>1&&!confirm('この注文は'+parts.length+'通のメールになります。各メールを送信後ににゃんSearchへ戻り、送信状況を確認して次のメールを作成してください。'))return;
-  const ticket=orderSendBegin('本文メール','ready',plan);if(!ticket.id)return;openBodyMail(0);
- }catch(e){mailStatus(e.message||String(e))}
+  const filename=nextOrderFileName();
+  const file=buildOrderFile(filename);
+  const cc=ccAddresses();
+  const subject=orderSubject();
+  const body=orderMailContent(filename);
+  const uri='mailto:'+ORDER_MAIL_ADDRESS+'?subject='+encodeURIComponent(subject)+
+   (cc.length?'&cc='+encodeURIComponent(cc.join(',')):'')+'&body='+encodeURIComponent(body);
+  if(uri.length>6000)throw Error('メール本文が長すぎます。注文全体の備考を短くしてください。');
+  const ticket=orderSendBegin('メール','ready');if(!ticket.id)return;
+  try{downloadOrderFile(file)}catch(error){orderSendFinish(ticket,false);throw Error('注文Excelの保存操作に失敗しました。'+(error.message||error))}
+  lastOrderFileName=filename;lastOrderSignature=orderSignature();
+  renderCart();orderSendRefresh();
+  mailStatus('今作った注文ファイル：'+filename+'。GmailでこのExcelを添付して送信してください（自動添付はされません）。');
+  alert('注文Excelを作成しました。\n\n今作ったファイル：'+filename+'\n\nGmailでクリップマークを押し、このファイルを添付してから送信してください。\n※添付を忘れないでください。');
+  window.location.href=uri;
+ }catch(e){mailStatus(e.message||String(e));alert(e.message||String(e))}
 }
 function openBodyMail(index){
  if(!orderSendReadLatest())return;
