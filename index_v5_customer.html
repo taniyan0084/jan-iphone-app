@@ -344,7 +344,7 @@ const NyanBodyMail=(()=>{
   if(storeLabel){const required=document.createElement('span');required.textContent=' ※必須';required.style.cssText='color:#c62828;font-weight:700';storeLabel.append(required)}
   appendOrderCc(form);
   const mailBtn=document.createElement('button');mailBtn.type='button';mailBtn.className='cart-email-btn';mailBtn.textContent=bodyMailPlan()?'作成中の注文を確認':'注文メールを作成';mailBtn.onclick=startBodyOrder;
-  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文Excelを保存した後、表示される「Gmailでメールを開く」を押します。ExcelはGmailで手動添付してください。';
+  const mailHint=document.createElement('div');mailHint.className='cart-mail-note';mailHint.textContent='注文Excelを保存した後、表示される「メールを開く」を押します。ExcelはGmailで手動添付してください。';
   const status=document.createElement('div');status.id='cartMailStatus';status.className='cart-status';status.setAttribute('role','status');
   const fallbacks=document.createElement('div');fallbacks.className='cart-action-row';
   const download=document.createElement('button');download.type='button';download.textContent='📥 Excelを保存';download.onclick=saveExcelOrder;
@@ -367,8 +367,8 @@ const NyanBodyMail=(()=>{
   if(orderSendPending?.kind==='メール'&&orderSendPending.attachmentFilename){
    const attachmentBox=document.createElement('div');attachmentBox.className='cart-mail-note';
    const filename=orderSendPending.attachmentFilename;
-   const instruction=document.createElement('p');instruction.textContent='今作ったファイル：'+filename+'。GmailでこのExcelを手動添付してください。';
-   const launch=document.createElement('button');launch.type='button';launch.className='primary';launch.textContent='✉ Gmailでメールを開く（Excelを添付して送信）';
+   const instruction=document.createElement('p');instruction.textContent='今作ったファイル：'+filename+'。メールアプリでこのExcelを手動添付してください。';
+   const launch=document.createElement('button');launch.type='button';launch.className='primary';launch.textContent='✉ メールを開く';
    launch.onclick=()=>openSavedAttachmentMail();
    const warning=document.createElement('p');warning.style.cssText='color:#c62828;font-weight:700';warning.textContent='※メール送信前に「'+filename+'」を必ず添付してください。';
    attachmentBox.append(instruction,launch,warning);form.append(attachmentBox);
@@ -833,6 +833,24 @@ function startBodyOrder(){
  summary.textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・お客様のメールアドレスに間違いがないか確認してください。';
  dialog.showModal();
 }
+function showOrderAttachmentReady(filename){
+ let dialog=document.getElementById('orderAttachmentReadyDialog');
+ if(!dialog){
+  dialog=document.createElement('dialog');dialog.id='orderAttachmentReadyDialog';
+  dialog.setAttribute('aria-labelledby','orderAttachmentReadyTitle');
+  dialog.style.cssText='width:calc(100% - 28px);max-width:480px;border:2px solid #2866ad;border-radius:14px;padding:22px;box-sizing:border-box;color:#162235;box-shadow:0 12px 42px #0005';
+  const title=document.createElement('h2');title.id='orderAttachmentReadyTitle';title.style.cssText='font-size:21px;margin:0 0 12px';title.textContent='注文Excelを作成しました';
+  const info=document.createElement('p');info.id='orderAttachmentReadyFile';info.style.cssText='font-weight:700;overflow-wrap:anywhere;margin:12px 0';
+  const warning=document.createElement('p');warning.style.cssText='color:#c62828;font-weight:700';warning.textContent='※この注文Excelをメールに手動で添付してください。';
+  const launch=document.createElement('button');launch.id='orderAttachmentReadyOpen';launch.type='button';launch.className='primary';launch.style.cssText='display:block;width:100%;min-height:56px;font-size:19px;font-weight:700;margin:16px 0';launch.textContent='✉ メールを開く';
+  launch.onclick=()=>{dialog.close();openSavedAttachmentMail()};
+  const later=document.createElement('button');later.type='button';later.style.cssText='display:block;width:100%;min-height:44px';later.textContent='後でメールを開く（カートに戻る）';later.onclick=()=>{dialog.close();showCart()};
+  dialog.append(title,info,warning,launch,later);document.body.append(dialog);
+ }
+ document.getElementById('orderAttachmentReadyFile').textContent='作成したファイル：'+filename;
+ try{if(!dialog.open)dialog.showModal();document.getElementById('orderAttachmentReadyOpen').focus()}
+ catch(error){const btn=[...document.querySelectorAll('button')].find(b=>b.textContent==='✉ メールを開く');if(btn){btn.scrollIntoView({block:'center'});btn.focus()}}
+}
 function openSavedAttachmentMail(){
  if(!orderSendReadLatest())return;
  const pending=orderSendPending;
@@ -846,7 +864,7 @@ function openSavedAttachmentMail(){
  pending.phase='ready';pending.hasLeft=false;
  if(!saveCart()){pending.phase=previousPhase;mailStatus('送信確認状態を保存できません。メール作成を中止しました。');return;}
  orderSendRefresh();
- mailStatus('Gmailで「'+pending.attachmentFilename+'」を添付して送信してください。添付は自動では行われません。');
+ mailStatus('メールアプリで「'+pending.attachmentFilename+'」を添付して送信してください。添付は自動では行われません。');
  window.location.href=uri;
 }
 function startBodyOrderConfirmed(){
@@ -863,7 +881,8 @@ function startBodyOrderConfirmed(){
   try{downloadOrderFile(file)}catch(error){orderSendFinish(ticket,false);throw Error('注文Excelの保存操作に失敗しました。'+(error.message||error))}
   lastOrderFileName=filename;lastOrderSignature=orderSignature();
   renderCart();orderSendRefresh();showCart();
-  mailStatus('作成ファイル：'+filename+'。保存を確認したら「Gmailでメールを開く」を押してください。');
+  mailStatus('作成ファイル：'+filename+'。保存を確認したら「メールを開く」を押してください。');
+  showOrderAttachmentReady(filename);
  }catch(e){mailStatus(e.message||String(e));alert(e.message||String(e))}
 }
 function openBodyMail(index){
