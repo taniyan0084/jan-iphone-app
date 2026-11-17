@@ -660,12 +660,16 @@ const NyanBodyMail=(()=>{
    return true;
   }catch(error){cart.clear();for(const row of before)cart.set(row.jan,row);Object.assign(cartMeta,meta);orderSendPending=pending;orderSendWarning='保存されたカートを確認できないため、送信後の削除を停止しています。';return false}
  }
+ function isUnopenedAttachmentOrder(pending){
+  return pending?.kind==='メール'&&pending.phase==='opening'&&!!pending.attachmentFilename;
+ }
  function orderSendRefresh(){
   const banner=document.getElementById('orderSendBanner');if(!banner)return;
   const text=document.getElementById('orderSendBannerText'),review=document.getElementById('orderSendReview');
   banner.hidden=!orderSendPending&&!orderSendWarning;
-  text.textContent=orderSendWarning||(orderSendPending?'注文メールの送信状況が未確認です。カートの商品はまだ残っています。':'');
-  review.hidden=!orderSendPending;review.disabled=!!orderSendPending&&orderSendPending.phase==='opening'&&!orderSendRestored;
+  const unopened=isUnopenedAttachmentOrder(orderSendPending);
+  text.textContent=orderSendWarning||(unopened?'Excelが見つからないときは「注文メールを作成」からやり直せます。':(orderSendPending?'注文メールの送信状況が未確認です。カートの商品はまだ残っています。':''));
+  review.hidden=!orderSendPending||unopened;review.disabled=!!orderSendPending&&orderSendPending.phase==='opening'&&!orderSendRestored;
  }
  function orderSendCanStart(){
   if(!orderSendReadLatest()){orderSendRefresh();return false}
@@ -676,18 +680,24 @@ const NyanBodyMail=(()=>{
   }
   orderSendMaybeAsk(true);mailStatus('前回の注文メールの送信状況を確認してください。未送信なら「まだ送信していない」を選ぶと再作成できます。');return false;
  }
- function orderSendBegin(kind,phase='opening',bodyMail=null){
+ function orderSendBegin(kind,phase='opening',bodyMail=null,attachment=null){
   const prepared=orderSendPrepared;orderSendPrepared=null;
   if(!orderSendReadLatest())return {id:null};
-  if(orderSendPending){orderSendMaybeAsk(true);return {blocked:true}}
+  const previous=orderSendPending;
+  if(attachment?.replaceId&&(!isUnopenedAttachmentOrder(previous)||previous.id!==attachment.replaceId)){
+   renderCart();orderSendRefresh();orderSendMaybeAsk(true);return {blocked:true};
+  }
+  if(previous&&!attachment?.replaceId){orderSendMaybeAsk(true);return {blocked:true}}
   if(cartRestoreError||prepared?.saved===false){orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。';orderSendRefresh();return {id:null}}
   for(const row of cart.values())if(!row.orderLineId)row.orderLineId=orderSendId();
   const record={version:1,id:bodyMail?.orderId||orderSendId(),phase,hasLeft:false,createdAt:Date.now(),kind,
    lines:prepared?.lines||[...cart.values()].map(row=>({jan:row.jan,lineId:row.orderLineId,qty:row.qty,fingerprint:orderSendFingerprint(row)}))};
   if(!record.lines.length)return {id:null};
   if(bodyMail)record.bodyMail=bodyMail;
-  orderSendPending=record;orderSendRestored=false;
-  if(!saveCart()){orderSendPending=null;orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。必要な場合は手動で整理してください。';orderSendRefresh();return {id:null}}
+  if(attachment)record.attachmentFilename=attachment.filename;
+  orderSendPending=record;
+  if(!saveCart()){orderSendPending=previous;orderSendWarning='送信確認の状態を保存できません。カートは自動削除しません。必要な場合は手動で整理してください。';orderSendRefresh();return {id:null}}
+  orderSendRestored=false;
   orderSendWarning='';orderSendRefresh();return {id:record.id};
  }
  function orderSendFinish(ticket,success){
@@ -720,7 +730,7 @@ const NyanBodyMail=(()=>{
  function orderSendMaybeAsk(force=false){
   if(nyanNativeConfirmActive||Date.now()<nyanIgnoreConfirmFocusUntil)return;
   if(!orderSendPending||document.visibilityState!=='visible'||(typeof document.hasFocus==='function'&&!document.hasFocus()))return;
-  if(orderSendPending.kind==='メール'&&orderSendPending.attachmentFilename&&orderSendPending.phase==='opening')return;
+  if(isUnopenedAttachmentOrder(orderSendPending))return;
   if(orderSendPending.phase==='opening'&&!orderSendRestored)return;
   if(bodyMailPlan()&&!orderSendPending.bodyMailError&&!bodyMailPlan().opened[bodyMailPlan().cursor]){if(force)showCart();return;}
   if(!force&&!orderSendRestored&&!orderSendPending.hasLeft)return;
@@ -815,7 +825,7 @@ function appendBodyMailProgress(form){
  form.append(box);
 }
 function startBodyOrder(){
- if(orderSendPending){startBodyOrderConfirmed();return}
+ if(orderSendPending&&!isUnopenedAttachmentOrder(orderSendPending)){startBodyOrderConfirmed();return}
  if(!cart.size){validateOrderMail();return}
  // No pending order is created until final confirmation is explicitly accepted.
  if(!validateOrderMail())return;
@@ -871,15 +881,14 @@ function openSavedAttachmentMail(){
 }
 function startBodyOrderConfirmed(){
  if(!orderSendReadLatest())return;
- if(orderSendPending){renderCart();orderSendRefresh();if(orderSendPending.kind!=='本文メール')orderSendMaybeAsk(true);return;}
+ const retry=isUnopenedAttachmentOrder(orderSendPending);
+ if(orderSendPending&&!retry){renderCart();orderSendRefresh();if(orderSendPending.kind!=='本文メール')orderSendMaybeAsk(true);return;}
  if(!validateOrderMail())return;
- if(!orderSendCanStart())return;
+ if(!retry&&!orderSendCanStart())return;
  try{
   const filename=nextOrderFileName();
   const file=buildOrderFile(filename);
-  const ticket=orderSendBegin('メール','opening');if(!ticket.id)return;
-  orderSendPending.attachmentFilename=filename;
-  if(!saveCart()){orderSendFinish(ticket,false);throw Error('注文ファイル情報を保存できませんでした。カートは残しています。')}
+  const ticket=orderSendBegin('メール','opening',null,{filename,replaceId:retry?orderSendPending.id:null});if(!ticket.id)return;
   try{downloadOrderFile(file)}catch(error){orderSendFinish(ticket,false);throw Error('注文Excelの保存操作に失敗しました。'+(error.message||error))}
   lastOrderFileName=filename;lastOrderSignature=orderSignature();
   renderCart();orderSendRefresh();showCart();
