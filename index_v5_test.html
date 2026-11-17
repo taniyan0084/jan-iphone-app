@@ -860,9 +860,11 @@ function startBodyOrder(){
  warning.style.cssText='font-weight:700;line-height:1.7;color:#c62828';
  const fix=document.createElement('button');fix.type='button';fix.textContent='カートに戻る';
  fix.onclick=()=>{dialog.close();showCart()};
- const proceed=document.createElement('button');proceed.type='button';proceed.className='primary';proceed.textContent='注文確定';
+ const proceed=document.createElement('button');proceed.type='button';proceed.className='primary';proceed.textContent='Excelダウンロード';
  proceed.onclick=()=>{dialog.close();startBodyOrderConfirmed()};
- dialog.append(h,summary,warning,proceed,fix);document.body.append(dialog);
+ const nextStep=document.createElement('p');
+ nextStep.textContent='次にExcelを保存します。注文メールはこのあと送信します';
+ dialog.append(h,summary,warning,nextStep,proceed,fix);document.body.append(dialog);
  summary.textContent='商品 '+cart.size+'種類／'+cartTotals().quantity+'個。商品・数量・商品別備考・お客様のメールアドレスに間違いがないか確認してください。';
  dialog.showModal();
 }
