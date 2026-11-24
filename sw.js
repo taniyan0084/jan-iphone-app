@@ -1,5 +1,5 @@
 // JAN照会アプリ: アプリ本体のみをキャッシュ。商品マスター(IndexedDB)には触れません。
-const CACHE = 'nyan-search-shell-v4-bodymail-128k-20261112';
+const CACHE = 'nyan-search-shell-v4-bodymail-128k-20261123-ui';
 const ASSETS = [
   './',
   './index.html',
