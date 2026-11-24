@@ -29,6 +29,7 @@ body.iphone-center-test #reader{width:58%;min-height:0;margin:0 auto}body.iphone
 #openCart{background:#08764b;color:#fff;font-weight:700;flex:1;min-height:45px}
 #cartQuickTotal{font-weight:700;font-size:14px}
 #cartNotice{margin-top:6px;font-size:13px;color:#08764b;min-height:0}
+.cart-add-feedback[hidden]{display:none!important}.cart-add-feedback{flex:0 0 100%;box-sizing:border-box;margin-top:4px;padding:8px 10px;border-radius:7px;background:#e6f5eb;border:1px solid #a6d8b4;color:#08764b;font-size:14px;font-weight:700;line-height:1.45;white-space:pre-line}
 .candidate-entry{border-bottom:1px solid #dfe5ed;padding:3px 0 12px}
 .candidate-entry .candidate{border-bottom:0;margin:0;padding:11px 4px 5px}
 .cart-add-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
@@ -114,7 +115,7 @@ function searchB(q){const timingStart=performance.now();let {words,cwords,a}=pla
 host.NyanB={create,definitions};if(typeof module!=='undefined')module.exports=host.NyanB;
 })(typeof window!=='undefined'?window:globalThis);
 
-</script></head><body><header>にゃんSearch Ver.5 スタッフ用（検証版）</header><main class="wrap"><section class="box"><label for="q">JAN・メーカー名・商品名・規格を検索</label><input id="q" type="search" autocomplete="off" enterkeyhint="search" placeholder="JAN・商品名・メーカー名・規格を入力" aria-describedby="unifiedSearchHelp"><div class="hint" id="unifiedSearchHelp">数字4～13桁はJAN検索（4～12桁は末尾一致・13桁は完全一致）。文字を含む検索は下の「検索」ボタンかEnterで実行します。</div><label class="hint" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input id="numericNameMode" type="checkbox" style="width:auto;min-height:auto">数字を商品名・規格として検索（型番など）</label><div style="margin-top:10px"><button class="primary" id="nameSearch" type="button">🔍 検索</button><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="toggleCost" type="button" aria-pressed="false">原価表示：OFF</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div><div style="margin-top:8px"><button id="variationSearch" class="variation-action" type="button" disabled>🔎 規格違いと思われる商品を探す</button></div><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div><div class="hint">検証版・社内用。原価表示の切替は認証機能ではありません。</div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings" open><summary>商品マスターの読み込み・更新（Ver.5対応）</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">master.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button></details></section><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></main>
+</script></head><body><header>にゃんSearch Ver.5 スタッフ用（検証版）</header><main class="wrap"><section class="box"><label for="q">JAN・メーカー名・商品名・規格を検索</label><input id="q" type="search" autocomplete="off" enterkeyhint="search" placeholder="JAN・商品名・メーカー名・規格を入力" aria-describedby="unifiedSearchHelp"><div class="hint" id="unifiedSearchHelp">数字4～13桁はJAN検索（4～12桁は末尾一致・13桁は完全一致）。文字を含む検索は下の「検索」ボタンかEnterで実行します。</div><label class="hint" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input id="numericNameMode" type="checkbox" style="width:auto;min-height:auto">数字を商品名・規格として検索（型番など）</label><div style="margin-top:10px"><button class="primary" id="nameSearch" type="button">🔍 検索</button><button class="primary" id="camera" disabled>📷 カメラでJANを読む</button><button id="voiceSearch" type="button">🎤 音声検索</button><button id="toggleCost" type="button" aria-pressed="false">原価表示：OFF</button><button id="clear">クリア</button><button id="imageSearch" type="button" disabled>🔎 画像検索</button></div><div id="cameraBox" class="hidden"><div id="reader"></div><button id="retryScanner" class="hidden" type="button">🔄 カメラを再起動</button><button id="stop">カメラを閉じる</button><button id="switchScanner" type="button" class="hidden">読み取り方式を切り替える</button><div id="camStatus" class="hint"></div></div><div style="margin-top:8px"><button id="variationSearch" class="variation-action hidden" type="button" disabled>🔎 規格違いと思われる商品を探す</button></div><div id="voiceStatus" class="hint" role="status" aria-live="polite"></div><div class="hint">検証版・社内用。原価表示の切替は認証機能ではありません。</div></section><div class="cart-nav"><button id="openCart" type="button" aria-expanded="false">🛒 カートを見る（0種類）</button><span id="cartQuickTotal">税抜 ¥0</span></div><div id="cartNotice" role="status" aria-live="polite"></div><div id="cartStorageAlert" role="alert"></div><section id="result" class="box"><div class="muted">商品マスターを読み込んでください。</div></section><section id="detail" class="box hidden"></section><section id="cartPanel" class="box hidden" aria-label="注文カート"><h2 style="font-size:19px;margin:0 0 8px">🛒 注文カート</h2><div id="cartContents"></div><div id="cartForm"></div></section><section class="box"><details id="settings"><summary>商品マスターの更新・設定</summary><div class="hint">配信元から商品マスターを初回取得し、端末に保存します。起動時に更新情報を確認し、変更を検出できた場合だけ再取得します。配信元が更新情報を返さない場合は保存済みマスターを利用します（最新化は「今すぐ更新」）。</div><p><button class="primary" id="remoteUpdate" type="button">🔄 配信元から今すぐ更新</button></p><div id="remoteProgress" class="hint" role="status" aria-live="polite">更新ボタンを押すと進行状況を表示します。</div><p><input type="file" id="masterFile" accept=".json,application/json"></p><div id="loadStatus" class="hint">マスター未読み込み</div><div class="hint">master.json（17項目形式）を使用します。保存後30日間利用できます。配信元の更新確認と「今すぐ更新」、手動JSON読込に対応します。</div><button id="forget">保存したマスターを削除</button><div class="hint">商品・卸価格・在庫情報はこの端末内で検索します。カメラは端末のブラウザから起動します。共有端末では情報の取り扱いに注意してください。</div></details></section></main>
 <script>
 'use strict';
 function validateData(d){
@@ -140,6 +141,8 @@ let costVisible=false;let DATA=[],currentProduct=null,scanner=null,usingDetector
 }
 document.getElementById('variationSearch').onclick=()=>{const p=currentProduct;if(!p)return;const btn=document.getElementById('variationSearch');btn.disabled=true;btn.textContent='⏳ 規格違いを検索中…';setTimeout(async()=>{try{await searchVariations(p)}catch(e){alert('規格違い検索に失敗しました：'+(e.message||e))}finally{btn.textContent='🔎 規格違いと思われる商品を探す';btn.disabled=!currentProduct}},20)};
 document.getElementById('toggleCost').onclick=()=>{costVisible=!costVisible;const b=document.getElementById('toggleCost');b.textContent='原価表示：'+(costVisible?'ON':'OFF');b.setAttribute('aria-pressed',String(costVisible));if(currentProduct)show(currentProduct);};
+const variationObserver=new MutationObserver(()=>{document.getElementById('variationSearch').classList.toggle('hidden',detail.classList.contains('hidden')||!currentProduct)});
+variationObserver.observe(detail,{attributes:true,attributeFilter:['class']});
 function search(){nameRequest++;if(!masterValid())return;currentProduct=null;document.getElementById('variationSearch').disabled=true;document.getElementById('imageSearch').disabled=true;detail.classList.add('hidden');res.classList.remove('hidden');let v=q.value.replace(/\D/g,'').slice(0,13);if(q.value!==v)q.value=v;if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}if(v.length<4){res.innerHTML='<div class="muted">JANの下4桁〜JAN13桁を入力してください。</div>';return}let matches=[];if(v.length===13){for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0')===v)matches.push(i)}else if(v.length===6){let start=lower(v),end=start;while(end<DATA.length&&DATA[end][0]===v)end++;for(let i=start;i<end;i++)matches.push(i)}else{for(let i=0;i<DATA.length;i++)if(String(DATA[i][1]??'').padStart(13,'0').endsWith(v))matches.push(i)}let n=matches.length;if(!n){res.innerHTML='<div class="status warn">該当商品なし</div>';return}if(n===1){show(DATA[matches[0]]);return}showPagedCandidates(matches,'末尾'+v.length+'桁が一致');}
 
  // あいまい検索：50件ずつ表示。検索結果の上限で候補を消さない。
@@ -168,7 +171,7 @@ function search(){nameRequest++;if(!masterValid())return;currentProduct=null;doc
    if(ticket!==fastTicket||DATA!==target)return;
    searchIndex=out.index;makerIndex=out.makers;searchIndexData=target;
    const t=performance.now();bEngine=NyanB.create(target,searchIndex);bEngineData=target;m.engineCreate_ms=performance.now()-t;m.ready_ms=performance.now()-m.started;
-   fastState.textContent='✓ 検索準備完了（'+(m.ready_ms/1000).toFixed(2)+'秒）';
+   fastState.textContent='';
    }catch(e){if(ticket===fastTicket){fastTarget=null;fastJob=null;fastState.textContent='検索準備に失敗しました。再検索で再試行します。';}throw e;}
   })();fastJob.catch(e=>{if(ticket===fastTicket)console.error(e)});return fastJob;
  }
@@ -290,7 +293,7 @@ const NyanBodyMail=(()=>{
   if(sum>CART_MAX_QTY){alert('同一JANの数量は合計9,999個までです。');return false}
   cart.set(jan,{jan,maker:String(p[2]??''),name:String(p[3]??''),spec1:String(p[4]??''),spec2:String(p[5]??''),unitPrice:cartNumber(p[7]),listPrice:cartNumber(p[6]),qty:sum,note:old?old.note:'',orderLineId:old?.orderLineId||orderSendId()});
   saveCart();
-  updateCartHeader('✓ '+String(p[3]??'商品')+'：'+n+'個を追加しました（カート内 '+sum+'個）');
+  updateCartHeader();
   return true;
  }
  function createAddControls(p){
@@ -299,12 +302,13 @@ const NyanBodyMail=(()=>{
   const input=document.createElement('input');input.type='number';input.min='1';input.max='9999';input.step='1';input.value='1';input.setAttribute('aria-label',String(p[3]??'商品')+' の追加数量');
   setupQuantityInput(input);label.appendChild(input);
   const btn=document.createElement('button');btn.type='button';btn.textContent='🛒 カートへ追加';
-  const add=()=>{if(addToCart(p,input.value))input.value='1'};
+  const feedback=document.createElement('div');feedback.className='cart-add-feedback';feedback.hidden=true;feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');let feedbackTimer=0;
+  const add=()=>{const quantity=input.value;if(!addToCart(p,quantity))return;input.value='1';feedback.textContent='✓ カートに追加しました\n'+String(p[3]??'商品')+' × '+Number(quantity)+'個';feedback.hidden=false;clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>{feedback.hidden=true;feedback.textContent=''},2000)};
   btn.onclick=add;
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
   const price=document.createElement('span');price.className='cart-unit-label';price.textContent='参考卸 '+money(p[7])+'（税抜）';
   const presence=document.createElement('span');presence.className='cart-presence';presence.dataset.jan=orderJAN(p);
-  wrap.append(label,btn,price,presence);
+  wrap.append(label,btn,price,presence,feedback);
   const old=cart.get(orderJAN(p));presence.textContent=old?'カート内：'+old.qty+'個':'';
   return wrap;
  }
@@ -631,7 +635,7 @@ const NyanBodyMail=(()=>{
  }
  function setupMasterLastRead(){
   try{const time=Number(localStorage.getItem(MASTER_LAST_READ_KEY));if(Number.isFinite(time)&&time>0)masterLastReadAt=time}catch(error){}
-  const box=document.createElement('section');box.className='box';const text=document.createElement('div');text.id='masterLastRead';text.setAttribute('role','status');const hint=document.createElement('div');hint.className='hint';hint.textContent='この端末でJSONを最後に正常取得・保存した日時（日本時間）です。JSONファイル自体の更新日時ではありません。保存済みデータの復元では日時を更新しません。';box.append(text,hint);document.getElementById('settings').closest('section').before(box);renderMasterLastRead();
+  const box=document.createElement('section');box.className='box';const text=document.createElement('div');text.id='masterLastRead';text.setAttribute('role','status');const hint=document.createElement('div');hint.className='hint';hint.textContent='この端末でJSONを最後に正常取得・保存した日時（日本時間）です。JSONファイル自体の更新日時ではありません。保存済みデータの復元では日時を更新しません。';box.append(text,hint);document.getElementById('settings').append(box);renderMasterLastRead();
  }
 
  function buildTextOrderFile(){
@@ -1121,7 +1125,7 @@ function unifiedInput(){
  document.getElementById('variationSearch').disabled=true;
  detail.classList.add('hidden');res.classList.remove('hidden');
  if(!DATA.length){res.innerHTML='<div class="muted">商品マスターを読み込んでください。</div>';return}
- if(!value){res.innerHTML='<div class="muted">JAN・メーカー名・商品名・規格で検索できます。</div>';return}
+ if(!value){res.innerHTML='';res.classList.add('hidden');return}
  if(/^\d{1,3}$/.test(value)&&!document.getElementById('numericNameMode').checked){res.innerHTML='<div class="hint">JANは下4桁から自動検索します。</div>';return}
  res.innerHTML='<div class="hint">「🔍 検索」を押すか、キーボードの検索キーで検索してください。</div>';
 }
