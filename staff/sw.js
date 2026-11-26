@@ -1,5 +1,5 @@
- 'use strict';
-const CACHE='nyan-staff-shell-v5-pages-3-bodymail-128k-20261123-ui';
+'use strict';
+const CACHE='nyan-staff-shell-v5-pages-3-direct-order-20261126-v1';
 const ASSETS=['./index_v5_test.html','./index_v5_staff.html','./manifest.webmanifest','../jan-cat-180.png','../jan-cat-192.png','../jan-cat-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('nyan-staff-shell-v5-pages-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
